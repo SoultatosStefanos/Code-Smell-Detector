@@ -15,8 +15,7 @@ int main(int argc, const char** argv) {
 	srcs.push_back(argv[1]);
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-
-	int result = CreateClangTool(argc, argv, srcs);
+	int result = DependenciesMining::CreateClangTool(argc, argv, srcs);
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 

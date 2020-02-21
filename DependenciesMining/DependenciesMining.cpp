@@ -1,8 +1,12 @@
 #include "DependenciesMining.h"
 
+using namespace DependenciesMining;
+
+StructuresTable DependenciesMining::structuresTable;
+
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind("ClassDecl"), cxxRecordDecl(isStruct()).bind("StructDecl"));
 DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
-DeclarationMatcher FieldDeclmatcher = fieldDecl().bind("FeildDecl");
+DeclarationMatcher FieldDeclMatcher = fieldDecl().bind("FeildDecl");
 
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody((hasType(recordDecl())))).bind("MethodDecl2");
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody(compoundStmt())).bind("MethodDecl2");
@@ -21,50 +25,59 @@ template<typename T> void printLocation(T d, const MatchFinder::MatchResult& res
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	const CXXRecordDecl* d;
-	
-
-	if ((d = result.Nodes.getNodeAs<CXXRecordDecl>("ClassDecl")) ) {
-		if (d->hasDefinition()) {
-			llvm::outs() << ++count << ". Class:    " << d->getName() << "\n";
-		}
+	Structure structure;
+	if ((d = result.Nodes.getNodeAs<CXXRecordDecl>("ClassDecl"))) {
+		structure.SetStructureType(StructureType::Class);
 	}
 	else if ((d = result.Nodes.getNodeAs<CXXRecordDecl>("StructDecl"))) {
-		if (d->hasDefinition())
-			llvm::outs() << ++count << ". Struct:   " << d->getName() << "\n";
+		structure.SetStructureType(StructureType::Struct);
 	}
 	else {
 		assert(0);
 	}
 
-	if (d->hasDefinition()) {
-		for (auto it = d->bases_begin(); it != d->bases_end(); ++it) {
-			std::cout << "\tBases Type: " << it->getType().getAsString() << std::endl;
-		}
-
-		//--------------------------------------------------------------------------
-		if (auto templ = d->getDescribedClassTemplate()) {
+	if (d->isInStdNamespace() || !d->hasDefinition()) return;	// ignore std && declarations
+	if (d->getDescribedClassTemplate() || d->getKind() == d->ClassTemplatePartialSpecialization) return; // ignore templates 
 	
-			for (auto it = templ->spec_begin(); it != templ->spec_end(); ++it) {				// it does not handle the partial specialization
-				std::cout << "\tSpecialization: " << it->getNumTemplateParameterLists() << std::endl;
-			}
-			//getTemplateArgs()
-			//auto special = d->getTemplateSpecializationKind();
+	// Template Specialization 
+	if (d->getKind() == d->ClassTemplateSpecialization) {
+		structure.SetStructureType(StructureType::TemplateSpecialization);
+		auto temp = (ClassTemplateSpecializationDecl*)d;
 
-			/*if (d->getTemplateInstantiationPattern()) {
-				llvm::outs() << "\t Template \n";
-				auto specialization = d->getTemplateSpecializationKind();
-			}*/
-		}else 
-		if (d->getKind() == d->ClassTemplateSpecialization) {	//  d->ClassTemplatePartialSpecialization	 ?
-			std::cout << "\tTEMPLATE SPECIAL\n";
+		auto qualifiedName = d->getQualifiedNameAsString();
+		auto name = d->getNameAsString();
+		std::string args = "<";
+		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
+			if (args != "<")
+				args += ", ";
+			args += temp->getTemplateArgs()[i].getAsType().getAsString();
 		}
-		else if (d->getKind() == d->ClassTemplatePartialSpecialization) {
-			std::cout << "\tTEMPLATE PARTIAL\n";
-		}
-		llvm::outs() << "\t" << d->getKindName() << " - " << d->getKind() << " - " << d->getTypeForDecl() << "\n";
-		printLocation(d, result);
-		
+		args += ">";
+		structure.SetName(qualifiedName + args + "::" + name);
 	}
+	else {
+		structure.SetName(d->getQualifiedNameAsString());
+	}
+
+	// Namespace
+	auto enclosingNamespace = d->getEnclosingNamespaceContext();
+	std::string fullEnclosingNamespace = "";
+	while (enclosingNamespace->isNamespace()) {
+		fullEnclosingNamespace = ((NamespaceDecl*)enclosingNamespace)->getNameAsString() + "::" + fullEnclosingNamespace;
+		enclosingNamespace = enclosingNamespace->getParent()->getEnclosingNamespaceContext();
+	}
+	structure.SetEnclosingNamespace(fullEnclosingNamespace);
+
+	// Bases
+	for (auto it = d->bases_begin(); it != d->bases_end(); ++it) {
+		std::string baseName = it->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
+		Structure* base = structuresTable.Get(baseName);
+		if (base == nullptr)
+			base = structuresTable.Insert(baseName);
+		structure.InsertBase(baseName, base);
+	}
+	
+	structuresTable.Insert(structure.GetName(), structure);
 }
 
 
@@ -73,9 +86,11 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const FieldDecl* d = Result.Nodes.getNodeAs<FieldDecl>("FeildDecl")) {
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
-			llvm::outs() << "Field:   " << d->getName() << "  -  Parent: " << d->getParent()->getName() << "  --  ";
-			std::cout << d->getType().getAsString() << std::endl;
-		}
+			llvm::outs() << "Field:   " << d->getName() << "  -  Parent: " << d->getParent()->getQualifiedNameAsString() << "  --  ";
+			std::string typeName = d->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
+			std::cout << typeName << std::endl;
+			
+		} 
 	}
 }
 
@@ -134,8 +149,6 @@ void MethodDeclsCallback2::run(const MatchFinder::MatchResult& Result) {
 }
 
 
-
-
 /*
 	Clang Tool Creation
 */
@@ -143,7 +156,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
+int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
 	CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
 	ClangTool Tool(OptionsParser.getCompilations(), srcs);
 
@@ -153,7 +166,7 @@ int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) 
 	//MethodDeclsCallback2 methodCallback2;
 	MatchFinder Finder;
 	Finder.addMatcher(ClassDeclMatcher, &classCallback);
-	//Finder.addMatcher(FieldDeclmatcher, &fieldCallback); 
+	//Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	//Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	//Finder.addMatcher(MethodDeclMatcher2, &methodCallback2);
 	int result = Tool.run(newFrontendActionFactory(&Finder).get());
