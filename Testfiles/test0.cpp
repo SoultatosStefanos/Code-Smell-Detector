@@ -13,7 +13,7 @@ namespace N_1_1{
     class class_B {};
     
     struct struct_S {
-        int i;
+        class_A i;
     };
     class class_X : public class_A, class_B {
       void method2(int arg1, float arg2);

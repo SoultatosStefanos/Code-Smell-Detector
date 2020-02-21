@@ -15,15 +15,19 @@ namespace DependenciesMining {
 		TemplateSpecialization
 	};
 
+
 	class Definition {
 	private:
 		std::string name;
 		Structure* type;
 
 	public:
+		Definition() = default;
+		Definition(const std::string& name, Structure* type) : name(name), type(type) {};
 		std::string GetName() const;
 		const Structure* GetType() const;
 	};
+
 
 	class Method {
 	private:
@@ -39,6 +43,7 @@ namespace DependenciesMining {
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
 	};
+
 
 	class Structure {
 	private:
@@ -67,11 +72,10 @@ namespace DependenciesMining {
 		void SetStructureType(StructureType structureType);
 
 		void InsertMethod(const std::string& name, Method& method);
-		void InsertDefinition(const std::string& name, Definition& definition);
+		void InsertField(const std::string& name, Definition& definition);
 		void InsertBase(const std::string& name, Structure* structure);
-
-
 	};
+
 
 	class StructuresTable {
 	private:
@@ -84,5 +88,4 @@ namespace DependenciesMining {
 
 		void Print();
 	};
-
 }

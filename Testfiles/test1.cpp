@@ -1,21 +1,24 @@
 /*
-
+    Fields
 */
 namespace N_1_1{
     namespace N_1{
         class class_X;
 
-        class class_A {};
+        class class_A {
+            char c;                                 // no
+        };
+
         class class_B {};
         struct struct_S {
-            int i;
+            int i;                                  // no 
+            class_A a;                              // yes
         };
         class class_X : public class_A, class_B {
                 void method() { int var_method_x; };
                 void method2(int arg1, float arg2);
         };
-        }
-        }
+        
 
         int global_var;
 
@@ -24,17 +27,17 @@ namespace N_1_1{
             struct_S *var_method2_px = new struct_S();
         }
 
-        /*
-        template <class C>
-        struct A {
-            template <class T> void f(const T&) {}
+        template<typename T1, typename T2> class template_Z {  
+            class_B temp_b;                                 // no
         };
 
-        static void f() {
-            A<std::string> a;
-            a.f(std::vector<int>());
-        }
-        */
+        template <> 
+        class template_Z <int, int>    
+        { 
+            class_A temp_a;                 // yes
+        };
+    }
+}
 
 namespace N_2 {
   class class_A{};

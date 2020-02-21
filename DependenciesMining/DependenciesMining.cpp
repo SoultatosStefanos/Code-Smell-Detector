@@ -15,10 +15,29 @@ DeclarationMatcher MethodDeclMatcher2 = varDecl().bind("MethodDecl2");
 
 static int count = 0; 
  
-template<typename T> void printLocation(T d, const MatchFinder::MatchResult& result) {
+template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
 	auto& sm = *result.SourceManager;
 	auto loc = d->getLocation().printToString(sm);
 	std::cout << "\t" << loc << "\n\n";
+}
+
+std::string GetFullName(const RecordDecl* d) {
+	if (d->getKind() == d->ClassTemplateSpecialization) {
+		auto temp = (ClassTemplateSpecializationDecl*)d;
+		auto qualifiedName = d->getQualifiedNameAsString();
+		auto name = d->getNameAsString();
+		std::string args = "<";
+		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
+			if (args != "<")
+				args += ", ";
+			args += temp->getTemplateArgs()[i].getAsType().getAsString();
+		}
+		args += ">";
+		return (qualifiedName + args + "::" + name);
+	}
+	else {
+		return d->getQualifiedNameAsString();
+	}
 }
 
 
@@ -42,23 +61,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	// Template Specialization 
 	if (d->getKind() == d->ClassTemplateSpecialization) {
 		structure.SetStructureType(StructureType::TemplateSpecialization);
-		auto temp = (ClassTemplateSpecializationDecl*)d;
-
-		auto qualifiedName = d->getQualifiedNameAsString();
-		auto name = d->getNameAsString();
-		std::string args = "<";
-		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
-			if (args != "<")
-				args += ", ";
-			args += temp->getTemplateArgs()[i].getAsType().getAsString();
-		}
-		args += ">";
-		structure.SetName(qualifiedName + args + "::" + name);
 	}
-	else {
-		structure.SetName(d->getQualifiedNameAsString());
-	}
-
+	structure.SetName(GetFullName(d));
+	
 	// Namespace
 	auto enclosingNamespace = d->getEnclosingNamespaceContext();
 	std::string fullEnclosingNamespace = "";
@@ -84,12 +89,23 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const FieldDecl* d = Result.Nodes.getNodeAs<FieldDecl>("FeildDecl")) {
+		if (!d->getType()->isStructureOrClassType()) {
+			return;
+		}
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
-			llvm::outs() << "Field:   " << d->getName() << "  -  Parent: " << d->getParent()->getQualifiedNameAsString() << "  --  ";
 			std::string typeName = d->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
-			std::cout << typeName << std::endl;
-			
+			//std::string parentName = parent->getQualifiedNameAsString();
+			std::string parentName = GetFullName(parent);
+
+			Structure* typeStructure = structuresTable.Get(typeName);
+			Structure* parentStructure = structuresTable.Get(parentName);
+			if (!parentStructure) return;							// templates
+
+			//llvm::outs() << "Field:   " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
+
+			Definition field(d->getQualifiedNameAsString(), typeStructure);
+			parentStructure->InsertField(d->getQualifiedNameAsString(), field);	
 		} 
 	}
 }
@@ -161,15 +177,14 @@ int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector
 	ClangTool Tool(OptionsParser.getCompilations(), srcs);
 
 	ClassDeclsCallback classCallback;
-	//FeildDeclsCallback	fieldCallback;
+	FeildDeclsCallback fieldCallback;
 	//MethodDeclsCallback methodCallback;
 	//MethodDeclsCallback2 methodCallback2;
 	MatchFinder Finder;
 	Finder.addMatcher(ClassDeclMatcher, &classCallback);
-	//Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
+	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	//Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	//Finder.addMatcher(MethodDeclMatcher2, &methodCallback2);
 	int result = Tool.run(newFrontendActionFactory(&Finder).get());
 	return result;
 }
-

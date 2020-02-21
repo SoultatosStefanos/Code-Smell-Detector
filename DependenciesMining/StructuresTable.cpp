@@ -26,12 +26,12 @@ std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
 }
 
 void Method::InsertArg(const std::string& name, Definition& definition) {
-	if (arguments.find(name) != arguments.end())
+	if (arguments.find(name) == arguments.end())
 		arguments[name] = definition;
 }
 
 void Method::InsertDefinition(const std::string& name, Definition& definition) {
-	if (definitions.find(name) != definitions.end())
+	if (definitions.find(name) == definitions.end())
 		definitions[name] = definition;
 }
 
@@ -79,12 +79,11 @@ void  Structure::SetStructureType(StructureType structureType){
 
 
 void Structure::InsertMethod(const std::string& name, Method& method) {
-	if (methods.find(name) != methods.end())
+	if (methods.find(name) == methods.end())
 		methods[name] = method;
 }
 
-void Structure::InsertDefinition(const std::string& name, Definition& definition) {
-	if (fields.find(name) != fields.end())
+void Structure::InsertField(const std::string& name, Definition& definition) {
 		fields[name] = definition;
 }
 
