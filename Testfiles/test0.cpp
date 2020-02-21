@@ -71,8 +71,9 @@ int main(){
   class_X x;  
   class_X *px = new class_X;  
     
-  template_Z<float, float> int_z; 
-  template_Z<int, int> float_z; 
+  template_Z<class_A, class_B> class_z; 
+  template_Z<int, int> int_z; 
+  template_Z<float, float> float_z; 
 
     int main_x;
     return 0;

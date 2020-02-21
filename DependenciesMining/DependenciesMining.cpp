@@ -30,7 +30,10 @@ std::string GetFullName(const RecordDecl* d) {
 		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			if (args != "<")
 				args += ", ";
-			args += temp->getTemplateArgs()[i].getAsType().getAsString();
+			if(temp->getTemplateArgs()[i].getAsType()->isStructureOrClassType())
+				args += temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
+			else
+				args += temp->getTemplateArgs()[i].getAsType().getAsString();
 		}
 		args += ">";
 		return (qualifiedName + args + "::" + name);
@@ -62,6 +65,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (d->getKind() == d->ClassTemplateSpecialization) {
 		structure.SetStructureType(StructureType::TemplateSpecialization);
 	}
+
+	std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullName(d) << "\n\n";
 	structure.SetName(GetFullName(d));
 	
 	// Namespace
@@ -95,7 +100,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
 			std::string typeName = d->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
-			//std::string parentName = parent->getQualifiedNameAsString();
 			std::string parentName = GetFullName(parent);
 
 			Structure* typeStructure = structuresTable.Get(typeName);
