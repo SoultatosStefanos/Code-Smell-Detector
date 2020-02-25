@@ -65,6 +65,11 @@ std::unordered_map<std::string, Structure*>& Structure::GetBases()  {
 	return bases; 
 }
 
+std::unordered_map<std::string, Structure*>& Structure::GetFriends()
+{
+	return friends;
+}
+
 void Structure::SetName(const std::string& name) {
 	this->name = name;
 }
@@ -89,6 +94,11 @@ void Structure::InsertField(const std::string& name, Definition& definition) {
 
 void Structure::InsertBase(const std::string& name, Structure* structure) {
 		bases[name] = structure;
+}
+
+void Structure::InsertFriend(const std::string& name, Structure* structure)
+{
+	friends[name] = structure;
 }
 
 // StructuresTable

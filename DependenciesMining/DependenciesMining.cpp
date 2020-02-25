@@ -5,15 +5,13 @@ using namespace DependenciesMining;
 StructuresTable DependenciesMining::structuresTable;
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind("ClassDecl"), cxxRecordDecl(isStruct()).bind("StructDecl"));
-DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind("FeildDecl");
+DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
 
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody((hasType(recordDecl())))).bind("MethodDecl2");
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody(compoundStmt())).bind("MethodDecl2");
 //DeclarationMatcher MethodDeclMatcher2 = varDecl(hasParent(cxxMethodDecl())).bind("MethodDecl2");	
 DeclarationMatcher MethodDeclMatcher2 = varDecl().bind("MethodDecl2");	
-
-static int count = 0; 
  
 template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
 	auto& sm = *result.SourceManager;
@@ -21,7 +19,7 @@ template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& res
 	std::cout << "\t" << loc << "\n\n";
 }
 
-std::string GetFullName(const RecordDecl* d) {
+std::string GetFullStructureName(const RecordDecl* d) {
 	if (d->getKind() == d->ClassTemplateSpecialization) {
 		auto temp = (ClassTemplateSpecializationDecl*)d;
 		auto qualifiedName = d->getQualifiedNameAsString();
@@ -43,6 +41,13 @@ std::string GetFullName(const RecordDecl* d) {
 	}
 }
 
+
+std::string GetFullMethodName(const CXXMethodDecl* d) {
+	std::string str = d->getType().getAsString();
+	std::size_t pos = str.find("(");
+	std::string argList = str.substr(pos);
+	return d->getQualifiedNameAsString() + argList; 
+}
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -66,8 +71,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		structure.SetStructureType(StructureType::TemplateSpecialization);
 	}
 
-	std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullName(d) << "\n\n";
-	structure.SetName(GetFullName(d));
+	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
+	structure.SetName(GetFullStructureName(d));
 	
 	// Namespace
 	auto enclosingNamespace = d->getEnclosingNamespaceContext();
@@ -79,12 +84,34 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetEnclosingNamespace(fullEnclosingNamespace);
 
 	// Bases
-	for (auto it = d->bases_begin(); it != d->bases_end(); ++it) {
-		std::string baseName = it->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
+	for(auto it : d->bases()){
+		std::string baseName = it.getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
 		Structure* base = structuresTable.Get(baseName);
 		if (base == nullptr)
 			base = structuresTable.Insert(baseName);
 		structure.InsertBase(baseName, base);
+	}
+
+	// Friends 
+	for (auto it : d->friends()) {
+		auto type = it->getFriendType();
+		if (type) {																							// Classes
+			std::string parentName = GetFullStructureName(type->getType()->getAsCXXRecordDecl()) ;
+			Structure* parentStructure = structuresTable.Get(parentName);
+			if (!parentStructure) continue;
+			structure.InsertFriend(parentName, parentStructure);
+		}
+		else {																								// Methods			
+			auto decl = it->getFriendDecl();
+			if (decl->getKind() == it->CXXMethod) {
+				std::string methodName = GetFullMethodName((CXXMethodDecl*)decl);
+				auto parentClass = ((CXXMethodDecl*)decl)->getParent();
+				std::string parentName = GetFullStructureName(parentClass);
+				Structure* parentStructure = structuresTable.Get(parentName);
+				if (!parentStructure) continue;
+				structure.InsertFriend(methodName, parentStructure);
+			}
+		}
 	}
 	
 	structuresTable.Insert(structure.GetName(), structure);
@@ -100,13 +127,13 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
 			std::string typeName = d->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
-			std::string parentName = GetFullName(parent);
+			std::string parentName = GetFullStructureName(parent);
 
 			Structure* typeStructure = structuresTable.Get(typeName);
 			Structure* parentStructure = structuresTable.Get(parentName);
 			if (!parentStructure) return;							// templates
 
-			//llvm::outs() << "Field:   " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
+			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
 
 			Definition field(d->getQualifiedNameAsString(), typeStructure);
 			parentStructure->InsertField(d->getQualifiedNameAsString(), field);	
@@ -114,27 +141,23 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	}
 }
 
-// Handle all the Methods - their args(and type) 
+// Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const CXXMethodDecl* d = Result.Nodes.getNodeAs<CXXMethodDecl>("MethodDecl")) {
-		
-		llvm::outs() << "Method:   " << d->getName() << "  ";
+		const RecordDecl* parent = d->getParent();
+		std::string parentName = GetFullStructureName(parent); 
+		Structure* parentStructure = structuresTable.Get(parentName);
+		if (!parentStructure) return;
+		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
+		Method method(GetFullMethodName(d));
+		parentStructure->InsertMethod(GetFullMethodName(d), method);
 
 		// Arguments
-		unsigned numParams = d->getNumParams();
+		/*unsigned numParams = d->getNumParams();
 		for (unsigned i = 0; i < numParams; ++i) {
 			std::cout << d->getParamDecl(i)->getType().getAsString() << " -- ";
 		}
-		std::cout << std::endl;
-
-		// Methods Body
-		/*if(d->hasBody()){	// method definition and declaration(if it exists)			
-			Stmt* body = d->getBody();
-			for (auto it = body->child_begin(); it != body->child_end(); ++it) {
-				std::cout << "body stmt\n";
-				
-			}
-		}*/
+		std::cout << std::endl;*/		
 	}
 }
 
@@ -182,12 +205,12 @@ int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector
 
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;
-	//MethodDeclsCallback methodCallback;
+	MethodDeclsCallback methodCallback;
 	//MethodDeclsCallback2 methodCallback2;
 	MatchFinder Finder;
 	Finder.addMatcher(ClassDeclMatcher, &classCallback);
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
-	//Finder.addMatcher(MethodDeclMatcher, &methodCallback);
+	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	//Finder.addMatcher(MethodDeclMatcher2, &methodCallback2);
 	int result = Tool.run(newFrontendActionFactory(&Finder).get());
 	return result;

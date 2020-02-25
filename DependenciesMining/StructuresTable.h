@@ -36,6 +36,8 @@ namespace DependenciesMining {
 		std::unordered_map<std::string, Definition> definitions;
 
 	public:
+		Method() = default;
+		Method(std::string name) : name(name) {};
 		std::string GetName() const;
 		std::unordered_map<std::string, Definition>& GetArguments() ;
 		std::unordered_map<std::string, Definition>& GetDefinitions();
@@ -54,7 +56,9 @@ namespace DependenciesMining {
 		std::unordered_map<std::string, Method> methods;
 		std::unordered_map<std::string, Definition> fields;
 		std::unordered_map<std::string, Structure*> bases;
-		
+		std::unordered_map<std::string, Structure*> friends;		// About Structures: Key->structureName, Value->Structure*
+																	// About Methods: Key->methodName, Value->Structure*
+				
 	public:
 		Structure(Structure& structure);
 		Structure() = default;
@@ -66,6 +70,7 @@ namespace DependenciesMining {
 		std::unordered_map<std::string, Method>& GetMethods();
 		std::unordered_map<std::string, Definition>& GetFields();
 		std::unordered_map<std::string, Structure*>& GetBases();
+		std::unordered_map<std::string, Structure*>& GetFriends();
 		
 		void SetName(const std::string& name);
 		void SetEnclosingNamespace(const std::string& enclosingNamespace);
@@ -74,6 +79,7 @@ namespace DependenciesMining {
 		void InsertMethod(const std::string& name, Method& method);
 		void InsertField(const std::string& name, Definition& definition);
 		void InsertBase(const std::string& name, Structure* structure);
+		void InsertFriend(const std::string& name, Structure* structure);
 	};
 
 
