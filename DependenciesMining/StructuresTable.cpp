@@ -82,6 +82,11 @@ void  Structure::SetStructureType(StructureType structureType){
 	this->structureType = structureType;
 }
 
+void Structure::SetContained(Structure* structure)
+{
+	contained = structure;
+}
+
 
 void Structure::InsertMethod(const std::string& name, Method& method) {
 	if (methods.find(name) == methods.end())

@@ -85,9 +85,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	// Bases
 	for(auto it : d->bases()){
-		std::string baseName = it.getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
+		std::string baseName = GetFullStructureName(it.getType()->getAsCXXRecordDecl());
 		Structure* base = structuresTable.Get(baseName);
-		if (base == nullptr)
+		if (!base)
 			base = structuresTable.Insert(baseName);
 		structure.InsertBase(baseName, base);
 	}
@@ -113,6 +113,18 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			}
 		}
 	}
+
+	// Members
+	const auto* parent = d->getParent();
+	//llvm::outs() << parent->getDeclKind() << parent->getDeclKindName() << "\n"; 
+
+	if (parent && (parent->getDeclKind() == 33 || parent->getDeclKind() == 34)) {
+		std::string parentName = GetFullStructureName((RecordDecl*)parent);
+		Structure* parentStructure = structuresTable.Get(parentName);
+		if (!parentStructure) return;																		// Templates
+		structure.SetContained(parentStructure);
+	}
+	
 	
 	structuresTable.Insert(structure.GetName(), structure);
 }
@@ -122,16 +134,28 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const FieldDecl* d = Result.Nodes.getNodeAs<FieldDecl>("FeildDecl")) {
 		if (!d->getType()->isStructureOrClassType()) {
-			return;
+			if (d->getType()->isPointerType()) {
+				if(!d->getType()->getPointeeType()->isStructureOrClassType())
+					return;
+			}
+			else
+				return;
 		}
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
-			std::string typeName = d->getType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
 			std::string parentName = GetFullStructureName(parent);
-
-			Structure* typeStructure = structuresTable.Get(typeName);
+			std::string typeName;
+			if(d->getType()->isPointerType())
+				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
+			else
+				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
+			
 			Structure* parentStructure = structuresTable.Get(parentName);
-			if (!parentStructure) return;							// templates
+			Structure* typeStructure = structuresTable.Get(typeName);
+			if (!typeStructure)
+				typeStructure = structuresTable.Insert(typeName);
+			if (!parentStructure)																			 // Templates
+				return;							
 
 			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
 

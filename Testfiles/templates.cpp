@@ -5,7 +5,9 @@ namespace templates{
     template<typename T1, typename T2> class template_Z;
     template<> class template_Z <int, int>  ;
 
-    template<typename T1, typename T2> class template_Z {};  // ignored (by me) 
+    template<typename T1, typename T2> class template_Z {
+      A field;
+    };  // ignored (by me) 
    
     template <> class template_Z <int, int> {};
 
@@ -17,6 +19,9 @@ namespace templates{
 
 
     template<typename T1> class template_Z2 : public template_Z <T1, int>{};  // ignored (by me) 
+
+    class I1 : public template_Z <int , int>{};           
+    class I2 : public template_Z <A, A>{};              // template_Z<A, A> is created (contains the field)
 }
 
 using namespace templates;

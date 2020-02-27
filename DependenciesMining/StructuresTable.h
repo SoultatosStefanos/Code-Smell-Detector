@@ -75,6 +75,7 @@ namespace DependenciesMining {
 		void SetName(const std::string& name);
 		void SetEnclosingNamespace(const std::string& enclosingNamespace);
 		void SetStructureType(StructureType structureType);
+		void SetContained(Structure* structure);
 
 		void InsertMethod(const std::string& name, Method& method);
 		void InsertField(const std::string& name, Definition& definition);

@@ -8,7 +8,7 @@ namespace methods{
       public:  
       void method(B x){}
     };
-    struct S{};
+    struct S{}; 
     class X : public A, B {
       void method2(int arg1, float arg2);
     };
@@ -19,7 +19,7 @@ namespace methods{
 
     template <> 
     class template_Z <int, int> {
-         void method();
+         void method_int();
     };
 
     template <typename T> 
@@ -37,4 +37,8 @@ int global_var;
 void methods::X::method2(int arg1, float arg2){
      S var_method2_x;
      S *var_method2_px = new S();
+}
+
+int main(){
+    methods::template_Z<float, float> float_z; 
 }
