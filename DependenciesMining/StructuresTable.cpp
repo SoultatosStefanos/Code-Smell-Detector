@@ -70,6 +70,13 @@ std::unordered_map<std::string, Structure*>& Structure::GetFriends()
 	return friends;
 }
 
+void Template::SetParent(Structure* structure) {
+	parent = structure;
+}
+void Template::InsertSpecializationArguments(const std::string& name, Structure* structure) {
+	specializationArguments[name] = structure;
+}
+
 void Structure::SetName(const std::string& name) {
 	this->name = name;
 }
@@ -82,9 +89,13 @@ void  Structure::SetStructureType(StructureType structureType){
 	this->structureType = structureType;
 }
 
-void Structure::SetContained(Structure* structure)
+void Structure::SetTemplateInfo(Template temp)
 {
-	contained = structure;
+	templateInfo = temp;
+}
+
+void Structure::SetTemplateParent(Structure* structure) {
+	templateInfo.SetParent(structure);
 }
 
 
@@ -104,6 +115,35 @@ void Structure::InsertBase(const std::string& name, Structure* structure) {
 void Structure::InsertFriend(const std::string& name, Structure* structure)
 {
 	friends[name] = structure;
+}
+
+void Structure::InsertTemplateSpecializationArguments(const std::string& name, Structure* structure) {
+	templateInfo.InsertSpecializationArguments(name, structure);
+}
+
+
+bool Structure::IsTemplateDefinition() {
+	if (structureType == StructureType::TemplateDefinition)
+		return true;
+	return false;
+}
+
+bool Structure::IsTemplateFullSpecialization() {
+		if (structureType == StructureType::TemplateFullSpecialization)
+			return true;
+		return false;
+}
+
+bool Structure::IsTemplateInstatiationSpecialization() {
+	if (structureType == StructureType::TemplateInstatiationSpecialization)
+		return true;
+	return false;
+}
+
+bool Structure::IsTemplatePartialSpecialization() {
+	if (structureType == StructureType::TemplatePartialSpecialization)
+		return true;
+	return false;
 }
 
 // StructuresTable

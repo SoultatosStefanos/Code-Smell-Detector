@@ -12,9 +12,11 @@ namespace DependenciesMining {
 		Undefined,
 		Class,
 		Struct,
-		TemplateSpecialization
+		TemplateDefinition,
+		TemplateFullSpecialization,
+		TemplateInstatiationSpecialization,
+		TemplatePartialSpecialization
 	};
-
 
 	class Definition {
 	private:
@@ -46,16 +48,27 @@ namespace DependenciesMining {
 		void InsertDefinition(const std::string& name, Definition& definition);
 	};
 
+	class Template {
+	private:
+		Structure* parent = nullptr; 
+		std::unordered_map<std::string, Structure*> specializationArguments;
+		
+	public:
+		Template() = default;
+		void SetParent(Structure* structure);
+		void InsertSpecializationArguments(const std::string& name, Structure* structure);
+	};
 
 	class Structure {
 	private:
 		std::string name;
 		std::string enclosingNamespace = "";
 		StructureType structureType = StructureType::Undefined;
-		Structure* contained = nullptr;
+		Template templateInfo;
 		std::unordered_map<std::string, Method> methods;
 		std::unordered_map<std::string, Definition> fields;
 		std::unordered_map<std::string, Structure*> bases;
+		std::unordered_map<std::string, Structure*> contains;
 		std::unordered_map<std::string, Structure*> friends;		// About Structures: Key->structureName, Value->Structure*
 																	// About Methods: Key->methodName, Value->Structure*
 				
@@ -75,12 +88,19 @@ namespace DependenciesMining {
 		void SetName(const std::string& name);
 		void SetEnclosingNamespace(const std::string& enclosingNamespace);
 		void SetStructureType(StructureType structureType);
-		void SetContained(Structure* structure);
+		void SetTemplateInfo(Template temp);
+		void SetTemplateParent(Structure* structure);
 
 		void InsertMethod(const std::string& name, Method& method);
 		void InsertField(const std::string& name, Definition& definition);
 		void InsertBase(const std::string& name, Structure* structure);
 		void InsertFriend(const std::string& name, Structure* structure);
+		void InsertTemplateSpecializationArguments(const std::string& name, Structure* structure);
+
+		bool IsTemplateDefinition();
+		bool IsTemplateFullSpecialization();
+		bool IsTemplateInstatiationSpecialization();
+		bool IsTemplatePartialSpecialization();
 	};
 
 
