@@ -75,8 +75,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (d->getDescribedClassTemplate()) {									
 		structure.SetStructureType(StructureType::TemplateDefinition);
 	} 
-	else if (d->getKind() == d->ClassTemplatePartialSpecialization) { 
+	else if (d->getKind() == d->ClassTemplatePartialSpecialization) {
 		structure.SetStructureType(StructureType::TemplatePartialSpecialization);
+
 	} 
 	else if (d->getKind() == d->ClassTemplateSpecialization) {
 		if(d->getTemplateSpecializationKind() == 1)
@@ -102,7 +103,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		Structure* templateParent = structuresTable.Get(parentName);
 		if (!templateParent)
-			assert(0);
+			templateParent = structuresTable.Insert(parentName);
 		structure.SetTemplateParent(templateParent);
 
 		//Template Arguments
@@ -116,7 +117,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 	
-	
 	// Namespace
 	auto enclosingNamespace = d->getEnclosingNamespaceContext();
 	std::string fullEnclosingNamespace = "";
@@ -127,13 +127,16 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetEnclosingNamespace(fullEnclosingNamespace);
 
 	// Bases
-	/*for(auto it : d->bases()){
-		std::string baseName = GetFullStructureName(it.getType()->getAsCXXRecordDecl());	// null gia klhronomikothta apo template
+	for(auto it : d->bases()){
+		auto* baseRecord = it.getType()->getAsCXXRecordDecl();	
+		if (baseRecord == nullptr)										// otan base einai template or partial specialization Ignored
+			continue;
+		std::string baseName = GetFullStructureName(baseRecord);	
 		Structure* base = structuresTable.Get(baseName);
 		if (!base)
 			base = structuresTable.Insert(baseName);
 		structure.InsertBase(baseName, base);
-	}*/
+	}
 
 	// Friends 
 	for (auto it : d->friends()) {

@@ -3,30 +3,38 @@ namespace templates{
     class B{};
     class C{};
     
-    template<typename T1, typename T2> class template_Z;
-    template<> class template_Z <int, int>  ;
+    template<typename T1, typename T2> struct template_Z;
+    template<> struct template_Z <int, int>  ;
 
-    template<typename T1, typename T2> class template_Z {
+    template<typename T1, typename T2> struct template_Z {
       A a;
     }; 
    
-    template <> class template_Z <int, int> {
+    template <> struct template_Z <int, int> {
       B b;
     };
 
     template <typename T> 
-    class template_Z <int, T> 
+    struct template_Z <int, T> 
     {
       C c;
      };
 
-    template<> class template_Z <int, float> ; //  ignored (automaticly)
+    template<> struct template_Z <int, float> ; //  ignored (automaticly)
 
-    template<typename T1,typename T2> class template_Z2 : public template_Z <T1, T2>{};  // ignored (by me) 
-    template<typename T1> class template_Z3 : public template_Z <T1, int>{};  // ignored (by me) 
+    template<typename T1,typename T2> class template_Z2 : public template_Z<T1,T2> {};   
+    template<typename T1> class template_Z3 : public template_Z <T1, int>{};  //  
+    template<typename T1> class template_Z4 : public template_Z <int, T1>{};  //  
 
-    class I1 : public template_Z <int , int>{};           
-    class I2 : public template_Z <A, A>{};              // template_Z<A, A> is created (contains the field)
+    template<typename T1,typename T2> class T_FS : public template_Z <int, int>{};
+    template<typename T1> class T_IS : public template_Z <char, A>{};
+
+    class I1 : public template_Z <int , int>{};          // OK 
+    class I2 : public template_Z <A, A>{};              // template_Z<A, A> is created (contains the field) - OK
+
+    template<> struct template_Z <int, float> : public I1{
+
+    };
 }
 /*
 struct Point { float x, y; };
@@ -52,10 +60,15 @@ int main(){
   template_Z<A, B> class_z; 
   template_Z<int, int> int_z; 
   template_Z<int, int> int_z2; 
-  template_Z<float, float> float_z; 
-
+  template_Z<float, float>* float_z;      // oi pointers den ftiaxnoyn specializations mexri na tous kanoume use 
+ // T_IS<A>* tis;
+  float_z->a;
+  //tis->a;         
+  template_Z2<char, char> z2; 
+  template_Z3<int> z3; 
+  template_Z3<char> z3_2; 
+  template_Z4<char> z4; 
   //Point_traits<Point> p;
-
-    int main_x;
-    return 0;
+  int main_x;
+  return 0;
 }
