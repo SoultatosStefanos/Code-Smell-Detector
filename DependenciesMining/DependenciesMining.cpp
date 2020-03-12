@@ -220,8 +220,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent); 
 		Structure* parentStructure = structuresTable.Get(parentName);
-		if (parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
-			return;
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(GetFullMethodName(d));
 		parentStructure->InsertMethod(GetFullMethodName(d), method);

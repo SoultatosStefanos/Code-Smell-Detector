@@ -14,7 +14,7 @@ namespace methods{
     };
 
     template<typename T1, typename T2> class template_Z {  
-      void method();
+      void method(T2 a);
     };
 
     template <> 
@@ -41,4 +41,5 @@ void methods::X::method2(int arg1, float arg2){
 
 int main(){
     methods::template_Z<float, float> float_z; 
+    methods::template_Z2<char> z2;
 }

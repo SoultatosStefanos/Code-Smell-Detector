@@ -22,9 +22,9 @@ namespace templates{
 
     template<> struct template_Z <int, float> ; //  ignored (automaticly)
 
-    template<typename T1,typename T2> class template_Z2 : public template_Z<T1,T2> {};   
-    template<typename T1> class template_Z3 : public template_Z <T1, int>{};  //  
-    template<typename T1> class template_Z4 : public template_Z <int, T1>{};  //  
+    template<typename T1,typename T2> class template_Z2 : public template_Z<T1,T2> {}; // den ta vazei san bases  
+    template<typename T1> class template_Z3 : public template_Z <T1, int>{};  // den ta vazei san bases
+    template<typename T1> class template_Z4 : public template_Z <int, T1>{};  // den ta vazei san bases  
 
     template<typename T1,typename T2> class T_FS : public template_Z <int, int>{};
     template<typename T1> class T_IS : public template_Z <char, A>{};
@@ -61,9 +61,9 @@ int main(){
   template_Z<int, int> int_z; 
   template_Z<int, int> int_z2; 
   template_Z<float, float>* float_z;      // oi pointers den ftiaxnoyn specializations mexri na tous kanoume use 
- // T_IS<A>* tis;
+  T_IS<A>* tis;
   float_z->a;
-  //tis->a;         
+  tis->a;         
   template_Z2<char, char> z2; 
   template_Z3<int> z3; 
   template_Z3<char> z3_2; 

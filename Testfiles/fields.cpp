@@ -16,7 +16,7 @@ namespace fields{
     };
       
     template<typename T1, typename T2> class template_Z {  
-        struct_S temp_s;                        // no
+        struct_S temp_s;                        // yes
     };
 
     template <> 
