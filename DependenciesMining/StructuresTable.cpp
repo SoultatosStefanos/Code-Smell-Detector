@@ -52,6 +52,9 @@ std::string Structure::GetEnclosingNamespace() const {
 StructureType Structure::GetStructureType() const { 
 	return structureType; 
 }
+Structure* Structure::GetNestedParent() const {
+	return nestedParent;
+}
 
 std::unordered_map<std::string, Method>& Structure::GetMethods() { 
 	return methods; 
@@ -63,6 +66,10 @@ std::unordered_map<std::string, Definition>& Structure::GetFields() {
 
 std::unordered_map<std::string, Structure*>& Structure::GetBases()  { 
 	return bases; 
+}
+
+std::unordered_map<std::string, Structure*>& Structure::GetContains()  { 
+	return contains; 
 }
 
 std::unordered_map<std::string, Structure*>& Structure::GetFriends()
@@ -98,6 +105,10 @@ void Structure::SetTemplateParent(Structure* structure) {
 	templateInfo.SetParent(structure);
 }
 
+void Structure::SetNestedParent(Structure* structure)
+{
+	nestedParent = structure;
+}
 
 void Structure::InsertMethod(const std::string& name, Method& method) {
 	if (methods.find(name) == methods.end())
@@ -110,6 +121,10 @@ void Structure::InsertField(const std::string& name, Definition& definition) {
 
 void Structure::InsertBase(const std::string& name, Structure* structure) {
 		bases[name] = structure;
+}
+
+void Structure::InsertNestedClass(const std::string& name, Structure* structure) {
+	contains[name] = structure;
 }
 
 void Structure::InsertFriend(const std::string& name, Structure* structure)
@@ -142,6 +157,12 @@ bool Structure::IsTemplateInstatiationSpecialization() {
 
 bool Structure::IsTemplatePartialSpecialization() {
 	if (structureType == StructureType::TemplatePartialSpecialization)
+		return true;
+	return false;
+}
+
+bool Structure::IsNestedClass() {
+	if (nestedParent)
 		return true;
 	return false;
 }

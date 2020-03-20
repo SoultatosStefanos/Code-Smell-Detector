@@ -3,12 +3,12 @@
 */
 
 namespace members{
-    /*class A{
+    class A{
         class M {                   // OK
         };
     };
 
-    struct B{
+   /* struct B{
         struct M{                  // OK
         };
     };*/
@@ -19,17 +19,33 @@ namespace members{
                T1 x;
            };
            M m;
+           T1 t1;
     };
 
-    template <> class T <int, int> {
+   template <> class T <int, int> {
          class M_INT {                      // OK
         };
-    };
+    }; 
 
     template<typename T1, typename T2> class T_2 {  
+        public:
         template<typename T3> class M_2 {  
         }; 
     };
+
+    struct S : public members::T<float, float>::M {
+
+    };
+
+
+    struct S_2 : public members::T_2<float, float>::M_2<A> {
+
+    };
+
+    struct S_3 : public A{
+
+    };
+
 
     // https://en.cppreference.com/w/cpp/language/member_template
    /* struct C {
@@ -45,7 +61,9 @@ namespace members{
 int main() {
     members::T<int, int> t; 
     members::T_2<float, float> t2; 
+    members::T_2<char, char>::M_2<char> m2; 
+    
   //  members::T<float, float>::M m;
    // members::T<char, char>::M m2;
-   members::T<T1,T2>::M m ;
+   //members::T<T1,T2>::M m ;
 }

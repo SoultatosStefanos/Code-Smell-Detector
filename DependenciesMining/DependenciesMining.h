@@ -21,7 +21,6 @@ namespace DependenciesMining {
 
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
-		int count = 0;
 		virtual void run(const MatchFinder::MatchResult& Result);
 	};
 

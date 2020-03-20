@@ -65,6 +65,7 @@ namespace DependenciesMining {
 		std::string enclosingNamespace = "";
 		StructureType structureType = StructureType::Undefined;
 		Template templateInfo;
+		Structure* nestedParent = nullptr;
 		std::unordered_map<std::string, Method> methods;
 		std::unordered_map<std::string, Definition> fields;
 		std::unordered_map<std::string, Structure*> bases;
@@ -80,9 +81,11 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::string GetEnclosingNamespace() const;
 		StructureType GetStructureType() const;
+		Structure* GetNestedParent() const;
 		std::unordered_map<std::string, Method>& GetMethods();
 		std::unordered_map<std::string, Definition>& GetFields();
 		std::unordered_map<std::string, Structure*>& GetBases();
+		std::unordered_map<std::string, Structure*>& GetContains();
 		std::unordered_map<std::string, Structure*>& GetFriends();
 		
 		void SetName(const std::string& name);
@@ -90,10 +93,12 @@ namespace DependenciesMining {
 		void SetStructureType(StructureType structureType);
 		void SetTemplateInfo(Template temp);
 		void SetTemplateParent(Structure* structure);
+		void SetNestedParent(Structure* structure);
 
 		void InsertMethod(const std::string& name, Method& method);
 		void InsertField(const std::string& name, Definition& definition);
 		void InsertBase(const std::string& name, Structure* structure);
+		void InsertNestedClass(const std::string& name, Structure* structure);
 		void InsertFriend(const std::string& name, Structure* structure);
 		void InsertTemplateSpecializationArguments(const std::string& name, Structure* structure);
 
@@ -101,6 +106,7 @@ namespace DependenciesMining {
 		bool IsTemplateFullSpecialization();
 		bool IsTemplateInstatiationSpecialization();
 		bool IsTemplatePartialSpecialization();
+		bool IsNestedClass();
 	};
 
 

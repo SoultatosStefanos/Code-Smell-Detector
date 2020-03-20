@@ -13,12 +13,12 @@ int main(int argc, const char** argv) {
 
 	std::vector<std::string> srcs;
 	std::string path = argv[1];
-	//srcs.push_back(path + "\\member_classes.cpp");
-	srcs.push_back(path + "\\methods.cpp");
+	srcs.push_back(path + "\\member_classes.cpp");
+	//srcs.push_back(path + "\\templates.cpp");
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int result = DependenciesMining::CreateClangTool(argc, argv, srcs);
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 
-	return result;
+	//return result;
 }

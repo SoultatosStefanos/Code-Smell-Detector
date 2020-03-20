@@ -12,7 +12,8 @@ DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody(compoundStmt())).bind("MethodDecl2");
 //DeclarationMatcher MethodDeclMatcher2 = varDecl(hasParent(cxxMethodDecl())).bind("MethodDecl2");	
 DeclarationMatcher MethodDeclMatcher2 = varDecl().bind("MethodDecl2");	
- 
+
+
 template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
 	auto& sm = *result.SourceManager;
 	auto loc = d->getLocation().printToString(sm);
@@ -26,7 +27,7 @@ std::string GetFullStructureName(const RecordDecl* d) {
 		auto qualifiedName = d->getQualifiedNameAsString();
 		auto name = d->getNameAsString();
 		std::string args = "<";
-		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
+		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			
 			if (args != "<")
 				args += ", ";
@@ -108,7 +109,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		//Template Arguments
 		auto temp = (ClassTemplateSpecializationDecl*)d;
-		for (int i = 0; i < temp->getTemplateArgs().size(); ++i) {
+		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			if (temp->getTemplateArgs()[i].getAsType()->isStructureOrClassType()) {
 				std::string argName = GetFullStructureName(temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl());
 				Structure* arg = structuresTable.Get(argName);
@@ -161,23 +162,30 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	// Members
-	/*d->getMemberSpecializationInfo();
-	const auto* parent = d->getParent();
-	llvm::outs() << parent->getDeclKind()  << "   " << parent->getDeclKindName() << "   "<< d->getNameAsString(); 
 
-	if (parent && (parent->getDeclKind() == 33 || parent->getDeclKind() == 34)) {
+	const auto* parent = d->getParent();
+	llvm::outs() << parent->getDeclKind()  << "   " << parent->getDeclKindName() << "   "<< d->getNameAsString() << "\n"; 
+	llvm::outs() << d->getDeclKind() << "   " << d->getKind() << "\n";
+	if(parent && parent->isRecord()){
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
-		Structure* parentStructure = structuresTable.Get(parentName);
-		std::cout << "   " <<parentName ;
-		if (!parentStructure) return;																		// Templates
-		structure.SetContained(parentStructure);
+		if (d->isCXXClassMember() && parentName != structure.GetName())
+		{
+			Structure* parentStructure = structuresTable.Get(parentName);
+			//if (!parentStructure || parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
+			/*if (d->getDeclKind() == 33) {
+				auto name = GetFullStructureName(d);
+				GetFullStructureName(d);
+			}*/																
+			assert(parentStructure);
+			structure.SetNestedParent(parentStructure);
+			parentStructure->InsertNestedClass(structure.GetName(), structuresTable.Insert(structure.GetName()));
+		}
+		std::cout << "\n";
 	}
-	std::cout <<"\n";
-	*/
+	
 	
 	structuresTable.Insert(structure.GetName(), structure);
 }
-
 
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
@@ -263,7 +271,6 @@ void MethodDeclsCallback2::run(const MatchFinder::MatchResult& Result) {
 	}
 }
 
-
 /*
 	Clang Tool Creation
 */
@@ -274,7 +281,7 @@ static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can
 int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
 	CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
 	ClangTool Tool(OptionsParser.getCompilations(), srcs);
-
+	
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;
 	MethodDeclsCallback methodCallback;
