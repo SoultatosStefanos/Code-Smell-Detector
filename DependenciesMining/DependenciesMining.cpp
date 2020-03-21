@@ -1,4 +1,5 @@
 #include "DependenciesMining.h"
+#include "Utilities.h"
 
 using namespace DependenciesMining;
 
@@ -12,50 +13,6 @@ DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
 //DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody(compoundStmt())).bind("MethodDecl2");
 //DeclarationMatcher MethodDeclMatcher2 = varDecl(hasParent(cxxMethodDecl())).bind("MethodDecl2");	
 DeclarationMatcher MethodDeclMatcher2 = varDecl().bind("MethodDecl2");	
-
-
-template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
-	auto& sm = *result.SourceManager;
-	auto loc = d->getLocation().printToString(sm);
-	std::cout << "\t" << loc << "\n\n";
-}
-
-
-std::string GetFullStructureName(const RecordDecl* d) {
-	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-		auto temp = (ClassTemplateSpecializationDecl*)d;
-		auto qualifiedName = d->getQualifiedNameAsString();
-		auto name = d->getNameAsString();
-		std::string args = "<";
-		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
-			
-			if (args != "<")
-				args += ", ";
-			if (temp->getTemplateArgs()[i].getAsType()->isStructureOrClassType())
-				args += temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString();
-			//else if (temp->getTemplateArgs()[i].getAsType()->isTemplateTypeParmType())					// an to valw etsi tha prepei na allaksw kai to onoma twn fields + methods gia na einai uniform 
-			//	args += "-T-";
-			else
-				args += temp->getTemplateArgs()[i].getAsType().getAsString();
-		}
-		args += ">";
-		return (qualifiedName + args + "::" + name);
-	}
-	else if (d->isCXXClassMember() && ((CXXRecordDecl*)d)->getInstantiatedFromMemberClass()) {
-		return  d->getQualifiedNameAsString() + "::" + d->getNameAsString();
-	}
-	else {
-		return d->getQualifiedNameAsString();
-	}
-}
-
-
-std::string GetFullMethodName(const CXXMethodDecl* d) {
-	std::string str = d->getType().getAsString();
-	std::size_t pos = str.find("(");
-	std::string argList = str.substr(pos);
-	return d->getQualifiedNameAsString() + argList; 
-}
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -74,7 +31,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (d->isInStdNamespace() || !d->hasDefinition()) {
 		return;														// ignore std && declarations
 	}
-
 	// Templates
 	if (d->getDescribedClassTemplate()) {									
 		structure.SetStructureType(StructureType::TemplateDefinition);
@@ -165,7 +121,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	// Members
-	if (d->isCXXClassMember()) {
+	/*if (d->isCXXClassMember()) {
 		const auto* parent = d->getParent();
 		assert(parent);
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
@@ -175,7 +131,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			structure.SetNestedParent(parentStructure);
 			parentStructure->InsertNestedClass(structure.GetName(), structuresTable.Insert(structure.GetName()));
 		}
-	}
+	}*/
 		
 	structuresTable.Insert(structure.GetName(), structure);
 }

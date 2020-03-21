@@ -4,10 +4,10 @@ namespace templates{
     class C{};
     
     template<typename T1, typename T2> struct template_Z;
-    template<> struct template_Z <int, int>  ;
+    template<> struct template_Z <int, int>;
 
     template<typename T1, typename T2> struct template_Z {
-      A a;
+      T1 a;
     }; 
    
     template <> struct template_Z <int, int> {
@@ -68,6 +68,8 @@ int main(){
   template_Z3<int> z3; 
   template_Z3<char> z3_2; 
   template_Z4<char> z4; 
+  template_Z<template_Z<int, A>, int> z;
+  z.a;
   //Point_traits<Point> p;
   int main_x;
   return 0;
