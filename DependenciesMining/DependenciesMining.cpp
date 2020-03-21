@@ -121,7 +121,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	// Members
-	/*if (d->isCXXClassMember()) {
+	if (d->isCXXClassMember()) {
 		const auto* parent = d->getParent();
 		assert(parent);
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
@@ -131,8 +131,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			structure.SetNestedParent(parentStructure);
 			parentStructure->InsertNestedClass(structure.GetName(), structuresTable.Insert(structure.GetName()));
 		}
-	}*/
-		
+	}
+	std::cout << "\n";
 	structuresTable.Insert(structure.GetName(), structure);
 }
 
