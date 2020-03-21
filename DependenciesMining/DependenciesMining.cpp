@@ -41,6 +41,9 @@ std::string GetFullStructureName(const RecordDecl* d) {
 		args += ">";
 		return (qualifiedName + args + "::" + name);
 	}
+	else if (d->isCXXClassMember() && ((CXXRecordDecl*)d)->getInstantiatedFromMemberClass()) {
+		return  d->getQualifiedNameAsString() + "::" + d->getNameAsString();
+	}
 	else {
 		return d->getQualifiedNameAsString();
 	}
@@ -162,28 +165,18 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	// Members
-
-	const auto* parent = d->getParent();
-	llvm::outs() << parent->getDeclKind()  << "   " << parent->getDeclKindName() << "   "<< d->getNameAsString() << "\n"; 
-	llvm::outs() << d->getDeclKind() << "   " << d->getKind() << "\n";
-	if(parent && parent->isRecord()){
+	if (d->isCXXClassMember()) {
+		const auto* parent = d->getParent();
+		assert(parent);
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
-		if (d->isCXXClassMember() && parentName != structure.GetName())
-		{
+		if (parentName != structure.GetName()) {
 			Structure* parentStructure = structuresTable.Get(parentName);
-			//if (!parentStructure || parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
-			/*if (d->getDeclKind() == 33) {
-				auto name = GetFullStructureName(d);
-				GetFullStructureName(d);
-			}*/																
-			assert(parentStructure);
+			auto inst = d->getInstantiatedFromMemberClass();
 			structure.SetNestedParent(parentStructure);
 			parentStructure->InsertNestedClass(structure.GetName(), structuresTable.Insert(structure.GetName()));
 		}
-		std::cout << "\n";
 	}
-	
-	
+		
 	structuresTable.Insert(structure.GetName(), structure);
 }
 

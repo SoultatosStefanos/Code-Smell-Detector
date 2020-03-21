@@ -106,6 +106,7 @@ namespace DependenciesMining {
 		bool IsTemplateFullSpecialization();
 		bool IsTemplateInstatiationSpecialization();
 		bool IsTemplatePartialSpecialization();
+		bool IsTemplate(); 
 		bool IsNestedClass();
 	};
 

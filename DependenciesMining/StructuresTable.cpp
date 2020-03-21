@@ -161,6 +161,12 @@ bool Structure::IsTemplatePartialSpecialization() {
 	return false;
 }
 
+bool Structure::IsTemplate() {
+	if (structureType >= StructureType::TemplateDefinition  && structureType <= StructureType::TemplatePartialSpecialization)
+		return true;
+	return false;
+}
+
 bool Structure::IsNestedClass() {
 	if (nestedParent)
 		return true;
