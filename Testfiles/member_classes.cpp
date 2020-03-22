@@ -48,12 +48,15 @@ namespace members{
         template<typename T> struct M_4{};
     };
 
-    struct S : public members::T<float, float>::M {
+    struct S : public T<float, float>::M {
 
     };
 
+    struct T_5 {
+        struct M_5 : public A, public T_2<float, float>::M_2<A>{};
+    };
 
-    struct S_2 : public members::T_2<float, float>::M_2<A> {
+    struct S_2 : public T_2<float, float>::M_2<A> {
 
     };
 
@@ -61,16 +64,10 @@ namespace members{
 
     };
 
+    template<typename T1> struct S_4 : public T_2<float, float>::M_2<T1>{
 
-    // https://en.cppreference.com/w/cpp/language/member_template
-   /* struct C {
-    template<class T> struct B;         // primary member template
-    template<class T> struct B<T*> { }; // OK: partial specialization
-    //  template<> struct B<int*> { };      // Error: full specialization
     };
-    template<> struct C::B<int*> { };       // OK
-    template<class T> struct C::B<T&> { };  // OK
-*/
+
 }
 
 int main() {
@@ -81,10 +78,13 @@ int main() {
     members::T_4::M_4<char> m4; 
     members::T_4::M_4<int> m_4;
     members::T_3<float>::M_3<int> m3; 
+    members::T_5::M_5 m5;
 
     members::T_2<members::A,members::A>::M_2<members::T_2<members::B,members::B>> t_templ_2;
     members::T_2<members::A,members::A>::M_2<members::T_2<members::B,members::B>::M_2<members::B>> m_templ_2;
-    m_templ_2.t; 
+    m_templ_2.t;
+
+    members::S_4<members::B> s;
 
   //  members::T<float, float>::M m;
    // members::T<char, char>::M m2;
