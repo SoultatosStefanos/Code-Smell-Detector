@@ -82,6 +82,7 @@ namespace DependenciesMining {
 		std::string GetEnclosingNamespace() const;
 		StructureType GetStructureType() const;
 		Structure* GetNestedParent() const;
+		Method* GetMethod(const std::string& name); 
 		std::unordered_map<std::string, Method>& GetMethods();
 		std::unordered_map<std::string, Definition>& GetFields();
 		std::unordered_map<std::string, Structure*>& GetBases();
@@ -118,7 +119,7 @@ namespace DependenciesMining {
 		std::unordered_map<std::string, Structure>& GetSymbolTable(); 
 		Structure* Insert(const std::string& name);
 		Structure* Insert(const std::string& name, Structure& structure);
-		Structure* Get(std::string& name);
+		Structure* Get(const std::string& name);
 
 		void Print();
 	};

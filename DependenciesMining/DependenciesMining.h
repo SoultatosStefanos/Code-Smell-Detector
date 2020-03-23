@@ -34,7 +34,7 @@ namespace DependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& Result);
 	};
 
-	class MethodDeclsCallback2 : public MatchFinder::MatchCallback {
+	class MethodVarsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& Result);
 	};

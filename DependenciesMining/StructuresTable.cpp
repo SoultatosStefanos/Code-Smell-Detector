@@ -56,6 +56,14 @@ Structure* Structure::GetNestedParent() const {
 	return nestedParent;
 }
 
+Method* Structure::GetMethod(const std::string& name) {
+	auto it = methods.find(name);
+	if (it != methods.end())
+		return  &it->second;
+	else
+		return nullptr;
+}
+
 std::unordered_map<std::string, Method>& Structure::GetMethods() { 
 	return methods; 
 }
@@ -197,7 +205,7 @@ Structure* StructuresTable::Insert(const std::string& name, Structure& structure
 	return &table.find(name)->second; 
 }
 
-Structure* StructuresTable::Get(std::string& name) {
+Structure* StructuresTable::Get(const std::string& name) {
 	auto it = table.find(name);
 	if (it != table.end())
 		return &it->second;
