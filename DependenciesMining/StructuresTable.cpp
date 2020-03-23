@@ -25,6 +25,14 @@ std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
 	return definitions;
 }
 
+Structure* Method::GetReturnType() {
+	return returnType;
+}
+
+void Method::SetReturnType(Structure* structure) {
+	returnType = structure;
+}
+
 void Method::InsertArg(const std::string& name, Definition& definition) {
 	if (arguments.find(name) == arguments.end())
 		arguments[name] = definition;

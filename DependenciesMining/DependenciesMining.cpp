@@ -179,7 +179,33 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 		Structure* parentStructure = structuresTable.Get(parentName);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(GetFullMethodName(d));
+		
+		//Return
+		auto returnType = d->getReturnType();
+		if (!returnType->isStructureOrClassType()) {
+			if (returnType->isPointerType()) {
+				if (!returnType->getPointeeType()->isStructureOrClassType()) {
+					parentStructure->InsertMethod(GetFullMethodName(d), method);
+					return;
+				}
+			}
+			else {
+				parentStructure->InsertMethod(GetFullMethodName(d), method);
+				return;
+			}
+		}
+		std::string typeName; 
+		if (returnType->isPointerType())
+			typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
+		else
+			typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
+		Structure* typeStructure = structuresTable.Get(typeName);
+		if (!typeStructure)
+			typeStructure = structuresTable.Insert(typeName);
+		method.SetReturnType(typeStructure);
+
 		parentStructure->InsertMethod(GetFullMethodName(d), method);
+
 	}
 }
 

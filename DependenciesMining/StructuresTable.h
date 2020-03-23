@@ -34,6 +34,7 @@ namespace DependenciesMining {
 	class Method {
 	private:
 		std::string name;
+		Structure* returnType = nullptr;
 		std::unordered_map<std::string, Definition> arguments;
 		std::unordered_map<std::string, Definition> definitions;
 
@@ -43,7 +44,9 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::unordered_map<std::string, Definition>& GetArguments() ;
 		std::unordered_map<std::string, Definition>& GetDefinitions();
+		Structure* GetReturnType();
 
+		void SetReturnType(Structure* structure);
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
 	};
