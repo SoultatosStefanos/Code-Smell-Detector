@@ -89,3 +89,18 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	std::string argList = str.substr(pos);
 	return d->getQualifiedNameAsString() + argList;
 }
+
+
+bool isStructureOrStructurePointerType(clang::QualType type) {
+	if (!type->isStructureOrClassType()) {
+		if (type->isPointerType()) {
+			if (!type->getPointeeType()->isStructureOrClassType()) {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	return true;
+}

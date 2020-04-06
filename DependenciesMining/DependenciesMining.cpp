@@ -8,11 +8,9 @@ StructuresTable DependenciesMining::structuresTable;
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind("ClassDecl"), cxxRecordDecl(isStruct()).bind("StructDecl"));
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind("FeildDecl");
 DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind("MethodDecl");
-
-//DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody((hasType(recordDecl())))).bind("MethodDecl2");
-//DeclarationMatcher MethodDeclMatcher2 = cxxMethodDecl(hasBody(compoundStmt())).bind("MethodDecl2");
-//DeclarationMatcher MethodDeclMatcher2 = varDecl(hasParent(cxxMethodDecl())).bind("MethodDecl2");	
-DeclarationMatcher MethodVarMatcher = varDecl().bind("MethodVar");	
+DeclarationMatcher MethodVarMatcher = varDecl().bind("MethodVar");
+StatementMatcher MemberMatcher = memberExpr().bind("Member");
+//StatementMatcher MemberMatcher = memberExpr(hasObjectExpression(hasType(cxxRecordDecl()))).bind("Member");
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -139,14 +137,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const FieldDecl* d = Result.Nodes.getNodeAs<FieldDecl>("FeildDecl")) {
-		if (!d->getType()->isStructureOrClassType()) {
-			if (d->getType()->isPointerType()) {
-				if(!d->getType()->getPointeeType()->isStructureOrClassType())
-					return;
-			}
-			else
-				return;
-		}
+		if (!isStructureOrStructurePointerType(d->getType()))
+			return; 
+
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
 			std::string parentName = GetFullStructureName(parent);
@@ -175,53 +168,39 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const CXXMethodDecl* d = Result.Nodes.getNodeAs<CXXMethodDecl>("MethodDecl")) {
 		const RecordDecl* parent = d->getParent();
-		std::string parentName = GetFullStructureName(parent); 
+		std::string parentName = GetFullStructureName(parent);
 		Structure* parentStructure = structuresTable.Get(parentName);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(GetFullMethodName(d));
-		
+
 		//Return
 		auto returnType = d->getReturnType();
-		if (!returnType->isStructureOrClassType()) {
-			if (returnType->isPointerType()) {
-				if (!returnType->getPointeeType()->isStructureOrClassType()) {
-					parentStructure->InsertMethod(GetFullMethodName(d), method);
-					return;
-				}
-			}
-			else {
-				parentStructure->InsertMethod(GetFullMethodName(d), method);
-				return;
-			}
+		if (isStructureOrStructurePointerType(returnType)) {
+			std::string typeName;
+			if (returnType->isPointerType())
+				typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
+			else
+				typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
+			Structure* typeStructure = structuresTable.Get(typeName);
+			if (!typeStructure)
+				typeStructure = structuresTable.Insert(typeName);
+			method.SetReturnType(typeStructure);
 		}
-		std::string typeName; 
-		if (returnType->isPointerType())
-			typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
-		else
-			typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
-		Structure* typeStructure = structuresTable.Get(typeName);
-		if (!typeStructure)
-			typeStructure = structuresTable.Insert(typeName);
-		method.SetReturnType(typeStructure);
 
 		parentStructure->InsertMethod(GetFullMethodName(d), method);
 
 	}
 }
 
+// Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& Result) {
 	if (const VarDecl* d = Result.Nodes.getNodeAs<VarDecl>("MethodVar")) {
 		auto parentMethod = d->getParentFunctionOrMethod();
 		if(d->isLocalVarDeclOrParm() && parentMethod && parentMethod->getDeclKind() == d->CXXMethod) {	// including params
 		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
-			if (!d->getType()->isStructureOrClassType()) {
-				if (d->getType()->isPointerType()) {
-					if (!d->getType()->getPointeeType()->isStructureOrClassType())
-						return;
-				}
-				else
-					return;
-			}
+			if (!isStructureOrStructurePointerType(d->getType()))
+				return;
+
 			auto parentClass = (CXXRecordDecl*)parentMethod->getParent();
 			auto parentClassName = GetFullStructureName(parentClass);
 			auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethod);
@@ -246,6 +225,67 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& Result) {
 	}
 }
 
+void MemberOnMethodsCallback::run(const MatchFinder::MatchResult& Result) {
+	if (const Stmt* d = Result.Nodes.getNodeAs<Stmt>("Member")) {
+		MemberExpr* memberExpr = (MemberExpr*)d;
+		auto decl = memberExpr->getMemberDecl();
+		auto base = memberExpr->getBase();
+
+		auto type = decl->getType();
+		if (!isStructureOrStructurePointerType(type)) {
+			if (decl->getKind() == decl->CXXMethod) {
+				CXXMethodDecl* methodDecl = (CXXMethodDecl*)decl;
+				type = methodDecl->getReturnType();
+				if (!isStructureOrStructurePointerType(type)) {
+					std::cout << "~~~~~~~~~~~~~~~method\n\n";
+					return;
+				}
+			}
+			else 
+				return; 
+		}
+
+		std::string typeName;
+		if (type->isPointerType())
+			typeName = GetFullStructureName(type->getPointeeType()->getAsCXXRecordDecl());
+		else
+			typeName = GetFullStructureName(type->getAsCXXRecordDecl());
+		Structure* typeStructure = structuresTable.Get(typeName);
+		if (!typeStructure)
+			typeStructure = structuresTable.Insert(typeName);
+
+		llvm::outs() << "Decl Type: " << typeName << "\n";
+		
+		if (base->getStmtClass() == d->DeclRefExprClass) {
+				// apo var tou method
+			auto baseDecl = ((DeclRefExpr*)base)->getDecl();
+			if (auto parentMethod = baseDecl->getParentFunctionOrMethod()) {
+				auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethod);
+				llvm::outs() << "Parent: " << parentMethod->getDeclKindName() << "   " << parentMethodName << "\n";
+			}
+		}
+		else if (base->getStmtClass() == d->MemberExprClass) {
+			// apo field ths class
+			auto baseDecl = ((MemberExpr*)base)->getMemberDecl();
+			if (auto parentMethod = baseDecl->getParentFunctionOrMethod()) {			// apo member expr den moy epistrefei to method
+					auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethod);
+					llvm::outs() << "Parent: " << parentMethod->getDeclKindName() << "   " << parentMethodName << "\n";
+				}
+		}
+		else if (base->getStmtClass() == d->CXXThisExprClass) {
+			// apo this
+			std::cout << "~~~~~~~~~~~~~~~this\n\n";
+			return;
+		}
+		else {
+			llvm::outs() << base->getStmtClassName() << " !!!!!!!!!!!\n";
+		}
+		llvm::outs() << "Kind: " << decl->getDeclKindName() << "\n";
+		llvm::outs() << "Name: " << decl->getNameAsString() << "\n";			
+	}
+	std::cout << "~~~~~~~~~~~~~~~\n\n";
+}
+
 /*
 	Clang Tool Creation
 */
@@ -261,11 +301,13 @@ int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector
 	FeildDeclsCallback fieldCallback;
 	MethodDeclsCallback methodCallback;
 	MethodVarsCallback methodVarCallback;
+	MemberOnMethodsCallback memberCallback; 
 	MatchFinder Finder;
 	Finder.addMatcher(ClassDeclMatcher, &classCallback);
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
+	Finder.addMatcher(MemberMatcher, &memberCallback);
 	int result = Tool.run(newFrontendActionFactory(&Finder).get());
 	return result;
 }

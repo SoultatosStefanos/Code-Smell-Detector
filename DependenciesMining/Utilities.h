@@ -15,3 +15,5 @@ template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& res
 std::string GetFullTemplateArgsName(const RecordDecl* d);
 std::string GetFullStructureName(const RecordDecl* d);
 std::string GetFullMethodName(const CXXMethodDecl* d);
+
+bool isStructureOrStructurePointerType(clang::QualType type); 

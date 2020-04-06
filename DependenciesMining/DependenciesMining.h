@@ -17,8 +17,7 @@ using namespace clang::tooling;
 
 namespace DependenciesMining {
 	extern StructuresTable structuresTable;
-	//extern StructuresTable structuresTable;
-
+	
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& Result);
@@ -39,6 +38,10 @@ namespace DependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& Result);
 	};
 
+	class MemberOnMethodsCallback : public MatchFinder::MatchCallback {
+	public:
+		virtual void run(const MatchFinder::MatchResult& Result);
+	};
 
 	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
 
