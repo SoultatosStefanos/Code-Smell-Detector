@@ -37,6 +37,7 @@ namespace DependenciesMining {
 		Structure* returnType = nullptr;
 		std::unordered_map<std::string, Definition> arguments;
 		std::unordered_map<std::string, Definition> definitions;
+		std::unordered_map<std::string, Structure*> memberExprs;
 
 	public:
 		Method() = default;
@@ -44,11 +45,13 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::unordered_map<std::string, Definition>& GetArguments() ;
 		std::unordered_map<std::string, Definition>& GetDefinitions();
+		std::unordered_map<std::string, Structure*>& GetMemberExprs();
 		Structure* GetReturnType();
 
 		void SetReturnType(Structure* structure);
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
+		void InsertMemberExpr(const std::string& name, Structure* structure);
 	};
 
 	class Template {
@@ -99,7 +102,7 @@ namespace DependenciesMining {
 		void SetTemplateParent(Structure* structure);
 		void SetNestedParent(Structure* structure);
 
-		void InsertMethod(const std::string& name, Method& method);
+		Method* InsertMethod(const std::string& name, Method& method);
 		void InsertField(const std::string& name, Definition& definition);
 		void InsertBase(const std::string& name, Structure* structure);
 		void InsertNestedClass(const std::string& name, Structure* structure);

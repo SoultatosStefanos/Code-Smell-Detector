@@ -12,14 +12,17 @@ namespace objects{
 
 	struct A {
 		B b;
-		B b2; 
+		B* b2; 
 
 		B method(){
-			C cc = b.c; 
+			/*int my = 1+2;
+			if(my==3){
+				return;
+			}*/
+			C cc = b2->c; 
 			B bb; 
 			cc = bb.c;
 			return b;
-			//bb = a.b; */
 		}
 	};
 

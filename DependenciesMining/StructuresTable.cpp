@@ -25,6 +25,10 @@ std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
 	return definitions;
 }
 
+std::unordered_map<std::string, Structure*>& Method::GetMemberExprs() {
+	return memberExprs;
+}
+
 Structure* Method::GetReturnType() {
 	return returnType;
 }
@@ -41,6 +45,11 @@ void Method::InsertArg(const std::string& name, Definition& definition) {
 void Method::InsertDefinition(const std::string& name, Definition& definition) {
 	if (definitions.find(name) == definitions.end())
 		definitions[name] = definition;
+}
+
+void Method::InsertMemberExpr(const std::string& name, Structure* structure) {
+	if (memberExprs.find(name) == memberExprs.end())
+		memberExprs[name] = structure;
 }
 
 
@@ -126,9 +135,10 @@ void Structure::SetNestedParent(Structure* structure)
 	nestedParent = structure;
 }
 
-void Structure::InsertMethod(const std::string& name, Method& method) {
+Method* Structure::InsertMethod(const std::string& name, Method& method) {
 	if (methods.find(name) == methods.end())
 		methods[name] = method;
+	return &methods.find(name)->second;
 }
 
 void Structure::InsertField(const std::string& name, Definition& definition) {
