@@ -25,12 +25,20 @@ std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
 	return definitions;
 }
 
-std::unordered_map<std::string, Structure*>& Method::GetMemberExprs() {
+std::unordered_map<std::string, std::pair<Structure*, std::vector<Method::MemberExpr>>>& Method::GetMemberExprs() {
 	return memberExprs;
 }
 
-Structure* Method::GetReturnType() {
+MethodType Method::GetMethodType() const {
+	return methodType;
+}
+
+Structure* Method::GetReturnType() const {
 	return returnType;
+}
+
+void Method::SetMethodType(MethodType type) {
+	methodType = type;
 }
 
 void Method::SetReturnType(Structure* structure) {
@@ -47,9 +55,30 @@ void Method::InsertDefinition(const std::string& name, Definition& definition) {
 		definitions[name] = definition;
 }
 
-void Method::InsertMemberExpr(const std::string& name, Structure* structure) {
-	if (memberExprs.find(name) == memberExprs.end())
-		memberExprs[name] = structure;
+void Method::InsertMemberExpr(const std::string& name, Structure* structure, Method::MemberExpr memberExpr) {
+	if (memberExprs.find(name) == memberExprs.end()) {
+		std::vector<Method::MemberExpr> exprs;
+		exprs.push_back(memberExpr);
+		memberExprs[name] = std::pair(structure, exprs);
+	} 
+	else{
+		memberExprs[name].second.push_back(memberExpr);
+	}
+}
+
+// MemberExpr 
+std::string Method::MemberExpr::GetMemberName() const {
+	return memberName;
+}
+std::string  Method::MemberExpr::GetExpr() const {
+	return expr;
+}
+
+bool  Method::MemberExpr::isMethod() {
+	return isMethod_;
+}
+void  Method::MemberExpr::SetAsMethod(bool b) {
+	isMethod_ = b;
 }
 
 
@@ -237,7 +266,3 @@ void StructuresTable::Print() {
 		std::cout << "--------------------------------------------\n";
 	}
 }
-
-
-
-

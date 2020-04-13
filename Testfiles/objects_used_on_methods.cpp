@@ -1,13 +1,35 @@
 /*
     Object Used on Methods
 */
-namespace objects{
+namespace memberExpr{
+	
+	struct K {};
+
+	struct Y {
+		K k;
+	};
+	 
+	struct X{
+		int i;
+		Y* m1(){
+			return new Y(); 
+		}
+
+		Y m2(){
+			Y y;
+			return y; 
+		}
+
+	};
+
 	struct C{
 		int i;
+		X x; 
 	};
 	
 	struct B {
 		C c; 
+		C* pc; 
 	};
 
 	struct A {
@@ -15,14 +37,17 @@ namespace objects{
 		B* b2; 
 
 		B method(){
-			/*int my = 1+2;
-			if(my==3){
-				return;
-			}*/
-			C cc = b2->c; 
+			C* pc = b2->pc; 
+			C c = b.c;
 			B bb; 
-			cc = bb.c;
-			return b;
+			c = bb.c;
+
+			X x = bb.c.x;
+			X* px = &(pc->x); 
+
+			px->m1(); 
+			x.m2().k; 		// MaterializeTemporaryExpr 						
+			return b; 		
 		}
 	};
 
