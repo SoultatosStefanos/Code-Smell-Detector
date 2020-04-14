@@ -27,6 +27,7 @@ namespace m_args_vars{
          void method_int(){
              int i; 
              A* a; 
+             auto AUTO = a; 
          }
     };
 

@@ -2,6 +2,15 @@
 
 using namespace DependenciesMining;
 
+// SourceInfo 
+std::string SourceInfo::GetFullLocation() const {
+	return fullLocation;
+}
+void SourceInfo::SetFullLocation(std::string fullLocation) {
+	this->fullLocation = fullLocation;
+}
+
+
 //Definition
 std::string Definition::GetName() const {
 	return name;
@@ -25,7 +34,7 @@ std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
 	return definitions;
 }
 
-std::unordered_map<std::string, std::pair<Structure*, std::vector<Method::MemberExpr>>>& Method::GetMemberExprs() {
+MEMBER_MAP& Method::GetMemberExprs() {
 	return memberExprs;
 }
 
@@ -55,6 +64,8 @@ void Method::InsertDefinition(const std::string& name, Definition& definition) {
 		definitions[name] = definition;
 }
 
+/*
+// Version with the Types' Map
 void Method::InsertMemberExpr(const std::string& name, Structure* structure, Method::MemberExpr memberExpr) {
 	if (memberExprs.find(name) == memberExprs.end()) {
 		std::vector<Method::MemberExpr> exprs;
@@ -64,9 +75,15 @@ void Method::InsertMemberExpr(const std::string& name, Structure* structure, Met
 	else{
 		memberExprs[name].second.push_back(memberExpr);
 	}
+}*/
+
+void Method::InsertMemberExpr(const std::string& locBegin, const std::string& locEnd, const std::string& expr, Method::MemberExpr memberExpr) {
+	memberExprs[locBegin][expr][locEnd] = memberExpr;
 }
 
 // MemberExpr 
+/*
+// Version with the Types' Map 
 std::string Method::MemberExpr::GetMemberName() const {
 	return memberName;
 }
@@ -79,6 +96,20 @@ bool  Method::MemberExpr::isMethod() {
 }
 void  Method::MemberExpr::SetAsMethod(bool b) {
 	isMethod_ = b;
+}
+*/
+std::string Method::MemberExpr::GetName() const {
+	return name;
+}
+Structure* Method::MemberExpr::GetType() const {
+	return type;
+}
+
+bool  Method::MemberExpr::IsMethod() {
+	return isMethod;
+}
+void  Method::MemberExpr::SetAsMethod(bool b) {
+	isMethod = b;
 }
 
 

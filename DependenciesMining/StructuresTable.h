@@ -4,6 +4,8 @@
 #include <unordered_map>
 #include <cassert>
 
+#define MEMBER_MAP std::unordered_map <std::string, std::unordered_map<std::string, std::unordered_map<std::string, Method::MemberExpr>>>
+
 namespace DependenciesMining {
 
 	class Structure;
@@ -26,6 +28,14 @@ namespace DependenciesMining {
 		TemplateUserMethod
 	};
 
+	class SourceInfo {
+	public: 
+		std::string fullLocation;
+
+		std::string GetFullLocation() const;
+		void SetFullLocation(std::string fullLocation);
+	};
+
 	class Definition {
 	private:
 		std::string name;
@@ -41,7 +51,7 @@ namespace DependenciesMining {
 
 	class Method {
 	public:
-		class MemberExpr {
+		/*class MemberExpr {
 		private:
 			std::string memberName;
 			std::string expr;
@@ -56,6 +66,22 @@ namespace DependenciesMining {
 			
 			bool isMethod();
 			void SetAsMethod(bool b = true);
+		};*/
+
+		class MemberExpr : public SourceInfo{
+		private:
+			std::string name;
+			Structure* type;
+			bool isMethod = false;
+		public:
+			MemberExpr() = default;
+			MemberExpr(std::string name, Structure* type, bool isMethod = false) : name(name), type(type), isMethod(isMethod) {};
+
+			std::string GetName() const;
+			Structure* GetType() const;
+			
+			bool IsMethod();
+			void SetAsMethod(bool b = true); 
 		};
 	private:
 		std::string name;
@@ -63,7 +89,8 @@ namespace DependenciesMining {
 		Structure* returnType = nullptr;
 		std::unordered_map<std::string, Definition> arguments;
 		std::unordered_map<std::string, Definition> definitions;
-		std::unordered_map<std::string, std::pair<Structure*, std::vector<Method::MemberExpr>>> memberExprs;
+		//std::unordered_map<std::string, std::pair<Structure*, std::vector<Method::MemberExpr>>> memberExprs;
+		MEMBER_MAP memberExprs; // locBegin : Expr : locEnd : [member : Info(type)]
 
 	public:
 		Method() = default;
@@ -71,7 +98,7 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::unordered_map<std::string, Definition>& GetArguments() ;
 		std::unordered_map<std::string, Definition>& GetDefinitions();
-		std::unordered_map<std::string, std::pair<Structure*, std::vector<Method::MemberExpr>>>& GetMemberExprs();
+		MEMBER_MAP& GetMemberExprs();
 		MethodType GetMethodType() const;
 		Structure* GetReturnType() const;
 
@@ -79,7 +106,8 @@ namespace DependenciesMining {
 		void SetReturnType(Structure* structure);
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
-		void InsertMemberExpr(const std::string& name, Structure* structure, MemberExpr memberExpr);
+		//void InsertMemberExpr(const std::string& name, Structure* structure, MemberExpr memberExpr);
+		void InsertMemberExpr(const std::string& locBegin, const std::string& locEnd, const std::string& expr, Method::MemberExpr memberExpr);
 	};
 
 	class Template {

@@ -33,13 +33,16 @@ namespace DependenciesMining {
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
 
-		class FindMemberClassVisitor : public RecursiveASTVisitor<FindMemberClassVisitor> {
+		class FindMemberExprVisitor : public RecursiveASTVisitor<FindMemberExprVisitor> {
 		public:
 			bool VisitMemberExpr(MemberExpr* expr);
+
+			std::string GetMemberExprAsString(MemberExpr* expr);
 		};
 	private: 
-		friend FindMemberClassVisitor;
+		friend FindMemberExprVisitor;
 		inline static Method* currentMethod = nullptr;
+		inline static SourceManager* sm = nullptr;
 	};
 
 	class MethodVarsCallback : public MatchFinder::MatchCallback {
@@ -47,11 +50,11 @@ namespace DependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& result);
 	};
 
-/*	class MemberOnMethodsCallback : public MatchFinder::MatchCallback {
+	/*class MemberOnMethodsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
-	};
-*/
+	};*/
+
 	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
 
 }
