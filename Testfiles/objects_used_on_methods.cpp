@@ -10,7 +10,7 @@ namespace memberExpr{
 	 
 	struct X{
 		int i;
-		Y* m1(){
+		Y* m1(int i){
 			return new Y(); 
 		}
 
@@ -33,40 +33,51 @@ namespace memberExpr{
 
 	B f(B b) { return b;}
 
-	struct A {
+	template<typename T>struct A {
 		B b;
 		B* b2; 
-		B m_b() {
+		B m_b(int i) {
 			B b;
 			return b;
 		};
 
+		A* m_a(){
+			return new A();
+		}
+
 		B method(){
 			C* pc = b2->pc; 
 			C c = b.c;
-			B bb; 
+			T bb; 
 			c = bb.c;
 
 			X x = bb.c.x;
 			X* px = &(pc->x); 
 
-			px->m1()->k; 
+			px->m1(1);	//->k; 
 			x.m2().k;	
-			(*(px->m1())).k;
+			(*(px->m1(1))).k;
 
 			//(&bb).c;
-			bb.c.x.m1()->k;		
+			bb.c.x.m1(1)->k;		
 
-			m_b().c.x;
+			m_b(2).c.x;			// den ta bazei mesa sto template
+			m_a()->b2->pc;		// den ta vazei mesa sto template
 			auto auto_c = f(b).c;
 
 			 bb.c.i + b.c.i;
+
+			A<B> a;
+			a.b2; 
+			if(a.b.c.i == 1){
+				a.b2
+			}
 			return b; 		
 		}
 	};
 
 	int main(){
-		A a; 
+		A<B> a; 
 		a.method();
 		return 0;
 	}

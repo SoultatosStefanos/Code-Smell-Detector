@@ -36,8 +36,6 @@ namespace DependenciesMining {
 		class FindMemberExprVisitor : public RecursiveASTVisitor<FindMemberExprVisitor> {
 		public:
 			bool VisitMemberExpr(MemberExpr* expr);
-
-			std::string GetMemberExprAsString(MemberExpr* expr);
 		};
 	private: 
 		friend FindMemberExprVisitor;

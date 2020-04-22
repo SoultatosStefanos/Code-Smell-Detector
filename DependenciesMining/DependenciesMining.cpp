@@ -51,7 +51,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
-	
+	auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+	structure.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+
 	structure.SetName(GetFullStructureName(d));
 
 	// Templates
@@ -165,6 +167,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
 
 			Definition field(d->getQualifiedNameAsString(), typeStructure);
+			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+			field.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			parentStructure->InsertField(d->getQualifiedNameAsString(), field);	
 		} 
 	}
@@ -178,6 +182,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		Structure* parentStructure = structuresTable.Get(parentName);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(GetFullMethodName(d));
+		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+
 		if (d->getDeclKind() == d->CXXConstructor) {
 			method.SetMethodType(MethodType::Constructor);
 		}
@@ -207,18 +214,18 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		currentMethod = parentStructure->InsertMethod(GetFullMethodName(d), method);
 		sm = result.SourceManager;
+		
 		// Body
-		//std::cout << GetFullMethodName(d) << "------------------\n";
+		std::cout << GetFullMethodName(d) << "------------------\n";
 		auto* body = d->getBody();
 		FindMemberExprVisitor visitor; 
 		visitor.TraverseStmt(body);
 		currentMethod = nullptr;  
-		//std::cout << "------------------\n\n";
+		std::cout << "------------------\n\n";
 	}
 }
 
-// Utilities
-std::string MethodDeclsCallback::FindMemberExprVisitor::GetMemberExprAsString(MemberExpr* memberExpr) {
+/*std::string MethodDeclsCallback::FindMemberExprVisitor::GetMemberExprAsString(MemberExpr* memberExpr) {
 	auto* base = memberExpr->getBase();
 	auto* decl = memberExpr->getMemberDecl();
 	//std::stack<SourceLocation> paren;
@@ -235,11 +242,6 @@ std::string MethodDeclsCallback::FindMemberExprVisitor::GetMemberExprAsString(Me
 			op = "->";
 		else
 			op = ".";
-
-		/*if (!paren.empty() && base->getSourceRange().getBegin() >= paren.top()) {
-			exprString = "(" + exprString;
-			paren.pop();
-		}*/
 
 		if (base->getStmtClass() == memberExpr->DeclRefExprClass) {				// apo var tou idiou tou method
 			auto baseName = ((DeclRefExpr*)base)->getDecl()->getNameAsString();
@@ -267,16 +269,13 @@ std::string MethodDeclsCallback::FindMemberExprVisitor::GetMemberExprAsString(Me
 			while (	base->getStmtClass() != memberExpr->DeclRefExprClass && 
 					base->getStmtClass() != memberExpr->MemberExprClass &&
 					base->getStmtClass() != memberExpr->CXXThisExprClass ) {
-				/*if (base->getStmtClass() != memberExpr->ParenExprClass) {
-					paren.push(((ParenExpr*)base)->getLParen());
-					exprString = ")" + exprString;
-				}*/
+				
 				base = (Expr*)*(base->child_begin());
 			}
 		}
 	}
 	return exprString;
-}
+}*/
 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
 	auto* decl = memberExpr->getMemberDecl();
@@ -285,9 +284,11 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	bool isMethod = false;
 
 	if (base->getStmtClass() == memberExpr->CXXThisExprClass) { // ignore class' fields
-		//std::cout << "~~~~~~~~~~~~~~~this\n\n";
+		//std::cout << decl->getNameAsString() << "   ~~~~~~~~~~~~~~~this\n\n";
 		return true;
 	}
+
+
 	if (!isStructureOrStructurePointerType(type)) {
 		if (decl->getKind() == decl->CXXMethod) {
 			CXXMethodDecl* methodDecl = (CXXMethodDecl*)decl;
@@ -298,8 +299,10 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 				return true;
 			}
 		}
-		else
+		else {
+			//std::cout << decl->getNameAsString() << "--------------ret true\n";
 			return true;
+		}
 	}
 	std::string typeName;
 	if (type->isPointerType())
@@ -311,17 +314,38 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 		typeStructure = structuresTable.Insert(typeName);
 	//llvm::outs() << "Decl Type: " << typeName << "\n";
 
+
 	auto range = memberExpr->getSourceRange();
-	auto locBegin = range.getBegin().printToString(*MethodDeclsCallback::sm);
-	auto locEnd = range.getEnd().printToString(*MethodDeclsCallback::sm);
-	std::string exprString = GetMemberExprAsString(memberExpr);
-
-	Method::MemberExpr methodMemberExpr(decl->getNameAsString(), typeStructure, isMethod);
-	MethodDeclsCallback::currentMethod->InsertMemberExpr(locBegin, locEnd, exprString, methodMemberExpr);
-
-	/*std::cout << "Member Expr:  " << exprString << "\n"; 	
+	std::string exprString;
+	if (decl->getKind() == decl->CXXMethod) {
+		auto end = sm->getCharacterData(range.getEnd());
+		int openCount = 0, closeCount = 0;
+		while (!(openCount == closeCount && openCount)) {
+			if (*end == '(') {
+				openCount++;
+			}
+			else if (*end == ')') {
+				closeCount++;
+			}
+			end++;
+		}
+		exprString = std::string(sm->getCharacterData(range.getBegin()), end);
+	}
+	else {
+		exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
+	}
+	std::cout << "Member Expr:  " << exprString << "\n";
 	llvm::outs() << "Kind: " << decl->getDeclKindName() << "\n";
-	llvm::outs() << "Name: " << decl->getNameAsString() << "\n";*/
+	llvm::outs() << "Name: " << decl->getNameAsString() << "\n";
+
+	auto srcLocationBegin = MethodDeclsCallback::sm->getPresumedLoc(range.getBegin());
+	auto srcLocationEnd = MethodDeclsCallback::sm->getPresumedLoc(range.getEnd());
+	SourceInfo locBegin(srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
+	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
+	
+	Method::MemberExpr methodMemberExpr(exprString, srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
+	Method::Member member(decl->getNameAsString(), typeStructure, locEnd);
+	MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, locBegin.toString());
 	
 	//std::cout << "~~~~~~~~~~~~~~~\n\n";
 	return true;
@@ -350,6 +374,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = structuresTable.Insert(typeName);
 			Definition def(d->getQualifiedNameAsString(), typeStructure);
+			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+			def.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
 				parentMethod->InsertDefinition(d->getQualifiedNameAsString(), def);
 			}
