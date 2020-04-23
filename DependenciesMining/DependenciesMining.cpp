@@ -6,7 +6,6 @@
 #define FIELD_DECL "FieldDecl"
 #define METHOD_DECL "MethodDecl"
 #define METHOD_VAR_OR_ARG "MethodVarOrArg"
-//#define MEMBER_EXPR "MemberExpr"
 
 using namespace DependenciesMining;
 
@@ -16,7 +15,6 @@ DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
 DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
 DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
-//StatementMatcher MemberMatcher = memberExpr().bind(MEMBER_EXPR);
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -216,67 +214,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		sm = result.SourceManager;
 		
 		// Body
-		std::cout << GetFullMethodName(d) << "------------------\n";
 		auto* body = d->getBody();
 		FindMemberExprVisitor visitor; 
 		visitor.TraverseStmt(body);
-		currentMethod = nullptr;  
-		std::cout << "------------------\n\n";
+		currentMethod = nullptr;
 	}
 }
 
-/*std::string MethodDeclsCallback::FindMemberExprVisitor::GetMemberExprAsString(MemberExpr* memberExpr) {
-	auto* base = memberExpr->getBase();
-	auto* decl = memberExpr->getMemberDecl();
-	//std::stack<SourceLocation> paren;
-	std::string exprString = decl->getNameAsString();
-	std::string op;
-	if (decl->getKind() == decl->CXXMethod || decl->getKind() == decl->Function)
-		exprString += "()";
-	while (true) {
-		auto type = base->getType();
-		if (decl->getKind() == decl->CXXMethod || decl->getKind() == decl->Function) {
-			type = ((FunctionDecl*)decl)->getReturnType();
-		}
-		if (type->isPointerType())
-			op = "->";
-		else
-			op = ".";
-
-		if (base->getStmtClass() == memberExpr->DeclRefExprClass) {				// apo var tou idiou tou method
-			auto baseName = ((DeclRefExpr*)base)->getDecl()->getNameAsString();
-			if (((DeclRefExpr*)base)->getDecl()->getKind() == decl->CXXMethod ||
-				((DeclRefExpr*)base)->getDecl()->getKind() == decl->Function)
-				exprString = baseName + "()" + op + exprString; 
-			else
-				exprString = baseName + op + exprString;
-			break;
-		}
-		else if (base->getStmtClass() == memberExpr->MemberExprClass) {	
-			auto baseName = ((MemberExpr*)base)->getMemberDecl()->getNameAsString();
-			if (((MemberExpr*)base)->getMemberDecl()->getKind() == decl->CXXMethod || 
-				((MemberExpr*)base)->getMemberDecl()->getKind() == decl->Function)
-				exprString = baseName + "()" + op + exprString;
-			else 
-				exprString = baseName + op + exprString;
-
-			base = ((MemberExpr*)base)->getBase();
-		}
-		else if (base->getStmtClass() == memberExpr->CXXThisExprClass) {
-			break;
-		}
-		else {
-			while (	base->getStmtClass() != memberExpr->DeclRefExprClass && 
-					base->getStmtClass() != memberExpr->MemberExprClass &&
-					base->getStmtClass() != memberExpr->CXXThisExprClass ) {
-				
-				base = (Expr*)*(base->child_begin());
-			}
-		}
-	}
-	return exprString;
-}*/
-
+// Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
 	auto* decl = memberExpr->getMemberDecl();
 	auto type = decl->getType();
@@ -284,38 +229,14 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	bool isMethod = false;
 
 	if (base->getStmtClass() == memberExpr->CXXThisExprClass) { // ignore class' fields
-		//std::cout << decl->getNameAsString() << "   ~~~~~~~~~~~~~~~this\n\n";
 		return true;
 	}
-
-
-	if (!isStructureOrStructurePointerType(type)) {
-		if (decl->getKind() == decl->CXXMethod) {
-			CXXMethodDecl* methodDecl = (CXXMethodDecl*)decl;
-			type = methodDecl->getReturnType();
-			isMethod = true;
-			if (!isStructureOrStructurePointerType(type)) {
-				//std::cout << "~~~~~~~~~~~~~~~method\n\n";
-				return true;
-			}
-		}
-		else {
-			//std::cout << decl->getNameAsString() << "--------------ret true\n";
-			return true;
-		}
-	}
-	std::string typeName;
-	if (type->isPointerType())
-		typeName = GetFullStructureName(type->getPointeeType()->getAsCXXRecordDecl());
-	else
-		typeName = GetFullStructureName(type->getAsCXXRecordDecl());
-	Structure* typeStructure = structuresTable.Get(typeName);
-	if (!typeStructure)
-		typeStructure = structuresTable.Insert(typeName);
-	//llvm::outs() << "Decl Type: " << typeName << "\n";
-
-
+		
 	auto range = memberExpr->getSourceRange();
+	auto srcLocationBegin = MethodDeclsCallback::sm->getPresumedLoc(range.getBegin());
+	auto srcLocationEnd = MethodDeclsCallback::sm->getPresumedLoc(range.getEnd());
+	SourceInfo locBegin(srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
+	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
 	std::string exprString;
 	if (decl->getKind() == decl->CXXMethod) {
 		auto end = sm->getCharacterData(range.getEnd());
@@ -334,19 +255,39 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	else {
 		exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
 	}
-	std::cout << "Member Expr:  " << exprString << "\n";
-	llvm::outs() << "Kind: " << decl->getDeclKindName() << "\n";
-	llvm::outs() << "Name: " << decl->getNameAsString() << "\n";
+	Method::MemberExpr methodMemberExpr(exprString, locEnd, locBegin.GetFileName(), locBegin.GetLine(), locBegin.GetColumn());
 
-	auto srcLocationBegin = MethodDeclsCallback::sm->getPresumedLoc(range.getBegin());
-	auto srcLocationEnd = MethodDeclsCallback::sm->getPresumedLoc(range.getEnd());
-	SourceInfo locBegin(srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
-	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
+	if (!isStructureOrStructurePointerType(type)) {
+		if (decl->getKind() == decl->CXXMethod) {
+			CXXMethodDecl* methodDecl = (CXXMethodDecl*)decl;
+			type = methodDecl->getReturnType();
+			isMethod = true;
+			if (!isStructureOrStructurePointerType(type)) {
+				MethodDeclsCallback::currentMethod->UpdateMemberExpr(methodMemberExpr, locBegin.toString());	// to get the full expr if I have fields with not a class type
+				return true;
+			}
+		}
+		else {
+			MethodDeclsCallback::currentMethod->UpdateMemberExpr(methodMemberExpr, locBegin.toString());
+			return true;
+		}
+	}
+
+	std::string typeName;
+	if (type->isPointerType())
+		typeName = GetFullStructureName(type->getPointeeType()->getAsCXXRecordDecl());
+	else
+		typeName = GetFullStructureName(type->getAsCXXRecordDecl());
+	Structure* typeStructure = structuresTable.Get(typeName);
+	if (!typeStructure)
+		typeStructure = structuresTable.Insert(typeName);
 	
-	Method::MemberExpr methodMemberExpr(exprString, srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
 	Method::Member member(decl->getNameAsString(), typeStructure, locEnd);
 	MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, locBegin.toString());
-	
+
+	//std::cout << "Member Expr:  " << exprString << "\n";
+	//llvm::outs() << "Kind: " << decl->getDeclKindName() << "\n";
+	//llvm::outs() << "Name: " << decl->getNameAsString() << "\n";
 	//std::cout << "~~~~~~~~~~~~~~~\n\n";
 	return true;
 }

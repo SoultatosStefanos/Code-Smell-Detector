@@ -48,11 +48,6 @@ namespace DependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& result);
 	};
 
-	/*class MemberOnMethodsCallback : public MatchFinder::MatchCallback {
-	public:
-		virtual void run(const MatchFinder::MatchResult& result);
-	};*/
-
 	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
 
 }

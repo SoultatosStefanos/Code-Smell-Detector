@@ -65,12 +65,12 @@ namespace memberExpr{
 			m_a()->b2->pc;		// den ta vazei mesa sto template
 			auto auto_c = f(b).c;
 
-			 bb.c.i + b.c.i;
+			bb.c.i + b.c.i;
 
 			A<B> a;
 			a.b2; 
 			if(a.b.c.i == 1){
-				a.b2
+				a.b2;
 			}
 			return b; 		
 		}

@@ -73,20 +73,17 @@ namespace DependenciesMining {
 		private:
 			std::string name;
 			SourceInfo locEnd;
-			//MemberExpr* expr;
 			Structure* type;
 
 		public:
 			Member() = default;
 			Member(const std::string& name, Structure* type, SourceInfo locEnd) : name(name), type(type), locEnd(locEnd) {};
 			std::string GetName() const;
-			std::string* GetLocEnd() const;
-			//std::string GetExpr() const;
+			SourceInfo GetLocEnd() const;
 			Structure* GetType() const;
 
 			void SetName(const std::string& name);
-			void SetLocEnd(const std::string& locEnd);
-			//void SetExpr(MemberExpr* expr);
+			void SetLocEnd(const SourceInfo& locEnd);
 			void SetType(Structure* type);
 		};
 
@@ -96,7 +93,7 @@ namespace DependenciesMining {
 			std::vector<Member> members;
 		public:
 			MemberExpr() = default;
-			MemberExpr(std::string expr, std::string file, int line, int column) : expr(expr), SourceInfo(file, line, column) {};
+			MemberExpr(std::string expr, SourceInfo locEnd, std::string file, int line, int column) : expr(expr), locEnd(locEnd), SourceInfo(file, line, column) {};
 			std::string GetExpr() const;
 			std::vector<Member> GetMembers() const;
 			SourceInfo GetLocEnd() const;
@@ -128,6 +125,7 @@ namespace DependenciesMining {
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
+		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
 	};
 
 	class Template {

@@ -134,6 +134,45 @@ void Method::InsertMemberExpr(MemberExpr const& memberExpr, Member const& member
 	memberExprs[locBegin].InsertMember(member);
 }
 
+void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin) {
+	if (memberExprs.find(locBegin) == memberExprs.end()) {
+		memberExprs[locBegin] = memberExpr;
+	}
+	else {
+		if (memberExpr.GetLocEnd() > memberExprs[locBegin].GetLocEnd()) {
+			memberExprs[locBegin].SetExpr(memberExpr.GetExpr());
+			memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
+		}
+	}
+}
+
+// Member
+std::string Method::Member::GetName() const {
+	return name;
+}
+
+SourceInfo Method::Member::GetLocEnd() const {
+	return locEnd;
+}
+
+Structure* Method::Member::GetType() const {
+	return type;
+}
+
+void Method::Member::SetName(const std::string& name) {
+	this->name = name; 
+}
+
+void Method::Member::SetLocEnd(const SourceInfo& locEnd) {
+	this->locEnd = locEnd; 
+}
+
+void Method::Member::SetType(Structure* type) {
+	this->type = type;
+}
+
+
+
 // MemberExpr 
 std::string Method::MemberExpr::GetExpr() const {
 	return expr;
