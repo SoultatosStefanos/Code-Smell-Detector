@@ -26,7 +26,9 @@ namespace DependenciesMining {
 		Constructor,
 		Destructor,
 		UserMethod,
-		TemplateUserMethod
+		TemplateDefinition,
+		TemplateSpecialization,
+		TemplateInstatiationSpecialization
 	};
 
 	class SourceInfo {

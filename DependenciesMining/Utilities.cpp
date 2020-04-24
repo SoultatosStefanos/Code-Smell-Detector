@@ -46,8 +46,6 @@ std::string GetFullTemplateArgsName(const RecordDecl* d) {
 std::string GetFullStructureName(const RecordDecl* d) {
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 		auto temp = (ClassTemplateSpecializationDecl*)d;
-		auto qualifiedName = d->getQualifiedNameAsString();
-		auto name = d->getNameAsString();
 		std::string args = "<";
 		bool lastArgTemplateSpecial = false;															// gia kapoio logo an to last arg einai template pecial afhnei ena keno
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
@@ -72,7 +70,7 @@ std::string GetFullStructureName(const RecordDecl* d) {
 		if (lastArgTemplateSpecial)
 			args += " ";
 		args += ">";
-		return (qualifiedName + args + "::" + name);
+		return (d->getQualifiedNameAsString() + args + "::" + d->getNameAsString());
 	}
 	else if (d->isCXXClassMember() && ((CXXRecordDecl*)d)->getInstantiatedFromMemberClass()) {
 		return  d->getQualifiedNameAsString() + "::" + d->getNameAsString();
@@ -87,6 +85,35 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	std::string str = d->getType().getAsString();
 	std::size_t pos = str.find("(");
 	std::string argList = str.substr(pos);
+	if (d->getTemplatedKind()) {
+		std::string tepmlateArgs = "<";
+		if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization) {
+			auto args = d->getTemplateSpecializationArgs()->asArray();
+			bool lastArgTemplateSpecial = false; 
+			for (auto it : args) {
+
+				if (tepmlateArgs != "<")
+					tepmlateArgs += ", ";
+				if (it.getAsType()->isStructureOrClassType()) {
+					auto fullName = GetFullTemplateArgsName(it.getAsType()->getAsCXXRecordDecl());
+					if (fullName != it.getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString())
+						lastArgTemplateSpecial = true;
+					else
+						lastArgTemplateSpecial = false;
+					tepmlateArgs += fullName;
+				}
+				else {
+					tepmlateArgs += it.getAsType().getAsString();
+					lastArgTemplateSpecial = false;
+				}
+			}
+			if (lastArgTemplateSpecial)
+				tepmlateArgs += " ";
+			
+		}
+		tepmlateArgs += ">";
+		return d->getQualifiedNameAsString() + tepmlateArgs + argList;
+	}
 	return d->getQualifiedNameAsString() + argList;
 }
 

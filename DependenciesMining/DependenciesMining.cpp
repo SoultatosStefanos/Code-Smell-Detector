@@ -182,19 +182,35 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		Method method(GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-
+		
 		if (d->getDeclKind() == d->CXXConstructor) {
 			method.SetMethodType(MethodType::Constructor);
 		}
 		else if (d->getDeclKind() == d->CXXDestructor) {
 			method.SetMethodType(MethodType::Destructor);
 		}
-		else if (d->getDeclKind() == d->ClassTemplate) {
-			method.SetMethodType(MethodType::TemplateUserMethod);
+		else if (d->getTemplatedKind()) {
+			if (d->getTemplatedKind() == d->TK_FunctionTemplate) {
+				method.SetMethodType(MethodType::TemplateDefinition);
+			}
+			else if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization) {
+				if (d->isTemplateInstantiation()) {
+					method.SetMethodType(MethodType::TemplateInstatiationSpecialization);
+				}
+				else {
+					method.SetMethodType(MethodType::TemplateSpecialization);
+				}
+			}
+			else {
+				std::cout << d->getTemplatedKind() << "\n\n";
+				assert(0);
+			}
+			
 		}
 		else {
 			method.SetMethodType(MethodType::UserMethod);
 		}
+
 
 		//Return
 		auto returnType = d->getReturnType();
