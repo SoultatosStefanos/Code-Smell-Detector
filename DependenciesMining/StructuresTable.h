@@ -27,7 +27,7 @@ namespace DependenciesMining {
 		Destructor,
 		UserMethod,
 		TemplateDefinition,
-		TemplateSpecialization,
+		TemplateFullSpecialization,
 		TemplateInstatiationSpecialization
 	};
 
@@ -128,6 +128,13 @@ namespace DependenciesMining {
 		void InsertDefinition(const std::string& name, Definition& definition);
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
+
+		bool isConstructor(); 
+		bool isDestructor();
+		bool isUserMethod();
+		bool isTemplateDefinition();
+		bool isTemplateFullSpecialization();
+		bool isTemplateInstatiationSpecialization();
 	};
 
 	class Template {

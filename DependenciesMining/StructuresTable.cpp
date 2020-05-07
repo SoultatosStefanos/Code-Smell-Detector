@@ -146,6 +146,43 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 	}
 }
 
+bool Method::isConstructor() {
+	if (methodType == MethodType::Constructor)
+		return true; 
+	return false;
+}
+
+bool Method::isDestructor() {
+	if (methodType == MethodType::Destructor)
+		return true;
+	return false;
+}
+
+bool Method::isUserMethod() {
+	if (methodType == MethodType::UserMethod)
+		return true;
+	return false;
+}
+
+bool Method::isTemplateDefinition() {
+	if (methodType == MethodType::TemplateDefinition)
+		return true;
+	return false;
+}
+
+bool Method::isTemplateFullSpecialization() {
+	if (methodType == MethodType::TemplateFullSpecialization)
+		return true;
+	return false;
+}
+
+bool Method::isTemplateInstatiationSpecialization() {
+	if (methodType == MethodType::TemplateInstatiationSpecialization)
+		return true;
+	return false;
+}
+
+
 // Member
 std::string Method::Member::GetName() const {
 	return name;

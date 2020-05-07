@@ -10,10 +10,39 @@ using namespace clang;
 using namespace clang::ast_matchers;
 using namespace llvm;
 
-template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result);
+template<typename T> 
+void PrintLocation(T d, const MatchFinder::MatchResult& result);
 
-std::string GetFullTemplateArgsName(const RecordDecl* d);
+bool isStructureOrStructurePointerType(clang::QualType type);
+
+template<typename Callback, typename ...Types>
+void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types... args);
 std::string GetFullStructureName(const RecordDecl* d);
 std::string GetFullMethodName(const CXXMethodDecl* d);
+clang::QualType GetTemplateArgType(clang::TemplateArgument arg);
+std::string GetInnerTemplateArgs(const RecordDecl* d);
+void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, bool* lastArgTemplateSpecial, std::string* args);
 
-bool isStructureOrStructurePointerType(clang::QualType type); 
+
+// ---------------------------- template function definition ---------------------------------
+template<typename Callback, typename ...Types>
+void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types... args) {
+	if (templateArg.getKind() == templateArg.Pack) {
+		auto argArray = templateArg.getPackAsArray();
+		for (auto it : argArray) {
+			TemplateArgsVisit(it, callback, args...);
+		}
+	}
+	/*else if (templateArg.getKind() == templateArg.Template || templateArg.getKind() == templateArg.TemplateExpansion) {
+		arg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName();
+	}		???????????????????????????????*/
+	else {
+		callback(templateArg, args...);
+	}
+}
+
+template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
+	auto& sm = *result.SourceManager;
+	auto loc = d->getLocation().printToString(sm);
+	std::cout << "\t" << loc << "\n\n";
+}

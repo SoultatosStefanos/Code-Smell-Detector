@@ -1,75 +1,72 @@
 #include "Utilities.h"
 
-template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& result) {
-	auto& sm = *result.SourceManager;
-	auto loc = d->getLocation().printToString(sm);
-	std::cout << "\t" << loc << "\n\n";
+QualType GetTemplateArgType(TemplateArgument arg) {
+	switch (arg.getKind()) {
+	case TemplateArgument::Null:
+		return QualType();
+	case TemplateArgument::Type:
+		return arg.getAsType();
+	case TemplateArgument::Template:
+	case TemplateArgument::TemplateExpansion:
+		assert(0);
+		return QualType();// arg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName();
+	case TemplateArgument::Pack:
+		assert(0);
+		return QualType();
+	case TemplateArgument::Integral:
+		return arg.getIntegralType();
+
+	case TemplateArgument::Expression:
+		return arg.getAsExpr()->getType();
+
+	case TemplateArgument::Declaration:
+		return arg.getParamTypeForDecl();
+		//return arg.getAsDecl()->getType();
+
+	case TemplateArgument::NullPtr:
+		return arg.getNullPtrType();
+	//arg.getNonTypeTemplateArgumentType();
+	}	
 }
 
-std::string GetFullTemplateArgsName(const RecordDecl* d) {
-	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-		auto temp = (ClassTemplateSpecializationDecl*)d;
+void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, bool* lastArgTemplateSpecial, std::string* args) {
+	if (*args != "<")
+		*args += ", ";
+	auto argType = GetTemplateArgType(templateArg);
+	if (argType->isStructureOrClassType()) {
+		RecordDecl* d = argType->getAsCXXRecordDecl();
 		auto qualifiedName = d->getQualifiedNameAsString();
-		auto name = d->getNameAsString();
-		std::string args = "<";
-		bool lastArgTemplateSpecial = false;															// gia kapoio logo an to last arg einai template pecial afhnei ena keno
-		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
-
-			if (args != "<")
-				args += ", ";
-			if (temp->getTemplateArgs()[i].getAsType()->isStructureOrClassType()) {
-				auto fullName = GetFullTemplateArgsName(temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl());
-				if (fullName != temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString())
-					lastArgTemplateSpecial = true;
-				else
-					lastArgTemplateSpecial = false;
-				args += fullName;
-			}
-			//else if (temp->getTemplateArgs()[i].getAsType()->isTemplateTypeParmType())				// an to valw etsi tha prepei na allaksw kai to onoma twn fields + methods gia na einai uniform 
-			//	args += "-T-";
-			else {
-				args += temp->getTemplateArgs()[i].getAsType().getAsString();
-				lastArgTemplateSpecial = false;
-			}
+		if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
+			 *args += qualifiedName + GetInnerTemplateArgs(d);
+			 *lastArgTemplateSpecial = true;
+		}			
+		else {
+			*args += qualifiedName;
+			*lastArgTemplateSpecial = false;
 		}
-		if (lastArgTemplateSpecial)
-			args += " ";
-		args += ">";
-		return (qualifiedName + args);
 	}
 	else {
-		return d->getQualifiedNameAsString();
+		*lastArgTemplateSpecial = false;
+		*args += argType.getAsString();
 	}
 }
 
+std::string GetInnerTemplateArgs(const RecordDecl* d) {
+	auto temp = (ClassTemplateSpecializationDecl*)d;
+	std::string args = "<";
+	bool lastArgTemplateSpecial = false;															// gia kapoio logo an to last arg einai template pecial afhnei ena keno
+	for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
+		TemplateArgsVisit(temp->getTemplateArgs()[i], AppendTemplateArgNameCallback, &lastArgTemplateSpecial, &args);
+	}
+	if (lastArgTemplateSpecial)
+		args += " ";
+	args += ">";
+	return args;
+}
 
 std::string GetFullStructureName(const RecordDecl* d) {
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-		auto temp = (ClassTemplateSpecializationDecl*)d;
-		std::string args = "<";
-		bool lastArgTemplateSpecial = false;															// gia kapoio logo an to last arg einai template pecial afhnei ena keno
-		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
-
-			if (args != "<")
-				args += ", ";
-			if (temp->getTemplateArgs()[i].getAsType()->isStructureOrClassType()) {
-				auto fullName = GetFullTemplateArgsName(temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl());
-				if (fullName != temp->getTemplateArgs()[i].getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString())
-					lastArgTemplateSpecial = true;
-				else
-					lastArgTemplateSpecial = false;
-				args += fullName;
-			}
-			//else if (temp->getTemplateArgs()[i].getAsType()->isTemplateTypeParmType())				// an to valw etsi tha prepei na allaksw kai to onoma twn fields + methods gia na einai uniform 
-			//	args += "-T-";
-			else {
-				args += temp->getTemplateArgs()[i].getAsType().getAsString();
-				lastArgTemplateSpecial = false;
-			}
-		}
-		if (lastArgTemplateSpecial)
-			args += " ";
-		args += ">";
+		std::string args = GetInnerTemplateArgs(d);
 		return (d->getQualifiedNameAsString() + args + "::" + d->getNameAsString());
 	}
 	else if (d->isCXXClassMember() && ((CXXRecordDecl*)d)->getInstantiatedFromMemberClass()) {
@@ -85,32 +82,16 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	std::string str = d->getType().getAsString();
 	std::size_t pos = str.find("(");
 	std::string argList = str.substr(pos);
-	if (d->getTemplatedKind()) {
+	if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
 		std::string tepmlateArgs = "<";
-		if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization) {
-			auto args = d->getTemplateSpecializationArgs()->asArray();
-			bool lastArgTemplateSpecial = false; 
-			for (auto it : args) {
-
-				if (tepmlateArgs != "<")
-					tepmlateArgs += ", ";
-				if (it.getAsType()->isStructureOrClassType()) {
-					auto fullName = GetFullTemplateArgsName(it.getAsType()->getAsCXXRecordDecl());
-					if (fullName != it.getAsType()->getAsCXXRecordDecl()->getQualifiedNameAsString())
-						lastArgTemplateSpecial = true;
-					else
-						lastArgTemplateSpecial = false;
-					tepmlateArgs += fullName;
-				}
-				else {
-					tepmlateArgs += it.getAsType().getAsString();
-					lastArgTemplateSpecial = false;
-				}
-			}
-			if (lastArgTemplateSpecial)
-				tepmlateArgs += " ";
-			
+		auto args = d->getTemplateSpecializationArgs()->asArray();
+		bool lastArgTemplateSpecial = false; 
+		for (auto it : args) {
+			TemplateArgsVisit(it, AppendTemplateArgNameCallback, &lastArgTemplateSpecial, &tepmlateArgs);
 		}
+		if (lastArgTemplateSpecial)
+			tepmlateArgs += " ";
+			
 		tepmlateArgs += ">";
 		return d->getQualifiedNameAsString() + tepmlateArgs + argList;
 	}
