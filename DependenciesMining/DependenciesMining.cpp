@@ -48,6 +48,11 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			structure.SetStructureType(StructureType::TemplateInstatiationSpecialization);
 		else 
 			structure.SetStructureType(StructureType::TemplateFullSpecialization);
+	}else if (d->getKind() == d->TemplateTemplateParm) {
+		assert(0);
+	}
+	else if (d->TemplateTypeParm) {
+		std::cout << "TemplateTypeParm\n";//return;			// bazei kai ta templates me args xwris full name ..... <int,Y,Y>
 	}
 
 	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
@@ -55,7 +60,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 	structure.SetName(GetFullStructureName(d));
-
+	
 	// Templates
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 		// Template parent
@@ -77,8 +82,15 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			auto templateArg = temp->getTemplateArgs()[i];
 			TemplateArgsVisit(templateArg, [](TemplateArgument templateArg, Structure *structure) {
-					if (GetTemplateArgType(templateArg)->isStructureOrClassType()) {
-						std::string argName = GetFullStructureName(GetTemplateArgType(templateArg)->getAsCXXRecordDecl());
+				RecordDecl* d = nullptr;
+				if (templateArg.getKind() == TemplateArgument::Template) {
+					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+					std::cout << d->getQualifiedNameAsString() << "??  ";
+				}
+				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
+						if (!d)
+							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
+						std::string argName = GetFullStructureName(d);
 						Structure* arg = structuresTable.Get(argName);
 						structure->InsertTemplateSpecializationArguments(argName, arg);
 					}
@@ -145,7 +157,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			parentStructure->InsertNestedClass(structure.GetName(), structuresTable.Insert(structure.GetName()));
 		}
 	}
-	//std::cout << "\n";
 	structuresTable.Insert(structure.GetName(), structure);
 }
 

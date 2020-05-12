@@ -8,7 +8,7 @@ QualType GetTemplateArgType(TemplateArgument arg) {
 		return arg.getAsType();
 	case TemplateArgument::Template:
 	case TemplateArgument::TemplateExpansion:
-		assert(0);
+	//	assert(0);
 		return QualType();// arg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName();
 	case TemplateArgument::Pack:
 		assert(0);
@@ -26,15 +26,24 @@ QualType GetTemplateArgType(TemplateArgument arg) {
 	case TemplateArgument::NullPtr:
 		return arg.getNullPtrType();
 	//arg.getNonTypeTemplateArgumentType();
-	}	
+	}
 }
 
 void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, bool* lastArgTemplateSpecial, std::string* args) {
 	if (*args != "<")
 		*args += ", ";
+	RecordDecl* d = nullptr;
+	if (templateArg.getKind() == TemplateArgument::Template) {
+		d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+	}
+	else if(templateArg.getKind() == TemplateArgument::TemplateExpansion){
+		d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+		std::cout << templateArg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName() << "!\n";
+	}
 	auto argType = GetTemplateArgType(templateArg);
-	if (argType->isStructureOrClassType()) {
-		RecordDecl* d = argType->getAsCXXRecordDecl();
+	if (d || argType->isStructureOrClassType()) {
+		if(!d)
+			d = argType->getAsCXXRecordDecl();
 		auto qualifiedName = d->getQualifiedNameAsString();
 		if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 			 *args += qualifiedName + GetInnerTemplateArgs(d);

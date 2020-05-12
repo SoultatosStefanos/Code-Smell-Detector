@@ -33,9 +33,9 @@ void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types...
 			TemplateArgsVisit(it, callback, args...);
 		}
 	}
-	/*else if (templateArg.getKind() == templateArg.Template || templateArg.getKind() == templateArg.TemplateExpansion) {
-		arg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName();
-	}		???????????????????????????????*/
+	/*if (templateArg.getKind() == templateArg.TemplateExpansion) {
+		templateArg.getExpansionType()
+	}*/
 	else {
 		callback(templateArg, args...);
 	}

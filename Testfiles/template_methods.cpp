@@ -1,11 +1,22 @@
 //#include <string>
 
 namespace temp { 
-    struct X{
+    // struct X{
 
+    // };
+    template <typename T, template <typename> class ...Cont > // pack with templates
+    class Matrix{
+    public:
+    int getSize() const{
+        return 1; //return data.size();
+    }
+    private:
+   // Cont<T, allocator<T>> data;                                                              
     };
+
+
     template<class T> struct Y{
-        X* x;
+        // X* x;
         int f(){};
 
         
@@ -13,56 +24,59 @@ namespace temp {
     }; 
 
     // Se aythn thn periptwsh (pou to class den einai template) vazei kanonika ta definitions + templateSpecialization type 
-    struct Z{
+    // struct Z{
 
-        template<typename T2> void method(T2 t, int i){
-            T2 t2; 
-            Tuple<int> tint;
-        }
+    //     template<typename T2> void method(T2 t, int i){
+    //         T2 t2; 
+    //         Tuple<int> tint;
+    //     }
 
-        template<> void method(X x, int i){
-            X x2;
-        }
-    };
+    //     template<> void method(X x, int i){
+    //         X x2;
+    //     }
+    // };
 
-    template<class T, class ... Types> struct Tuple {
-        //Tuple<char>* tup = new Tuple<char>();
-        Y<char>* y = new Y<char>();
-        X x;
+    // template<class T, class ... Types> struct Tuple { 
+    //     //Tuple<char>* tup = new Tuple<char>();
+    //     Y<char>* y = new Y<char>();
+    //     X x;
 
-        void No_Templ(X x){ }
+    //     void No_Templ(X x){ }
 
-        template<typename T2> void method(T2 t){
-            T2 t2; 
-            //Tuple<int> tint;
-        }
+    //     template<typename T2> void method(T2 t){
+    //         T2 t2; 
+    //         //Tuple<int> tint;
+    //     }
 
-        // template<> void method(X x){
-        //     X x2;
-        //     x2 = x; 
-        //     x2;
-        // }
+    //     // template<> void method(X x){
+    //     //     X x2;
+    //     //     x2 = x; 
+    //     //     x2;
+    //     // }
         
-    };
+    // };
 
-    // tuple<int,int> is a templateInstatiationSpecial 
-    // and method is a templateFullSpecial
-    template<> template<> void Tuple<int, int>::method(Z z){
-        Z z2;
-    }
+    // // tuple<int,int> is a templateInstatiationSpecial 
+    // // and method is a templateFullSpecial
+    // template<> template<> void Tuple<int, int>::method(Z z){
+    //     Z z2;
+    // }
 
 
 
     int main(){
-        Tuple<char, Tuple<int>> t0;           // Types contains no arguments
-        X x;
-        t0.method("sss");
-        t0.method(x);
+        Matrix<int, Y> m; 
+        Matrix<int, Y, Y> m2; 
+        
+        // Tuple<char, Tuple<int>> t0;           // Types contains no arguments
+        // X x;
+        // t0.method("sss");
+        // t0.method(x);
 
-        Z z;
-        Y<int> y; 
-        z.method(y, 1);
-        z.method(x, 2); 
+        // Z z;
+        // Y<int> y; 
+        // z.method(y, 1);
+        // z.method(x, 2); 
         return 0;
     }
     // Tuple<int> t1;        // Types contains one argument: int
