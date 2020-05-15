@@ -11,7 +11,7 @@ namespace temp {
         return 1; //return data.size();
     }
     private:
-      //  T t;                                                             
+        T t;                                                             
     };
 
 

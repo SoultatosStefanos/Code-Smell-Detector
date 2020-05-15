@@ -37,7 +37,7 @@ void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::str
 	if (templateArg.getKind() == TemplateArgument::Template) {
 		d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
 	}
-	else if(templateArg.getKind() == TemplateArgument::TemplateExpansion){
+	else if (templateArg.getKind() == TemplateArgument::TemplateExpansion) {
 		d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
 		std::cout << templateArg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName() << "!\n";
 	}
@@ -47,16 +47,23 @@ void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::str
 			d = argType->getAsCXXRecordDecl();
 		auto qualifiedName = d->getQualifiedNameAsString();
 		auto name = d->getName().str(); 
+		if (templateArg.getKind() == TemplateArgument::Integral) {
+			name = templateArg.getAsIntegral().toString(10);
+		}
 		if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 			 *args += qualifiedName + GetInnerTemplateArgs(d);							
 		}			
 		else {
-			//*args += qualifiedName;				// den bazw qualified name giati to clang mou epistrefei to onoma xwris to namespace gia ta args kai moy dhmiourgei problhma
+			//*args += qualifiedName;				// gia na einai idio me ta args sta methods 
 			*args += name;
 		}
 	}
 	else {
-		*args += argType.getAsString();
+		std::string name = argType.getAsString();
+		if (templateArg.getKind() == TemplateArgument::Integral) {
+			name = templateArg.getAsIntegral().toString(10);
+		}
+		*args += name;
 	}
 }
 
@@ -104,7 +111,7 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	else {
 		name = d->getQualifiedNameAsString() + argList;
 	}
-	name.erase(std::remove_if(name.begin(), name.end(), isspace), name.end());
+	//name.erase(std::remove_if(name.begin(), name.end(), isspace), name.end());
 	return name;
 }
 

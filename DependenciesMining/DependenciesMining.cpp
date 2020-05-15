@@ -34,9 +34,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (!d->hasDefinition()) {
 		return;														// ignore std && declarations
 	}
+	if (d->isImplicit()) {
+		return;
+	}
 
 	// Templates
-	if (d->getDescribedClassTemplate()) {									
+	if (d->getDescribedClassTemplate()) {	
 		structure.SetStructureType(StructureType::TemplateDefinition);
 	} 
 	else if (d->getKind() == d->ClassTemplatePartialSpecialization) {
@@ -77,7 +80,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			templateParent = structuresTable.Insert(parentName);
 		structure.SetTemplateParent(templateParent);
 
-		//Template Arguments
+		//Template Arguments		
 		auto* temp = (ClassTemplateSpecializationDecl*)d;
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			auto templateArg = temp->getTemplateArgs()[i];
