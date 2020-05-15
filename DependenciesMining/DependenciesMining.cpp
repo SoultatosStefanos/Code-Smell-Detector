@@ -51,8 +51,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}else if (d->getKind() == d->TemplateTemplateParm) {
 		assert(0);
 	}
-	else if (d->TemplateTypeParm) {
-		std::cout << "TemplateTypeParm\n";//return;			// bazei kai ta templates me args xwris full name ..... <int,Y,Y>
+	else if (d->getKind() == d->TemplateTypeParm) {
+		assert(0);
 	}
 
 	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
@@ -85,13 +85,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				RecordDecl* d = nullptr;
 				if (templateArg.getKind() == TemplateArgument::Template) {
 					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
-					std::cout << d->getQualifiedNameAsString() << "??  ";
 				}
 				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
 						std::string argName = GetFullStructureName(d);
 						Structure* arg = structuresTable.Get(argName);
+						if(arg == nullptr)
+							arg = structuresTable.Insert(argName);
 						structure->InsertTemplateSpecializationArguments(argName, arg);
 					}
 				}, &structure);			

@@ -11,7 +11,7 @@ namespace temp {
         return 1; //return data.size();
     }
     private:
-   // Cont<T, allocator<T>> data;                                                              
+      //  T t;                                                             
     };
 
 
@@ -66,7 +66,7 @@ namespace temp {
 
     int main(){
         Matrix<int, Y> m; 
-        Matrix<int, Y, Y> m2; 
+        Matrix<Matrix<Y<int>, Y>, Y, Y> m2; 
         
         // Tuple<char, Tuple<int>> t0;           // Types contains no arguments
         // X x;

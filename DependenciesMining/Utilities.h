@@ -21,7 +21,7 @@ std::string GetFullStructureName(const RecordDecl* d);
 std::string GetFullMethodName(const CXXMethodDecl* d);
 clang::QualType GetTemplateArgType(clang::TemplateArgument arg);
 std::string GetInnerTemplateArgs(const RecordDecl* d);
-void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, bool* lastArgTemplateSpecial, std::string* args);
+void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args);
 
 
 // ---------------------------- template function definition ---------------------------------
