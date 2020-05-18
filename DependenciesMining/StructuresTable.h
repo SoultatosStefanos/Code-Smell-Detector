@@ -5,8 +5,6 @@
 #include <cassert>
 #include <Vector>
 
-#define MEMBER_MAP std::unordered_map <std::string, std::unordered_map<std::string, std::unordered_map<std::string, Method::MemberExpr>>>
-
 namespace DependenciesMining {
 
 	class Structure;
@@ -69,6 +67,20 @@ namespace DependenciesMining {
 	};
 
 
+	template<typename Parent_T> class Template {
+	private:
+		Parent_T* parent = nullptr;
+		std::unordered_map<std::string, Structure*> specializationArguments;
+
+	public:
+		Template() = default;
+
+		Parent_T* GetParent() const;
+		void SetParent(Parent_T* structure); 
+		void InsertSpecializationArguments(const std::string& name, Structure* structure);
+	};
+
+
 	class Method : public SourceInfo {
 	public:
 		class Member {
@@ -108,6 +120,7 @@ namespace DependenciesMining {
 		std::string name;
 		MethodType methodType = MethodType::Undefined;
 		Structure* returnType = nullptr;
+		Template<Method> templateInfo;
 		std::unordered_map<std::string, Definition> arguments;
 		std::unordered_map<std::string, Definition> definitions;
 		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
@@ -118,16 +131,19 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::unordered_map<std::string, Definition>& GetArguments();
 		std::unordered_map<std::string, Definition>& GetDefinitions();
-		MEMBER_MAP& GetMemberExprs();
 		MethodType GetMethodType() const;
 		Structure* GetReturnType() const;
 
 		void SetMethodType(MethodType type);
 		void SetReturnType(Structure* structure);
+		void SetTemplateInfo(Template<Method> temp);
+		void SetTemplateParent(Method* structure);
+
 		void InsertArg(const std::string& name, Definition& definition);
 		void InsertDefinition(const std::string& name, Definition& definition);
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
+		void InsertTemplateSpecializationArguments(const std::string& name, Structure* structure);
 
 		bool isConstructor(); 
 		bool isDestructor();
@@ -137,23 +153,13 @@ namespace DependenciesMining {
 		bool isTemplateInstatiationSpecialization();
 	};
 
-	class Template {
-	private:
-		Structure* parent = nullptr;
-		std::unordered_map<std::string, Structure*> specializationArguments;
-
-	public:
-		Template() = default;
-		void SetParent(Structure* structure);
-		void InsertSpecializationArguments(const std::string& name, Structure* structure);
-	};
 
 	class Structure : public SourceInfo {
 	private:
 		std::string name;
 		std::string enclosingNamespace = "";
 		StructureType structureType = StructureType::Undefined;
-		Template templateInfo;
+		Template<Structure> templateInfo;
 		Structure* nestedParent = nullptr;
 		std::unordered_map<std::string, Method> methods;
 		std::unordered_map<std::string, Definition> fields;
@@ -172,6 +178,7 @@ namespace DependenciesMining {
 		std::string GetName() const;
 		std::string GetEnclosingNamespace() const;
 		StructureType GetStructureType() const;
+		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
 		Method* GetMethod(const std::string& name);
 		std::unordered_map<std::string, Method>& GetMethods();
@@ -183,7 +190,7 @@ namespace DependenciesMining {
 		void SetName(const std::string& name);
 		void SetEnclosingNamespace(const std::string& enclosingNamespace);
 		void SetStructureType(StructureType structureType);
-		void SetTemplateInfo(Template temp);
+		void SetTemplateInfo(Template<Structure> temp);
 		void SetTemplateParent(Structure* structure);
 		void SetNestedParent(Structure* structure);
 

@@ -1,90 +1,21 @@
 //#include <string>
 
-namespace temp { 
-    // struct X{
+namespace template_methods {
+    struct C{};
 
-    // };
-    template <typename T, template <typename> class ...Cont > // pack with templates
-    class Matrix{
-    public:
-    int getSize() const{
-        return 1; //return data.size();
-    }
-    private:
-        T t;                                                             
+    struct S{
+        template <typename T> void method() {};
     };
-
-
-    template<class T> struct Y{
-        // X* x;
-        int f(){};
-
-        
-        
-    }; 
-
-    // Se aythn thn periptwsh (pou to class den einai template) vazei kanonika ta definitions + templateSpecialization type 
-    // struct Z{
-
-    //     template<typename T2> void method(T2 t, int i){
-    //         T2 t2; 
-    //         Tuple<int> tint;
-    //     }
-
-    //     template<> void method(X x, int i){
-    //         X x2;
-    //     }
-    // };
-
-    // template<class T, class ... Types> struct Tuple { 
-    //     //Tuple<char>* tup = new Tuple<char>();
-    //     Y<char>* y = new Y<char>();
-    //     X x;
-
-    //     void No_Templ(X x){ }
-
-    //     template<typename T2> void method(T2 t){
-    //         T2 t2; 
-    //         //Tuple<int> tint;
-    //     }
-
-    //     // template<> void method(X x){
-    //     //     X x2;
-    //     //     x2 = x; 
-    //     //     x2;
-    //     // }
-        
-    // };
-
-    // // tuple<int,int> is a templateInstatiationSpecial 
-    // // and method is a templateFullSpecial
-    // template<> template<> void Tuple<int, int>::method(Z z){
-    //     Z z2;
-    // }
-
-
-
-    int main(){
-        Matrix<int, Y> m; 
-        Matrix<Matrix<Y<int>, Y>, Y, Y> m2; 
-        
-        // Tuple<char, Tuple<int>> t0;           // Types contains no arguments
-        // X x;
-        // t0.method("sss");
-        // t0.method(x);
-
-        // Z z;
-        // Y<int> y; 
-        // z.method(y, 1);
-        // z.method(x, 2); 
-        return 0;
-    }
-    // Tuple<int> t1;        // Types contains one argument: int
-    // Tuple<int, float> t2; // Types contains two arguments: int and float
-
-
-
 }
+
+using namespace template_methods;
+int main(){
+    S s; 
+    s.method<C>();
+    return 0;
+}
+
+
 
 /*
 namespace template_methods{

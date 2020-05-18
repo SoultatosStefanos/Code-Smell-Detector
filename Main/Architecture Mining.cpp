@@ -14,8 +14,8 @@ int main(int argc, const char** argv) {
 	std::vector<std::string> srcs;
 	std::string path = argv[1];
 	//srcs.push_back(path + "\\objects_used_on_methods.cpp");
-	//srcs.push_back(path + "\\template_methods.cpp");
-	srcs.push_back(path + "\\template_types.cpp");
+	srcs.push_back(path + "\\template_methods.cpp");
+	//srcs.push_back(path + "\\template_types.cpp");
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int result = DependenciesMining::CreateClangTool(argc, argv, srcs);

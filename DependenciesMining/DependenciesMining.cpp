@@ -206,7 +206,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		Method method(GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-		
+
 		if (d->getDeclKind() == d->CXXConstructor) {
 			method.SetMethodType(MethodType::Constructor);
 		}
@@ -241,6 +241,49 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			if (method.isUserMethod() || method.isTemplateDefinition()) // || method.isTemplateFullSpecialization()) mporei na kanw special gia authn thn klash
 				return;
 		}
+
+		//Template
+		if (method.isTemplateFullSpecialization() || method.isTemplateInstatiationSpecialization()) {
+			//assert(parentStructure->IsTemplate() || parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstatiationSpecialization());
+			Method* templateParentMethod = nullptr;
+			std::string parentMethodName = GetFullMethodName(d);
+			size_t start = parentMethodName.find("<");
+			size_t end = parentMethodName.find(">");
+			parentMethodName.erase(parentMethodName.begin() + start, parentMethodName.begin() + end + 1);
+			if (parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstatiationSpecialization()) {
+				
+				templateParentMethod = parentStructure->GetTemplateParent()->GetMethod(parentMethodName);
+			}
+			else {
+				templateParentMethod = parentStructure->GetMethod(parentMethodName);
+			}
+			assert(templateParentMethod);
+			method.SetTemplateParent(templateParentMethod);
+
+			//Template Arguments		
+			auto args = d->getTemplateSpecializationArgs()->asArray();
+			for (auto it : args) {
+				TemplateArgsVisit(it, [](TemplateArgument templateArg, Method* method) {
+					RecordDecl* d = nullptr;
+					if (templateArg.getKind() == TemplateArgument::Template) {
+						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+					}
+					else if (templateArg.getKind() == TemplateArgument::Integral) {
+						return;
+					}
+					if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
+						if (!d)
+							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();
+						std::string argName = GetFullStructureName(d);
+						Structure* arg = structuresTable.Get(argName);
+						if (arg == nullptr)
+							arg = structuresTable.Insert(argName);
+						method->InsertTemplateSpecializationArguments(argName, arg);
+					}
+					}, &method);
+			}
+		}
+	
 
 		//Return
 		auto returnType = d->getReturnType();

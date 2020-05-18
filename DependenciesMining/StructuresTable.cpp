@@ -111,6 +111,15 @@ void Method::SetReturnType(Structure* structure) {
 	returnType = structure;
 }
 
+void Method::SetTemplateInfo(Template<Method> temp)
+{
+	templateInfo = temp;
+}
+
+void Method::SetTemplateParent(Method* method) {
+	templateInfo.SetParent(method);
+}
+
 void Method::InsertArg(const std::string& name, Definition& definition) {
 	if (arguments.find(name) == arguments.end())
 		arguments[name] = definition;
@@ -144,6 +153,10 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 			memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
 		}
 	}
+}
+
+void Method::InsertTemplateSpecializationArguments(const std::string& name, Structure* structure) {
+	templateInfo.InsertSpecializationArguments(name, structure);
 }
 
 bool Method::isConstructor() {
@@ -236,7 +249,6 @@ void Method::MemberExpr::InsertMember(Member member) {
 
 // Structure
 Structure::Structure(Structure& structure) {
-	std::cout << "Structure copy const\n";
 }
 
 std::string Structure::GetName() const {
@@ -250,6 +262,11 @@ std::string Structure::GetEnclosingNamespace() const {
 StructureType Structure::GetStructureType() const {
 	return structureType;
 }
+
+Structure* Structure::GetTemplateParent() const {
+	return templateInfo.GetParent();
+}
+
 Structure* Structure::GetNestedParent() const {
 	return nestedParent;
 }
@@ -283,10 +300,15 @@ std::unordered_map<std::string, Structure*>& Structure::GetFriends()
 	return friends;
 }
 
-void Template::SetParent(Structure* structure) {
-	parent = structure;
+template<typename Parent_T> Parent_T* Template<Parent_T>::GetParent() const {
+	return parent;
 }
-void Template::InsertSpecializationArguments(const std::string& name, Structure* structure) {
+
+template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent){
+	this->parent = parent;
+}
+
+template<typename Parent_T> void Template<Parent_T>::InsertSpecializationArguments(const std::string& name, Structure* structure) {
 	specializationArguments[name] = structure;
 }
 
@@ -302,7 +324,7 @@ void  Structure::SetStructureType(StructureType structureType) {
 	this->structureType = structureType;
 }
 
-void Structure::SetTemplateInfo(Template temp)
+void Structure::SetTemplateInfo(Template<Structure> temp)
 {
 	templateInfo = temp;
 }
