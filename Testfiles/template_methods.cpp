@@ -1,17 +1,58 @@
 //#include <string>
 
 namespace template_methods {
-    struct C{};
+    struct B {
+        int i ;
+     };
+    
+    struct A {
+        B b; 
+    };
+    
+    struct C{
+        A a ; 
+
+    };
 
     struct S{
-        template <typename T> void method() {};
+        // Type
+        template <typename T> void method() {
+            T t;
+            t.a.b ;
+            B b;  
+        };
+
+         template <typename T, int A> void method() {
+             C c; 
+         }
+
+
+        template <> void method<A>(){
+            A a; 
+            a.b; 
+        }
+
+        // Integral 
+        template<int N> void Integral() {
+            B b; 
+            b.i = N; 
+        }
+
+        // Pack
+        template<typename ...P>void  Pack(){
+
+        }
     };
+
 }
+
 
 using namespace template_methods;
 int main(){
     S s; 
     s.method<C>();
+    s.method<C, 2>();
+    s.Integral<'a'>(); 
     return 0;
 }
 

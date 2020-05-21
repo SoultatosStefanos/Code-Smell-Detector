@@ -12,17 +12,20 @@ namespace temp_exrta{
 
     // a nontype template param may not have class type
     // template<Type<int> N> struct Integral{
+
+    // Integral
     template<int N> struct Integral{
         S1 s; 
         S2 method(){ return S2; };
     } ; 
 
-    // Full Specialization 
+        // Full Specialization 
     template<> struct Integral <2020> {
         S2 s; 
         S1 method(){ return S1(); };
     };
 
+    // Template
     template<template <typename> class Cont> struct Template{
         S1 s;  
     };
@@ -32,6 +35,7 @@ namespace temp_exrta{
         S1 method(){ return S1(); };
     };
 
+    // Pack
     template<typename ...P>struct Type_Pack{
         S1 s;
         S1 method(){ return S1(); };
@@ -48,7 +52,6 @@ namespace temp_exrta{
     };
 
    
-
    template<typename T, int N> struct Combo{
        T t;
        T method(){ return t; };
