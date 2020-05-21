@@ -109,10 +109,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		fullEnclosingNamespace = ((NamespaceDecl*)enclosingNamespace)->getNameAsString() + "::" + fullEnclosingNamespace;
 		enclosingNamespace = enclosingNamespace->getParent()->getEnclosingNamespaceContext();
 	}
-
-	//std::cout << GetFullStructureName(d) << "\n\tNamespace: " << fullEnclosingNamespace << "\n";
-	//if (fullEnclosingNamespace == "")
-	//	std::cout << "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 	structure.SetEnclosingNamespace(fullEnclosingNamespace);
 	
 	// Bases
@@ -215,6 +211,20 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		else if (d->getTemplatedKind()) {
 			if (d->getTemplatedKind() == d->TK_FunctionTemplate) {
+		////		std::cout << GetFullMethodName(d) << " "<<d->getID() << ": \n";
+		//		auto id = d->getIdentifier(); 
+		//		
+		//		auto funcTempl = d->getDescribedFunctionTemplate(); 
+		//		auto params = funcTempl->getTemplateParameters();
+		//		for (int i = 0; i < params->size(); i++) {
+		//			auto param = params->getParam(i);
+		//	
+		//			auto kind = param->getKind();
+		//			//std::cout << i << " :" << param->getQualifiedNameAsString() << "\n"; 
+		//			std::cout << i << " :" << param->getDeclKindName() << "\n";
+	
+		//		}
+
 				method.SetMethodType(MethodType::TemplateDefinition);
 			}
 			else if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
@@ -283,26 +293,26 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 					}, &method);
 			}
 		}
-	
-
-		//Return
-		auto returnType = d->getReturnType();
-		if (isStructureOrStructurePointerType(returnType)) {
-			std::string typeName;
-			if (returnType->isPointerType())
-				typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
-			else
-				typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
-			Structure* typeStructure = structuresTable.Get(typeName);
-			if (!typeStructure)
-				typeStructure = structuresTable.Insert(typeName);
-			method.SetReturnType(typeStructure);
+		else {											// den krataw to return type gia ta specialization (tha ta exei to definition h tha einai tou typou tou pairnei san templateParam)
+			//Return
+			auto returnType = d->getReturnType();
+			if (isStructureOrStructurePointerType(returnType)) {
+				std::string typeName;
+				if (returnType->isPointerType())
+					typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
+				else
+					typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
+				Structure* typeStructure = structuresTable.Get(typeName);
+				if (!typeStructure)
+					typeStructure = structuresTable.Insert(typeName);
+				method.SetReturnType(typeStructure);
+			}
 		}
 
 		currentMethod = parentStructure->InsertMethod(GetFullMethodName(d), method);
 		sm = result.SourceManager;
 		
-		// Body
+		// Body - MemberExpr
 		auto* body = d->getBody();
 		FindMemberExprVisitor visitor; 
 		visitor.TraverseStmt(body);
@@ -411,6 +421,12 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				assert(parentStructure->IsTemplateInstatiationSpecialization());		// insertion speciallization inherite its dependencies from the parent template
 				return;
 			}
+			
+			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
+			if (parentMethod->isTemplateInstatiationSpecialization()) {
+				return;
+			}
+
 			std::string typeName;
 			if (d->getType()->isPointerType())
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
@@ -423,10 +439,10 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			def.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
-				// remove from templateInstatiation Methods the declarations (TODO: I have to save a pointer to the templateecleration method)
-				if (((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() && ((CXXMethodDecl*)parentMethodDecl)->isTemplateInstantiation()) {
+				// remove from templateInstatiation Methods the declarations 
+				/*if (((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() && ((CXXMethodDecl*)parentMethodDecl)->isTemplateInstantiation()) {
 					return;
-				}
+				}*/
 				std::cout << "Parent: " << parentMethodName << "  ";
 				std::cout << "DEFINITION\n";
 				parentMethod->InsertDefinition(d->getQualifiedNameAsString(), def);
