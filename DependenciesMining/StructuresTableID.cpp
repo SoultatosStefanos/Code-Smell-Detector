@@ -1,6 +1,6 @@
 #include "StructuresTableID.h"
 
-using namespace DependenciesMining2;
+using namespace DependenciesMining;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {
@@ -261,6 +261,10 @@ void Method::MemberExpr::InsertMember(Member member) {
 Structure::Structure(Structure& structure) {
 }
 
+ID_T Structure::GetID() const {
+	return id;
+}
+
 std::string Structure::GetName() const {
 	return name;
 }
@@ -320,6 +324,10 @@ template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent)
 
 template<typename Parent_T> void Template<Parent_T>::InsertSpecializationArguments(ID_T id, Structure* structure) {
 	specializationArguments[id] = structure;
+}
+
+void Structure::SetID(const ID_T id) {
+	this->id = id;
 }
 
 void Structure::SetName(const std::string& name) {

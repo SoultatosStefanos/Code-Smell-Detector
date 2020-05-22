@@ -5,10 +5,10 @@
 #include <cassert>
 #include <Vector>
 
-#define ID_T unsigned int
+#define ID_T int64_t 
 
 
-namespace DependenciesMining2 {
+namespace DependenciesMining {
 
 	class Structure;
 
@@ -199,7 +199,7 @@ namespace DependenciesMining2 {
 		std::unordered_map<ID_T, Structure*>& GetContains();
 		std::unordered_map<ID_T, Structure*>& GetFriends();
 
-		void SetID(ID_T	id);
+		void SetID(const ID_T id);
 		void SetName(const std::string& name);
 		void SetEnclosingNamespace(const std::string& enclosingNamespace);
 		void SetStructureType(StructureType structureType);
@@ -228,7 +228,7 @@ namespace DependenciesMining2 {
 	private:
 		std::unordered_map<ID_T, Structure> table;
 	public:
-		std::unordered_map<unsigned int, Structure>& GetSymbolTable();
+		std::unordered_map<ID_T, Structure>& GetSymbolTable();
 		Structure* Insert(ID_T id, const std::string& name = "");
 		Structure* Insert(ID_T id, Structure& structure);
 		Structure* Get(ID_T id);

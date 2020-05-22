@@ -1,6 +1,6 @@
 #include "StructuresTable.h"
 
-using namespace DependenciesMining;
+using namespace DependenciesMining2;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {

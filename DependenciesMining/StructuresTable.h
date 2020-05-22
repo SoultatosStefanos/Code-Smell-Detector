@@ -5,7 +5,7 @@
 #include <cassert>
 #include <Vector>
 
-namespace DependenciesMining {
+namespace DependenciesMining2 {
 
 	class Structure;
 

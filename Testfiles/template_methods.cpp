@@ -54,6 +54,7 @@ int main(){
     s.method<C, 2>();
     s.Integral<'a'>(); 
     return 0;
+    
 }
 
 
