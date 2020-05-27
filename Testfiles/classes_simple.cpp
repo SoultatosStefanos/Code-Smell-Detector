@@ -6,6 +6,7 @@
 namespace CS{
   namespace CS_1{
     class class_X;  
+    class class_B;  
     class class_B {};
     class class_A {};    
     struct struct_S {};

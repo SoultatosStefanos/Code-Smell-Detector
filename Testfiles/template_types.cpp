@@ -27,7 +27,8 @@ namespace temp_exrta{
 
     // Template
     template<template <typename> class Cont> struct Template{
-        S1 s;  
+        S1 s;
+        Cont<int> C;  
     };
 
     template<template <int> class ...Cont> struct Template_Integral{

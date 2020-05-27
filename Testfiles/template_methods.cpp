@@ -1,19 +1,104 @@
 //#include <string>
 
 namespace template_methods {
+    struct A; 
+    template <typename T1, typename T2> struct Temp; 
+    
     struct B {
         int i ;
      };
     
     struct A {
         B b; 
+        template <typename T> void method_A() {
+            T t;
+            t.i ;
+            B b;  
+        };
     };
     
     struct C{
         A a ; 
+    };
+
+    template <typename T1, typename T2> struct Temp : public A{
+        // Type
+        template <typename T> void method() {
+            T t;
+            t.a.b ;
+            B b;  
+        };
+
+         template <typename T, int A> void method() {
+             C c; 
+         }
+
+
+        // Den to blepei ws template specialization (alla ws user method)
+        // ClassScopeFunctionSpecialization (apo AST eida)
+        template <> void method<A, 2>(){
+            A a; 
+            a.b; 
+        }
+
+        // template <> void method<B, 100>();
+
+        // Integral 
+        template<int N> void Integral();    // ignores the declerations
+        
+
+        // Pack
+        template<typename ...P>void  Pack(){
+
+        }
 
     };
 
+    // method definition out of the struct 
+    template<typename T1, typename T2> template<int N> void Temp<T1,T2>::Integral() {
+        B b; 
+        b.i = N; 
+    }
+
+    //cannot specialize (with 'template<>') a member of an unspecialized template --> Clang Error
+    // template<typename T1, typename T2> template<> void Temp<T1,T2>::method<B, 100>(){
+    //         A a; 
+    //         a.b; 
+    // }
+    
+    // Method Full Specialization 
+    template<> template<> void Temp<A, A>::Integral<12>() {
+        A* a; 
+        a->method_A<B>(); 
+    }
+
+    // Method Partial Specialization ---> is not allowed (by c++)
+   /* template<> template<typename T> void Temp<A, A>::method<T, 22>() {
+        A* a; 
+        a->method_A<B>(); 
+    }*/
+
+
+    // Full Specialization 
+    template <> struct Temp<B, B>{
+        B b; 
+        template<int ...P> B Int_Pack(){
+            B b; 
+            return b;
+        }
+    };
+
+    // Partial Specialization 
+    template <typename T> struct Temp<T, B*>{
+        B b; 
+        template<typename T1, typename T2> T2 method_partial(T1 a, T2 b){ 
+            return b;
+        }
+    };
+
+
+   
+    //11 methods
     struct S{
         // Type
         template <typename T> void method() {
@@ -33,16 +118,19 @@ namespace template_methods {
         }
 
         // Integral 
-        template<int N> void Integral() {
-            B b; 
-            b.i = N; 
-        }
+        template<int N> void Integral();    // ignores the declerations
+        
 
         // Pack
         template<typename ...P>void  Pack(){
 
         }
     };
+
+    template<int N> void S::Integral() {
+            B b; 
+            b.i = N; 
+    }
 
 }
 
@@ -52,78 +140,19 @@ int main(){
     S s; 
     s.method<C>();
     s.method<C, 2>();
-    s.Integral<'a'>(); 
-    return 0;
-    
+    s.Integral<'a'>();
+
+    Temp<A, B> t; 
+    t.method<C>(); 
+    t.method<C, 2>();
+    t.method<A, 2>();       // full specialized --> to vazei ws instatiation special sto Temp<A, B> alla me swsto body
+                            // sto Temp to vazei ws user method xwris body  
+    t.Integral<'a'>();
+
+    Temp<B, B> tb; 
+    B b = tb.Int_Pack<1,2,3>();
+
+    Temp<int, B*> ti; 
+    ti.method_partial(t, tb); 
+    return 0;  
 }
-
-
-
-/*
-namespace template_methods{
-    struct X;
-    template<typename T1, typename T2> struct template_Z;
-    template<> struct template_Z <int, int>;
-   
-    struct B {
-
-    };
-    struct A {
-      public:  
-      B b;
-      void method(B x){}
-    };
-    struct S{}; 
-    struct X : public A, B {
-      template<typename T> A* method2(T arg1, T arg2);
-    };
-
-    template<typename T1, typename T2> struct template_Z {  
-      template<typename T> void method(T2 a, T b);
-    };
-
-    template <> 
-    struct template_Z <int, int> {
-        template<typename T> void method_int(){
-            T i; 
-        }
-    };
-
-    template <typename T> 
-    struct template_Z <int, T>   
-    { 
-        template<typename T1>void m(){
-            T1 t ;
-            t.method2(1,2)->b;
-        } 
-    };
-
-    template<> struct template_Z <int, float> ; 
-
-
-    template<typename T1> struct template_Z2 : public template_Z <T1, int>{
-        
-    }; 
-
-    int global_var;
-
-    template<typename T> A* X::method2(T arg1, T arg2){
-        S var_method2_x;
-        S *var_method2_px = new S();
-        return this; 
-    }
-
-    int main(){
-        X x; 
-        x.method2(1,2);
-        template_Z<float, float> float_z; 
-        template_Z<int, char> z;
-        float_z.method(2.1, x); 
-        z.m<X>();
-        return 0;
-    }
-}*/
-
-/* - Change GetStructureName + GetMethodName (+ insert extra template types (not ready yet))
-- Remove from templateInstatiationSpecialization Classes the User and templateDefinition Methods (Not fullSpecialization because they can have there own fullspecialization method)
-- */

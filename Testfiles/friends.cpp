@@ -19,7 +19,9 @@ namespace friends{
     };
 
     template<typename T1, typename T2> 
-    class template_Z {};
+    class template_Z {
+        friend T1;
+    };
 
     template <> 
     class template_Z <int, int>    
@@ -27,6 +29,6 @@ namespace friends{
 }
 
 int main() {
-   friends::template_Z <int, float> z;
+   friends::template_Z <friends::B, float> z;                            // friend with B
     return 0;
 }

@@ -99,14 +99,26 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	std::string str = d->getType().getAsString();
 	std::size_t pos = str.find("(");
 	std::string argList = str.substr(pos);
-	if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
-		std::string tepmlateArgs = "<";
+	if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization ){
+		std::string templateArgs = "<";
 		auto args = d->getTemplateSpecializationArgs()->asArray();
 		for (auto it : args) {
-			TemplateArgsVisit(it, AppendTemplateArgNameCallback, &tepmlateArgs);
+			TemplateArgsVisit(it, AppendTemplateArgNameCallback, &templateArgs);
 		}
-		tepmlateArgs += ">";
-		name = d->getQualifiedNameAsString() + tepmlateArgs + argList;
+		templateArgs += ">";
+		name = d->getQualifiedNameAsString() + templateArgs + argList;
+	}
+	else if (d->getTemplatedKind() == d->TK_FunctionTemplate) {	
+		auto funcTempl = d->getDescribedFunctionTemplate(); 
+		auto params = funcTempl->getTemplateParameters()->asArray();// ->getPackAsArray();
+		std::string templateArgs = "<";
+		for (auto it : params) {
+			if (templateArgs != "<")
+				templateArgs += ", ";
+			templateArgs += it->getDeclKindName();
+		}
+		templateArgs += ">";
+		name = d->getQualifiedNameAsString() + templateArgs + argList;
 	}
 	else {
 		name = d->getQualifiedNameAsString() + argList;

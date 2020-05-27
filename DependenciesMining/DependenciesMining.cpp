@@ -7,7 +7,6 @@
 #define METHOD_DECL "MethodDecl"
 #define METHOD_VAR_OR_ARG "MethodVarOrArg"
 
-
 using namespace DependenciesMining;
 
 StructuresTable DependenciesMining::structuresTable;
@@ -32,9 +31,16 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	//if (d->isInStdNamespace() || !d->hasDefinition()) {
-	if (!d->hasDefinition()) {
-		return;														// ignore std && declarations
+	
+
+	if (!(d->isCompleteDefinition())) {
+		return; 
 	}
+
+	//if (!d->hasDefinition()) {
+	//	return;														// ignore std && declarations
+	//}
+
 	if (d->isImplicit()) {
 		return;
 	}
@@ -96,7 +102,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			TemplateArgsVisit(templateArg, [](TemplateArgument templateArg, Structure *structure) {
 				RecordDecl* d = nullptr;
 				if (templateArg.getKind() == TemplateArgument::Template) {
-					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
 				}
 				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
@@ -140,12 +146,15 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	for (auto* it : d->friends()) {
 		auto* type = it->getFriendType();
 		if (type) {																							// Classes
-			auto parent = type->getType()->getAsCXXRecordDecl(); 
+			auto parent = type->getType()->getAsCXXRecordDecl();
+			if (!parent)
+				continue;
 			auto parentID = parent->getID();
 			assert(parentID);
 			std::string parentName = GetFullStructureName(type->getType()->getAsCXXRecordDecl()) ;
 			Structure* parentStructure = structuresTable.Get(parentID);
-			if (!parentStructure) continue;								// templates
+			if (!parentStructure)
+				parentStructure = structuresTable.Insert(parentID, parentName);
 			structure.InsertFriend(parentID, parentStructure);
 		}
 		else {																								// Methods			
@@ -161,6 +170,16 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				// meta thn allagh se ids ws keys den krataw info gia to method
 				structure.InsertFriend(parentClassID, parentStructure);
 			}
+			else if (decl->isTemplateDecl()) {
+				// problem with the ID , me names douleuei kanonika
+				/*auto recdecl = ((TemplateDecl*)decl)->getTemplatedDecl();
+				auto parentID = recdecl->getID();
+				auto parentName = GetFullStructureName((RecordDecl*)recdecl);
+				Structure* parentStructure = structuresTable.Get(parentID);
+				if (!parentStructure)
+					parentStructure = structuresTable.Insert(parentID, parentName);
+				structure.InsertFriend(parentID, parentStructure);*/
+			}
 		}
 	}
 
@@ -170,7 +189,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(parent);
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
 		auto parentID = ((RecordDecl*)parent)->getID();
-		assert(parentID); 
+		assert(parentID);
 		if (parentName != structure.GetName()) {
 			Structure* parentStructure = structuresTable.Get(parentID);
 			auto* inst = d->getInstantiatedFromMemberClass();
@@ -185,14 +204,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		if (!isStructureOrStructurePointerType(d->getType()))
-			return; 
+			return;
 
 		const RecordDecl* parent = d->getParent();
 		if (parent->isClass() || parent->isStruct()) {
 			std::string parentName = GetFullStructureName(parent);
 			std::string typeName;
-			ID_T parentID = parent->getID(); 
-			ID_T typeID = 0; 
+			ID_T parentID = parent->getID();
+			ID_T typeID = 0;
 			if (d->getType()->isPointerType()) {
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
 				typeID = d->getType()->getPointeeType()->getAsCXXRecordDecl()->getID();
@@ -201,16 +220,16 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
 				typeID = d->getType()->getAsCXXRecordDecl()->getID();
 			}
-			assert(parentID); 
-			assert(typeID); 
-			
+			assert(parentID);
+			assert(typeID);
+
 			Structure* parentStructure = structuresTable.Get(parentID);
 			Structure* typeStructure = structuresTable.Get(typeID);
 			if (parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
 				return;
 			if (!typeStructure)
 				typeStructure = structuresTable.Insert(typeID, typeName);
-			
+
 			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
 
 			auto fieldID = d->getID();
@@ -218,8 +237,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			Definition field(fieldID, d->getQualifiedNameAsString(), typeStructure);
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			field.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-			parentStructure->InsertField(fieldID, field);	
-		} 
+			parentStructure->InsertField(fieldID, field);
+		}
 	}
 }
 
@@ -229,15 +248,27 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent);
 		auto parentID = parent->getID();
-		auto methodID = d->getID(); 
+		auto methodID = d->getID();
 		assert(parentID);
 		assert(methodID);
+
+		auto methodName = GetFullMethodName(d);
+
+		if(!(d->isThisDeclarationADefinition())){
+			return;
+		}
+
 
 		Structure* parentStructure = structuresTable.Get(parentID);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(methodID, GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+
+		// Method's Type
+		auto kind = d->getDeclKind();
+		auto kind2 = d->getAsFunction()->getDeclKind();
+		//auto kind3 = d->;
 
 		if (d->getDeclKind() == d->CXXConstructor) {
 			method.SetMethodType(MethodType::Constructor);
@@ -247,20 +278,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		else if (d->getTemplatedKind()) {
 			if (d->getTemplatedKind() == d->TK_FunctionTemplate) {
-		////		std::cout << GetFullMethodName(d) << " "<<d->getID() << ": \n";
-		//		auto id = d->getIdentifier(); 
-		//		
-		//		auto funcTempl = d->getDescribedFunctionTemplate(); 
-		//		auto params = funcTempl->getTemplateParameters();
-		//		for (int i = 0; i < params->size(); i++) {
-		//			auto param = params->getParam(i);
-		//	
-		//			auto kind = param->getKind();
-		//			//std::cout << i << " :" << param->getQualifiedNameAsString() << "\n"; 
-		//			std::cout << i << " :" << param->getDeclKindName() << "\n";
-	
-		//		}
-
 				method.SetMethodType(MethodType::TemplateDefinition);
 			}
 			else if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
@@ -283,15 +300,11 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			method.SetMethodType(MethodType::UserMethod);
 		}
 
-		if (parentStructure->IsTemplateInstatiationSpecialization()) {		// insertion speciallization inherite its dependencies from the parent template
-			if (method.isUserMethod() || method.isTemplateDefinition()) // || method.isTemplateFullSpecialization()) mporei na kanw special gia authn thn klash
-				return;
-		}
-
 		//Template
 		if (method.isTemplateFullSpecialization() || method.isTemplateInstatiationSpecialization()) {
-			//assert(parentStructure->IsTemplate() || parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstatiationSpecialization());
-		/*	Method* templateParentMethod = nullptr;
+		/*	
+			// Tempalte Method's parent
+			Method* templateParentMethod = nullptr;
 			std::string parentMethodName = GetFullMethodName(d);
 			size_t start = parentMethodName.find("<");
 			size_t end = parentMethodName.find(">");
@@ -305,14 +318,13 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			}
 			assert(templateParentMethod);
 			method.SetTemplateParent(templateParentMethod);*/
-
 			//Template Arguments		
 			auto args = d->getTemplateSpecializationArgs()->asArray();
 			for (auto it : args) {
 				TemplateArgsVisit(it, [](TemplateArgument templateArg, Method* method) {
 					RecordDecl* d = nullptr;
 					if (templateArg.getKind() == TemplateArgument::Template) {
-						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl();
+						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
 					}
 					else if (templateArg.getKind() == TemplateArgument::Integral) {
 						return;
@@ -331,26 +343,25 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 					}, &method);
 			}
 		}
-		else {											// den krataw to return type gia ta specialization (tha ta exei to definition h tha einai tou typou tou pairnei san templateParam)
-			//Return
-			auto returnType = d->getReturnType();
-			if (isStructureOrStructurePointerType(returnType)) {
-				std::string typeName;
-				ID_T typeID;
-				if (returnType->isPointerType()) {
-					typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
-					typeID = returnType->getPointeeType()->getAsCXXRecordDecl()->getID();
-				}
-				else {
-					typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
-					typeID = returnType->getAsCXXRecordDecl()->getID();
-				}
-				assert(typeID);
-				Structure* typeStructure = structuresTable.Get(typeID);
-				if (!typeStructure)
-					typeStructure = structuresTable.Insert(typeID, typeName);
-				method.SetReturnType(typeStructure);
+
+		//Return
+		auto returnType = d->getReturnType();
+		if (isStructureOrStructurePointerType(returnType)) {
+			std::string typeName;
+			ID_T typeID;
+			if (returnType->isPointerType()) {
+				typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
+				typeID = returnType->getPointeeType()->getAsCXXRecordDecl()->getID();
 			}
+			else {
+				typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
+				typeID = returnType->getAsCXXRecordDecl()->getID();
+			}
+			assert(typeID);
+			Structure* typeStructure = structuresTable.Get(typeID);
+			if (!typeStructure)
+				typeStructure = structuresTable.Insert(typeID, typeName);
+			method.SetReturnType(typeStructure);
 		}
 
 		currentMethod = parentStructure->InsertMethod(methodID, method);
@@ -446,17 +457,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
-		// exei mpei gia na to thema pou den vazei ta definitions stis full specialization methods mesa se template
-		/*if (d->isFunctionOrMethodVarDecl() && parentMethodDecl->getDeclKind() == d->CXXMethod) {
-			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
-			auto parentClassName = GetFullStructureName(parentClass);
-			auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
-			Structure* parentStructure = structuresTable.Get(parentClassName);
-			Method* parentMethod = parentStructure->GetMethod(parentMethodName);
-			std::cout << "Parent: " << parentMethodName << "   " << ((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() << " !!!!!!!!!  \n";
-		}*/
-
-
 		if (d->isLocalVarDeclOrParm() && parentMethodDecl && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
 		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
 			if (!isStructureOrStructurePointerType(d->getType()))
@@ -477,9 +477,9 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			}
 			
 			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
-			if (parentMethod->isTemplateInstatiationSpecialization()) {
-				return;
-			}
+			//if (parentMethod->isTemplateInstatiationSpecialization()) {
+			//	return;
+			//}
 
 			std::string typeName;
 			ID_T typeID; 
@@ -502,16 +502,12 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			def.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
 				// remove from templateInstatiation Methods the declarations 
-				/*if (((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() && ((CXXMethodDecl*)parentMethodDecl)->isTemplateInstantiation()) {
-					return;
-				}*/
-				std::cout << "Parent: " << parentMethodName << "  ";
-				std::cout << "DEFINITION\n";
+				//if (((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() && ((CXXMethodDecl*)parentMethodDecl)->isTemplateInstantiation()) {
+				//	return;
+				//}
 				parentMethod->InsertDefinition(defID, def);
 			}
 			else {
-				std::cout << "Parent: " << parentMethodName << "  ";
-				std::cout << "ARGUMENT\n";
 				parentMethod->InsertArg(defID, def);
 			}
 		}

@@ -127,7 +127,7 @@ namespace DependenciesMining {
 		std::string name;
 		MethodType methodType = MethodType::Undefined;
 		Structure* returnType = nullptr;
-		Template<Method> templateInfo;
+		Template<Method> templateInfo;								// Template Parent is *not* used
 		std::unordered_map<ID_T, Definition> arguments;
 		std::unordered_map<ID_T, Definition> definitions;
 		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
