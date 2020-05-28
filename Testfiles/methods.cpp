@@ -14,12 +14,12 @@ namespace methods{
     };
 
     template<typename T1, typename T2> class template_Z {  
-      void method(T2 a);
+      void method(T2 a){};
     };
 
     template <> 
     class template_Z <int, int> {
-         void method_int();
+         void method_int(){}; 
     };
 
     template <typename T> 

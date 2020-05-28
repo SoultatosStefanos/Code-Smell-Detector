@@ -451,6 +451,14 @@ Structure* StructuresTable::Insert(ID_T id, Structure& structure) {
 	if (it != table.end() && it->second.GetStructureType() != StructureType::Undefined)
 		return &it->second;
 
+	if (auto s = Get(structure.GetName())) {
+		if (id != s->GetID() && s->GetStructureType() == StructureType::Undefined) {
+			auto undefStructure = table.extract(s->GetID());
+			undefStructure.key() = id; 
+			table.insert(std::move(undefStructure)); 
+		}
+	}
+
 	table[id] = structure;
 	return &table.find(id)->second;
 }
@@ -461,6 +469,16 @@ Structure* StructuresTable::Get(ID_T id) {
 		return &it->second;
 	else
 		return nullptr;
+}
+
+
+Structure* StructuresTable::Get(const std::string& structureName) {
+	for (auto& [key, value] : table) {
+		if (value.GetName() == structureName) {
+			return &value;
+		}
+	}
+	return nullptr;
 }
 
 void StructuresTable::Print() {

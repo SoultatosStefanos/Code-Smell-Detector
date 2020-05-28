@@ -232,6 +232,7 @@ namespace DependenciesMining {
 		Structure* Insert(ID_T id, const std::string& name = "");
 		Structure* Insert(ID_T id, Structure& structure);
 		Structure* Get(ID_T id);
+		Structure* Get(const std::string& structureName);
 
 		void Print();
 	};

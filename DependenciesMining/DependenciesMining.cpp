@@ -167,18 +167,23 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				std::string parentName = GetFullStructureName(parentClass);
 				Structure* parentStructure = structuresTable.Get(parentClassID);
 				if (!parentStructure) continue;
-				// meta thn allagh se ids ws keys den krataw info gia to method
+				// meta thn allagh se ids ws keys den krataw info gia to idio to method alla mono gia to structure pou anoikei
 				structure.InsertFriend(parentClassID, parentStructure);
 			}
 			else if (decl->isTemplateDecl()) {
 				// problem with the ID , me names douleuei kanonika
-				/*auto recdecl = ((TemplateDecl*)decl)->getTemplatedDecl();
+				auto recdecl = ((TemplateDecl*)decl)->getTemplatedDecl();
 				auto parentID = recdecl->getID();
 				auto parentName = GetFullStructureName((RecordDecl*)recdecl);
 				Structure* parentStructure = structuresTable.Get(parentID);
-				if (!parentStructure)
-					parentStructure = structuresTable.Insert(parentID, parentName);
-				structure.InsertFriend(parentID, parentStructure);*/
+				Structure* parentStructurebyName = structuresTable.Get(parentName);
+				if (!parentStructure) {
+					parentStructure = structuresTable.Get(parentName);
+					if (!parentStructure) {
+						parentStructure = structuresTable.Insert(parentID, parentName);
+					}
+				}
+				structure.InsertFriend(parentID, parentStructure);
 			}
 		}
 	}
@@ -252,12 +257,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(parentID);
 		assert(methodID);
 
-		auto methodName = GetFullMethodName(d);
-
 		if(!(d->isThisDeclarationADefinition())){
 			return;
 		}
-
 
 		Structure* parentStructure = structuresTable.Get(parentID);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
@@ -266,10 +268,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
-		auto kind = d->getDeclKind();
-		auto kind2 = d->getAsFunction()->getDeclKind();
-		//auto kind3 = d->;
-
 		if (d->getDeclKind() == d->CXXConstructor) {
 			method.SetMethodType(MethodType::Constructor);
 		}
@@ -457,6 +455,11 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
+		// Ignore the methods declarations 
+		if (!(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition())) {
+			return;
+		}
+
 		if (d->isLocalVarDeclOrParm() && parentMethodDecl && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
 		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
 			if (!isStructureOrStructurePointerType(d->getType()))
@@ -471,10 +474,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			assert(parentMethodID);
 			Structure* parentStructure = structuresTable.Get(parentClassID);
 			Method* parentMethod = parentStructure->GetMethod(parentMethodID);
-			if (!parentMethod){
-				assert(parentStructure->IsTemplateInstatiationSpecialization());		// insertion speciallization inherite its dependencies from the parent template
-				return;
-			}
+			assert(parentMethod);
 			
 			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
 			//if (parentMethod->isTemplateInstatiationSpecialization()) {
@@ -501,10 +501,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			def.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
-				// remove from templateInstatiation Methods the declarations 
-				//if (((CXXMethodDecl*)parentMethodDecl)->getTemplatedKind() && ((CXXMethodDecl*)parentMethodDecl)->isTemplateInstantiation()) {
-				//	return;
-				//}
 				parentMethod->InsertDefinition(defID, def);
 			}
 			else {
@@ -513,6 +509,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 }
+
 /*
 	Clang Tool Creation
 */
