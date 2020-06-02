@@ -75,22 +75,25 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetID(structID);
 	
 	// Templates
-	//if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-	if (structure.IsTemplateInstatiationSpecialization()){
+	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
+	//if (structure.IsTemplateInstatiationSpecialization()){
 		// Template parent
 		std::string parentName;
 		ID_T parentID; 
 
-		//if (structure.IsTemplateInstatiationSpecialization()) {
+		Structure* templateParent;
+		if (structure.IsTemplateInstatiationSpecialization()) {
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = parent->getID();
 			assert(parentID); 
 			parentName = GetFullStructureName(parent);
-		//}
-		//else {
-		//	parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
-		//}
-		Structure* templateParent = structuresTable.Get(parentID);
+			templateParent = structuresTable.Get(parentID);
+		}
+		else {
+			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
+			templateParent = structuresTable.Get(parentName);
+		}
+		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
 			templateParent = structuresTable.Insert(parentID, parentName);
 		structure.SetTemplateParent(templateParent);
@@ -176,7 +179,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				auto parentID = recdecl->getID();
 				auto parentName = GetFullStructureName((RecordDecl*)recdecl);
 				Structure* parentStructure = structuresTable.Get(parentID);
-				Structure* parentStructurebyName = structuresTable.Get(parentName);
 				if (!parentStructure) {
 					parentStructure = structuresTable.Get(parentName);
 					if (!parentStructure) {
@@ -456,11 +458,11 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
 		// Ignore the methods declarations 
-		if (!(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition())) {
+		if (!parentMethodDecl || !(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition())) {
 			return;
 		}
 
-		if (d->isLocalVarDeclOrParm() && parentMethodDecl && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
+		if (d->isLocalVarDeclOrParm() && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
 		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
 			if (!isStructureOrStructurePointerType(d->getType()))
 				return;
