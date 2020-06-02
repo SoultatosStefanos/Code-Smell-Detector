@@ -4,7 +4,8 @@ Template specialization
 Namespaces
 Friends
 */
-namespace N_1_1{
+
+/*namespace N_1_1{
   namespace N_1{
     class class_X;
     template<typename T1, typename T2> class template_Z;
@@ -56,7 +57,7 @@ void N_1_1::N_1::class_X::method2(int arg1, float arg2){
      struct_S *var_method2_px = new struct_S();
 }
 
-void f(){};
+void f(){};*/
 
 /*
 template <class C>
@@ -70,7 +71,7 @@ static void f() {
 }
 */
 
-namespace N_2 {
+/*namespace N_2 {
   class class_A{};
 }
 using namespace N_1_1::N_1;
@@ -92,3 +93,18 @@ int main(){
     int main_x;
     return 0;
 }
+*/
+
+template <typename T> struct  template_T;
+
+template <> struct template_T<int>{
+  char c; 
+};
+
+template <typename T> struct template_T{
+  int x; 
+};
+
+int main(){
+  return 0;
+};

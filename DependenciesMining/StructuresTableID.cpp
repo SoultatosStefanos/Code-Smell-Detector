@@ -443,6 +443,12 @@ Structure* StructuresTable::Insert(ID_T id, const std::string& name) {
 
 	Structure dummy(id, name);
 	table[id] = dummy;
+
+	auto& nameList = QualifiedNameTable[name];
+	if (std::find(nameList.begin(), nameList.end(), &table.find(id)->second) == nameList.end()) {
+		QualifiedNameTable[name].push_back(&table.find(id)->second);
+		//nameList.push_back(&table.find(id)->second);
+	}
 	return &table.find(id)->second;
 }
 
@@ -451,15 +457,21 @@ Structure* StructuresTable::Insert(ID_T id, Structure& structure) {
 	if (it != table.end() && it->second.GetStructureType() != StructureType::Undefined)
 		return &it->second;
 
-	if (auto s = Get(structure.GetName())) {
-		if (id != s->GetID() && s->GetStructureType() == StructureType::Undefined) {
-			auto undefStructure = table.extract(s->GetID());
-			undefStructure.key() = id; 
-			table.insert(std::move(undefStructure)); 
-		}
-	}
+	//if (auto s = Get(structure.GetName())) {
+	//	if (id != s->GetID() && s->GetStructureType() == StructureType::Undefined) {
+	//		auto undefStructure = table.extract(s->GetID());
+	//		undefStructure.key() = id; 
+	//		table.insert(std::move(undefStructure)); 
+	//	}
+	//}
 
 	table[id] = structure;
+
+	auto& nameList = QualifiedNameTable[structure.GetName()];
+	if (std::find(nameList.begin(), nameList.end(), &table.find(id)->second) == nameList.end()) {
+		QualifiedNameTable[structure.GetName()].push_back(&table.find(id)->second);
+		//nameList.push_back(&table.find(id)->second);
+	}
 	return &table.find(id)->second;
 }
 
@@ -473,10 +485,10 @@ Structure* StructuresTable::Get(ID_T id) {
 
 
 Structure* StructuresTable::Get(const std::string& structureName) {
-	for (auto& [key, value] : table) {
-		if (value.GetName() == structureName) {
-			return &value;
-		}
+	if (QualifiedNameTable.find(structureName) != QualifiedNameTable.end()) {
+		auto& nameList = QualifiedNameTable[structureName];
+		//assert(nameList.size() == 1);
+		return nameList.front();			
 	}
 	return nullptr;
 }

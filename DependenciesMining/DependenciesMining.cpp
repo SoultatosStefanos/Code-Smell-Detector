@@ -33,16 +33,22 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	//if (d->isInStdNamespace() || !d->hasDefinition()) {
 	
 
-	if (!(d->isCompleteDefinition())) {
+	/*if (!(d->isCompleteDefinition())) {
 		return; 
+	}*/
+
+	if (!d->hasDefinition()) {
+		return;														// ignore std && declarations
 	}
 
-	//if (!d->hasDefinition()) {
-	//	return;														// ignore std && declarations
-	//}
 
 	if (d->isImplicit()) {
 		return;
+	}
+
+	// gia ta declerations
+	if (!(d->isCompleteDefinition())) {
+		d = d->getDefinition(); 
 	}
 
 	// Templates
@@ -92,6 +98,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		else {
 			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
 			templateParent = structuresTable.Get(parentName);
+			assert(templateParent);
+			parentID = templateParent->GetID();
 		}
 		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
@@ -162,9 +170,22 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		else {																								// Methods			
 			auto* decl = it->getFriendDecl();
-			if (decl->getKind() == it->CXXMethod) {
-				std::string methodName = GetFullMethodName((CXXMethodDecl*)decl);
-				auto* parentClass = ((CXXMethodDecl*)decl)->getParent();
+			auto kind = decl->getKind();
+			if (decl->getKind() == d->CXXMethod || decl->getKind() == d->FunctionTemplate) {
+				
+				CXXMethodDecl* methodDecl; 
+				if (decl->getKind() == d->FunctionTemplate) {												// Template Methods				
+					 // TODO remove the functions 		
+					methodDecl = (CXXMethodDecl*)decl;				
+					//if (!methodDecl)																		// Ignore Template Function
+						continue;
+				}
+				else {
+					methodDecl = (CXXMethodDecl*)decl;
+				}
+
+				std::string methodName = GetFullMethodName(methodDecl);
+				auto* parentClass = methodDecl->getParent();
 				auto parentClassID = parentClass->getID();
 				assert(parentClassID);
 				std::string parentName = GetFullStructureName(parentClass);
@@ -173,11 +194,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				// meta thn allagh se ids ws keys den krataw info gia to idio to method alla mono gia to structure pou anoikei
 				structure.InsertFriend(parentClassID, parentStructure);
 			}
-			else if (decl->isTemplateDecl()) {
-				// problem with the ID , me names douleuei kanonika
-				auto recdecl = ((TemplateDecl*)decl)->getTemplatedDecl();
-				auto parentID = recdecl->getID();
-				auto parentName = GetFullStructureName((RecordDecl*)recdecl);
+			else if (decl->isTemplateDecl()) {																// Template Classes
+				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();
+				auto structureDefinition = recdecl->getDefinition(); 
+				assert(structureDefinition);
+				auto parentID = structureDefinition->getID();
+				auto parentName = GetFullStructureName(structureDefinition);
 				Structure* parentStructure = structuresTable.Get(parentID);
 				if (!parentStructure) {
 					parentStructure = structuresTable.Get(parentName);

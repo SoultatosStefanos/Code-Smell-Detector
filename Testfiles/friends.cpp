@@ -5,7 +5,12 @@ namespace friends{
     class A {
         public:
         void method (B b);
+        template<typename T> void method(){
+        }
     };
+
+     template<typename T> void tempF(){
+        }
     
     void A::method (B b){
         A a;
@@ -31,6 +36,8 @@ namespace friends{
         friend class template_Z <int, int>;
         friend class template_Z <int, float>;
         template<typename T1, typename T2> friend class template_Z;     // ~
+        template<typename T> friend void A::method();
+        template<typename T> friend void tempF();
         friend Anonymous2;
         friend void f();                                                // ignored
     };

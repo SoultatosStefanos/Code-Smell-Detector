@@ -227,9 +227,10 @@ namespace DependenciesMining {
 	class StructuresTable {
 	private:
 		std::unordered_map<ID_T, Structure> table;
+		std::unordered_map<std::string, std::list<Structure*>> QualifiedNameTable;
 	public:
 		std::unordered_map<ID_T, Structure>& GetSymbolTable();
-		Structure* Insert(ID_T id, const std::string& name = "");
+		Structure* Insert(ID_T id, const std::string& name);
 		Structure* Insert(ID_T id, Structure& structure);
 		Structure* Get(ID_T id);
 		Structure* Get(const std::string& structureName);

@@ -6,16 +6,17 @@ namespace templates{
     template<typename T1, typename T2> struct template_Z;
     template<> struct template_Z <int, int>;
 
-    template<typename T1, typename T2> struct template_Z {
-      T1 a;
-      void method();
-    }; 
-   
     template <> struct template_Z <int, int> {
       B b;
       void method_int();
     };
 
+  
+    template<typename T1, typename T2> struct template_Z {
+      T1 a;
+      void method(){}
+    }; 
+  
     template <typename T> 
     struct template_Z <int, T> 
     {
