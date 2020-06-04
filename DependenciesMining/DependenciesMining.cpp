@@ -172,23 +172,21 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			auto* decl = it->getFriendDecl();
 			auto kind = decl->getKind();
 			if (decl->getKind() == d->CXXMethod || decl->getKind() == d->FunctionTemplate) {
-				
 				CXXMethodDecl* methodDecl; 
-				if (decl->getKind() == d->FunctionTemplate) {												// Template Methods				
-					 // TODO remove the functions 		
-					methodDecl = (CXXMethodDecl*)decl;				
-					//if (!methodDecl)																		// Ignore Template Function
+				if (decl->getKind() == d->FunctionTemplate) {												// Template Methods				 		
+					auto funcdecl = ((FunctionTemplateDecl*)decl)->getTemplatedDecl();
+					auto parent = funcdecl->getParent();
+					if(!parent->isRecord())																	// Ignore Template Function
 						continue;
+					methodDecl = (CXXMethodDecl*)funcdecl;												
 				}
 				else {
 					methodDecl = (CXXMethodDecl*)decl;
 				}
-
 				std::string methodName = GetFullMethodName(methodDecl);
 				auto* parentClass = methodDecl->getParent();
 				auto parentClassID = parentClass->getID();
 				assert(parentClassID);
-				std::string parentName = GetFullStructureName(parentClass);
 				Structure* parentStructure = structuresTable.Get(parentClassID);
 				if (!parentStructure) continue;
 				// meta thn allagh se ids ws keys den krataw info gia to idio to method alla mono gia to structure pou anoikei
