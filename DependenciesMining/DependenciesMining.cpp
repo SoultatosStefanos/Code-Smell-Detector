@@ -73,11 +73,11 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
 	auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-	structure.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+	structure.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 	
 	auto structID = d->getID(); 
 	assert(structID); 
-	structure.SetName(GetFullStructureName(d));
+	structure.SetQualifiedName(GetFullStructureName(d));
 	structure.SetID(structID);
 	
 	// Templates
@@ -217,11 +217,11 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
 		auto parentID = ((RecordDecl*)parent)->getID();
 		assert(parentID);
-		if (parentName != structure.GetName()) {
+		if (parentName != structure.GetQualifiedName()) {
 			Structure* parentStructure = structuresTable.Get(parentID);
 			auto* inst = d->getInstantiatedFromMemberClass();
 			structure.SetNestedParent(parentStructure);
-			parentStructure->InsertNestedClass(structure.GetID(), structuresTable.Insert(structure.GetID(), structure.GetName()));
+			parentStructure->InsertNestedClass(structure.GetID(), structuresTable.Insert(structure.GetID(), structure.GetQualifiedName()));
 		}
 	}
 	structuresTable.Insert(structure.GetID(), structure);
@@ -261,9 +261,9 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 			auto fieldID = d->getID();
 			assert(fieldID);
-			Definition field(fieldID, d->getQualifiedNameAsString(), typeStructure);
+			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetEnclosingNamespace(), typeStructure);
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-			field.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			parentStructure->InsertField(fieldID, field);
 		}
 	}
@@ -285,9 +285,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		Structure* parentStructure = structuresTable.Get(parentID);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
-		Method method(methodID, GetFullMethodName(d));
+		Method method(methodID, parentStructure->GetEnclosingNamespace(), GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-		method.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
 		if (d->getDeclKind() == d->CXXConstructor) {
@@ -519,9 +519,9 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				typeStructure = structuresTable.Insert(typeID, typeName);
 			auto defID = d->getID();
 			assert(defID);
-			Definition def(defID, d->getQualifiedNameAsString(), typeStructure);
+			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetEnclosingNamespace(), typeStructure);
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-			def.SetTotalLocation(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+			def.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
 				parentMethod->InsertDefinition(defID, def);
 			}

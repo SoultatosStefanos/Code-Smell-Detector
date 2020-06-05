@@ -5,7 +5,9 @@
 #include <cassert>
 #include <Vector>
 
-namespace DependenciesMining2 {
+#define ID_T int64_t 
+
+namespace DependenciesMining {
 
 	class Structure;
 
@@ -29,6 +31,13 @@ namespace DependenciesMining2 {
 		TemplateInstatiationSpecialization
 	};
 
+	enum class ClassType {
+		Undefined,
+		Structure,
+		Method, 
+		Definition
+	};
+
 	class SourceInfo {
 	private:
 		std::string fileName;
@@ -44,7 +53,7 @@ namespace DependenciesMining2 {
 		void SetFileName(std::string name);
 		void SetLine(int line);
 		void SetColumn(int column);
-		void SetTotalLocation(std::string fileName, int line, int column);
+		void SetTotalLocation(const std::string& fileName, int line, int column);
 
 		bool  operator<(SourceInfo const& loc) const;
 		bool  operator<=(SourceInfo const& loc) const;
@@ -52,36 +61,65 @@ namespace DependenciesMining2 {
 		bool  operator>=(SourceInfo const& loc) const;
 	};
 
+	class Symbol {
+		ID_T id;
+		std::string qualifiedName;
+		std::string enclosingNamespace = "";
+		SourceInfo srcInfo;
+		ClassType classType;
 
-	class Definition : public SourceInfo {
+	public:
+		Symbol() = default; 
+		Symbol(ClassType classType) : classType(classType) {};
+		Symbol(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1) : id(id), qualifiedName(qualifiedName), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
+
+		ID_T GetID() const;
+		std::string GetQualifiedName() const;
+		ClassType GetClassType() const; 
+		const SourceInfo& GetSourceInfo() const;
+		std::string GetEnclosingNamespace() const;
+
+		void SetID(const ID_T id); 
+		void SetQualifiedName(const std::string& qualifiedName);
+		void SetClassType(ClassType type);
+		void SetSourceInfo(const SourceInfo& info);
+		void SetSourceInfo(const std::string& fileName, int line, int column);
+		void SetEnclosingNamespace(const std::string& enclosingNamespace);
+	};
+
+
+
+
+	class Definition : public Symbol {
 	private:
-		std::string name;
 		Structure* type;
 
 	public:
-		Definition() = default;
-		Definition(const std::string& name, Structure* type) : name(name), type(type) {};
-		Definition(const std::string& name, Structure* type, std::string fileName, int line, int column) : name(name), type(type), SourceInfo(fileName, line, column) {};
-		std::string GetName() const;
+		Definition() : Symbol(ClassType::Definition) {};
+		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type) : Symbol( id, qualifiedName, enclosingNamespace, ClassType::Definition) , type(type) {};
+		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type, const std::string& fileName, int line, int column) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Definition, fileName, line, column), type(type) {};
+		
 		const Structure* GetType() const;
+		void SetType(Structure* structure);
+
 	};
 
 
 	template<typename Parent_T> class Template {
 	private:
 		Parent_T* parent = nullptr;
-		std::unordered_map<std::string, Structure*> specializationArguments;
+		std::unordered_map<ID_T, Structure*> specializationArguments;
 
 	public:
 		Template() = default;
 
 		Parent_T* GetParent() const;
 		void SetParent(Parent_T* structure); 
-		void InsertSpecializationArguments(const std::string& name, Structure* structure);
+		void InsertSpecializationArguments(ID_T id, Structure* structure);
 	};
 
 
-	class Method : public SourceInfo {
+	class Method : public Symbol {
 	public:
 		class Member {
 		private:
@@ -117,20 +155,19 @@ namespace DependenciesMining2 {
 		};
 
 	private:
-		std::string name;
 		MethodType methodType = MethodType::Undefined;
 		Structure* returnType = nullptr;
-		Template<Method> templateInfo;
-		std::unordered_map<std::string, Definition> arguments;
-		std::unordered_map<std::string, Definition> definitions;
+		Template<Method> templateInfo;								// Template Parent is *not* used
+		std::unordered_map<ID_T, Definition> arguments;
+		std::unordered_map<ID_T, Definition> definitions;
 		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
 	public:
-		Method() = default;
-		Method(std::string name) : name(name) {};
-		Method(std::string name, std::string fileName, int line, int column) : name(name), SourceInfo(fileName, line, column) {};
-		std::string GetName() const;
-		std::unordered_map<std::string, Definition>& GetArguments();
-		std::unordered_map<std::string, Definition>& GetDefinitions();
+		Method() : Symbol(ClassType::Method) {};
+		Method(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Method) {};
+		Method(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, const std::string& fileName, int line, int column) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Method, fileName, line, column) {};
+
+		std::unordered_map<ID_T, Definition>& GetArguments();
+		std::unordered_map<ID_T, Definition>& GetDefinitions();
 		MethodType GetMethodType() const;
 		Structure* GetReturnType() const;
 
@@ -139,11 +176,11 @@ namespace DependenciesMining2 {
 		void SetTemplateInfo(Template<Method> temp);
 		void SetTemplateParent(Method* structure);
 
-		void InsertArg(const std::string& name, Definition& definition);
-		void InsertDefinition(const std::string& name, Definition& definition);
+		void InsertArg(ID_T id, Definition& definition);
+		void InsertDefinition(ID_T id, Definition& definition);
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
-		void InsertTemplateSpecializationArguments(const std::string& name, Structure* structure);
+		void InsertTemplateSpecializationArguments(ID_T id, Structure* structure);
 
 		bool isConstructor(); 
 		bool isDestructor();
@@ -154,53 +191,48 @@ namespace DependenciesMining2 {
 	};
 
 
-	class Structure : public SourceInfo {
+	class Structure : public Symbol {
 	private:
-		std::string name;
-		std::string enclosingNamespace = "";
+		
 		StructureType structureType = StructureType::Undefined;
 		Template<Structure> templateInfo;
 		Structure* nestedParent = nullptr;
-		std::unordered_map<std::string, Method> methods;
-		std::unordered_map<std::string, Definition> fields;
-		std::unordered_map<std::string, Structure*> bases;
-		std::unordered_map<std::string, Structure*> contains;
-		std::unordered_map<std::string, Structure*> friends;	// About Structures: Key->structureName, Value->Structure*
-																// About Methods: Key->methodName, Value->Structure* (the parent Class which owns this method)
+		std::unordered_map<ID_T, Method> methods;
+		std::unordered_map<ID_T, Definition> fields;
+		std::unordered_map<ID_T, Structure*> bases;
+		std::unordered_map<ID_T, Structure*> contains;
+		std::unordered_map<ID_T, Structure*> friends;	// About Structures: Key->structureID, Value->Structure*
+														// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
 
 	public:
-		Structure(Structure& structure);
-		Structure() = default;
-		Structure(std::string name, std::string enclosingNamespace = "", StructureType structureType = StructureType::Undefined)
-			: name(name), enclosingNamespace(enclosingNamespace), structureType(structureType) {};
-		Structure(std::string name, std::string enclosingNamespace, StructureType structureType, std::string fileName, int line, int column)
-			: name(name), enclosingNamespace(enclosingNamespace), structureType(structureType), SourceInfo(fileName, line, column) {};
-		std::string GetName() const;
-		std::string GetEnclosingNamespace() const;
+		Structure() : Symbol(ClassType::Structure) {};
+		Structure(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace = "", StructureType structureType = StructureType::Undefined)
+			: Symbol(id, qualifiedName, enclosingNamespace, ClassType::Structure), structureType(structureType) {};
+		Structure(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, StructureType structureType, std::string fileName, int line, int column)
+			: Symbol(id, qualifiedName, enclosingNamespace, ClassType::Structure, fileName, line, column), structureType(structureType) {};
+		
 		StructureType GetStructureType() const;
 		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
-		Method* GetMethod(const std::string& name);
-		std::unordered_map<std::string, Method>& GetMethods();
-		std::unordered_map<std::string, Definition>& GetFields();
-		std::unordered_map<std::string, Structure*>& GetBases();
-		std::unordered_map<std::string, Structure*>& GetContains();
-		std::unordered_map<std::string, Structure*>& GetFriends();
+		Method* GetMethod(ID_T id);
+		std::unordered_map<ID_T, Method>& GetMethods();
+		std::unordered_map<ID_T, Definition>& GetFields();
+		std::unordered_map<ID_T, Structure*>& GetBases();
+		std::unordered_map<ID_T, Structure*>& GetContains();
+		std::unordered_map<ID_T, Structure*>& GetFriends();
 
-		void SetName(const std::string& name);
-		void SetEnclosingNamespace(const std::string& enclosingNamespace);
 		void SetStructureType(StructureType structureType);
 		void SetTemplateInfo(Template<Structure> temp);
 		void SetTemplateParent(Structure* structure);
 		void SetNestedParent(Structure* structure);
 
 		//Method* InsertMethod(const std::string& returnTypeName, const std::string& methodName, Method& method);
-		Method* InsertMethod(const std::string& name, Method& method);
-		void InsertField(const std::string& name, Definition& definition);
-		void InsertBase(const std::string& name, Structure* structure);
-		void InsertNestedClass(const std::string& name, Structure* structure);
-		void InsertFriend(const std::string& name, Structure* structure);
-		void InsertTemplateSpecializationArguments(const std::string& name, Structure* structure);
+		Method* InsertMethod(ID_T id, Method& method);
+		void InsertField(ID_T id, Definition& definition);
+		void InsertBase(ID_T id, Structure* structure);
+		void InsertNestedClass(ID_T id, Structure* structure);
+		void InsertFriend(ID_T id, Structure* structure);
+		void InsertTemplateSpecializationArguments(ID_T id, Structure* structure);
 
 		bool IsTemplateDefinition();
 		bool IsTemplateFullSpecialization();
@@ -213,12 +245,14 @@ namespace DependenciesMining2 {
 
 	class StructuresTable {
 	private:
-		std::unordered_map<std::string, Structure> table;
+		std::unordered_map<ID_T, Structure> table;
+		std::unordered_map<std::string, std::list<Structure*>> QualifiedNameTable;
 	public:
-		std::unordered_map<std::string, Structure>& GetSymbolTable();
-		Structure* Insert(const std::string& name);
-		Structure* Insert(const std::string& name, Structure& structure);
-		Structure* Get(const std::string& name);
+		std::unordered_map<ID_T, Structure>& GetSymbolTable();
+		Structure* Insert(ID_T id, const std::string& name);
+		Structure* Insert(ID_T id, Structure& structure);
+		Structure* Get(ID_T id);
+		Structure* Get(const std::string& structureName);
 
 		void Print();
 	};

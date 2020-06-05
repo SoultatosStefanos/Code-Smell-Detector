@@ -1,6 +1,6 @@
 #include "StructuresTable.h"
 
-using namespace DependenciesMining2;
+using namespace DependenciesMining;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {
@@ -30,7 +30,7 @@ void SourceInfo::SetColumn(int column) {
 	this->column = column;
 }
 
-void SourceInfo::SetTotalLocation(std::string fileName, int line, int column) {
+void SourceInfo::SetTotalLocation(const std::string& fileName, int line, int column) {
 	this->fileName = fileName;
 	this->line = line;
 	this->column = column;
@@ -72,26 +72,68 @@ bool  SourceInfo::operator>=(SourceInfo const& loc) const {
 	return false;
 }
 
-//Definition
-std::string Definition::GetName() const {
-	return name;
+
+// Symbol 
+ID_T Symbol::GetID() const {
+	return id;
 }
 
+std::string Symbol::GetQualifiedName() const {
+	return qualifiedName;
+}
+
+ClassType Symbol::GetClassType() const {
+	return classType;
+}
+
+const SourceInfo& Symbol::GetSourceInfo() const {
+	return srcInfo;
+}
+
+std::string Symbol::GetEnclosingNamespace() const {
+	return enclosingNamespace;
+}
+
+void Symbol::SetID(const ID_T id) {
+	this->id = id;
+}
+
+void Symbol::SetQualifiedName(const std::string& qualifiedName) {
+	this->qualifiedName = qualifiedName;
+}
+
+void Symbol::SetClassType(ClassType type) {
+	classType = type;
+}
+
+void Symbol::SetSourceInfo(const SourceInfo& info) {
+	srcInfo = info;
+}
+
+void Symbol::SetSourceInfo(const std::string& fileName, int line, int column) {
+	srcInfo.SetTotalLocation(fileName, line, column);
+}
+
+void Symbol::SetEnclosingNamespace(const std::string& enclosingNamespace) {
+	this->enclosingNamespace = enclosingNamespace;
+}
+
+
+//Definition
 const Structure* Definition::GetType() const {
 	return type;
 }
 
-
-// Method
-std::string Method::GetName() const {
-	return name;
+void Definition::SetType(Structure* structure) {
+	type = structure;
 }
 
-std::unordered_map<std::string, Definition>& Method::GetArguments() {
+// Method
+std::unordered_map<ID_T, Definition>& Method::GetArguments() {
 	return arguments;
 }
 
-std::unordered_map<std::string, Definition>& Method::GetDefinitions() {
+std::unordered_map<ID_T, Definition>& Method::GetDefinitions() {
 	return definitions;
 }
 
@@ -120,14 +162,14 @@ void Method::SetTemplateParent(Method* method) {
 	templateInfo.SetParent(method);
 }
 
-void Method::InsertArg(const std::string& name, Definition& definition) {
-	if (arguments.find(name) == arguments.end())
-		arguments[name] = definition;
+void Method::InsertArg(ID_T id, Definition& definition) {
+	if (arguments.find(id) == arguments.end())
+		arguments[id] = definition;
 }
 
-void Method::InsertDefinition(const std::string& name, Definition& definition) {
-	if (definitions.find(name) == definitions.end())
-		definitions[name] = definition;
+void Method::InsertDefinition(ID_T id, Definition& definition) {
+	if (definitions.find(id) == definitions.end())
+		definitions[id] = definition;
 }
 
 void Method::InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin) {
@@ -155,8 +197,8 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 	}
 }
 
-void Method::InsertTemplateSpecializationArguments(const std::string& name, Structure* structure) {
-	templateInfo.InsertSpecializationArguments(name, structure);
+void Method::InsertTemplateSpecializationArguments(ID_T id, Structure* structure) {
+	templateInfo.InsertSpecializationArguments(id, structure);
 }
 
 bool Method::isConstructor() {
@@ -248,17 +290,6 @@ void Method::MemberExpr::InsertMember(Member member) {
 
 
 // Structure
-Structure::Structure(Structure& structure) {
-}
-
-std::string Structure::GetName() const {
-	return name;
-}
-
-std::string Structure::GetEnclosingNamespace() const {
-	return enclosingNamespace;
-}
-
 StructureType Structure::GetStructureType() const {
 	return structureType;
 }
@@ -271,31 +302,31 @@ Structure* Structure::GetNestedParent() const {
 	return nestedParent;
 }
 
-Method* Structure::GetMethod(const std::string& name) {
-	auto it = methods.find(name);
+Method* Structure::GetMethod(ID_T id) {
+	auto it = methods.find(id);
 	if (it != methods.end())
 		return  &it->second;
 	else
 		return nullptr;
 }
 
-std::unordered_map<std::string, Method>& Structure::GetMethods() {
+std::unordered_map<ID_T, Method>& Structure::GetMethods() {
 	return methods;
 }
 
-std::unordered_map<std::string, Definition>& Structure::GetFields() {
+std::unordered_map<ID_T, Definition>& Structure::GetFields() {
 	return fields;
 }
 
-std::unordered_map<std::string, Structure*>& Structure::GetBases() {
+std::unordered_map<ID_T, Structure*>& Structure::GetBases() {
 	return bases;
 }
 
-std::unordered_map<std::string, Structure*>& Structure::GetContains() {
+std::unordered_map<ID_T, Structure*>& Structure::GetContains() {
 	return contains;
 }
 
-std::unordered_map<std::string, Structure*>& Structure::GetFriends()
+std::unordered_map<ID_T, Structure*>& Structure::GetFriends()
 {
 	return friends;
 }
@@ -308,16 +339,8 @@ template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent)
 	this->parent = parent;
 }
 
-template<typename Parent_T> void Template<Parent_T>::InsertSpecializationArguments(const std::string& name, Structure* structure) {
-	specializationArguments[name] = structure;
-}
-
-void Structure::SetName(const std::string& name) {
-	this->name = name;
-}
-
-void Structure::SetEnclosingNamespace(const std::string& enclosingNamespace) {
-	this->enclosingNamespace = enclosingNamespace;
+template<typename Parent_T> void Template<Parent_T>::InsertSpecializationArguments(ID_T id, Structure* structure) {
+	specializationArguments[id] = structure;
 }
 
 void  Structure::SetStructureType(StructureType structureType) {
@@ -349,31 +372,31 @@ Method* Structure::InsertMethod(const std::string& returnTypeName, const std::st
 	return &methods[returnTypeName][methodName];//->second;
 }*/
 
-Method* Structure::InsertMethod(const std::string& name, Method& method) {
-	if (methods.find(name) == methods.end())
-		methods[name] = method;
-	return &methods.find(name)->second;
+Method* Structure::InsertMethod(ID_T id, Method& method) {
+	if (methods.find(id) == methods.end())
+		methods[id] = method;
+	return &methods.find(id)->second;
 }
 
-void Structure::InsertField(const std::string& name, Definition& definition) {
-	fields[name] = definition;
+void Structure::InsertField(ID_T id, Definition& definition) {
+	fields[id] = definition;
 }
 
-void Structure::InsertBase(const std::string& name, Structure* structure) {
-	bases[name] = structure;
+void Structure::InsertBase(ID_T id, Structure* structure) {
+	bases[id] = structure;
 }
 
-void Structure::InsertNestedClass(const std::string& name, Structure* structure) {
-	contains[name] = structure;
+void Structure::InsertNestedClass(ID_T id, Structure* structure) {
+	contains[id] = structure;
 }
 
-void Structure::InsertFriend(const std::string& name, Structure* structure)
+void Structure::InsertFriend(ID_T id, Structure* structure)
 {
-	friends[name] = structure;
+	friends[id] = structure;
 }
 
-void Structure::InsertTemplateSpecializationArguments(const std::string& name, Structure* structure) {
-	templateInfo.InsertSpecializationArguments(name, structure);
+void Structure::InsertTemplateSpecializationArguments(ID_T id, Structure* structure) {
+	templateInfo.InsertSpecializationArguments(id, structure);
 }
 
 
@@ -414,35 +437,55 @@ bool Structure::IsNestedClass() {
 }
 
 // StructuresTable
-std::unordered_map<std::string, Structure>& StructuresTable::GetSymbolTable() {
+std::unordered_map<ID_T, Structure>& StructuresTable::GetSymbolTable() {
 	return table;
 }
 
-Structure* StructuresTable::Insert(const std::string& name) {
-	auto it = table.find(name);
+Structure* StructuresTable::Insert(ID_T id, const std::string& name) {
+	auto it = table.find(id);
 	if (it != table.end())
 		return &it->second;
 
-	Structure dummy(name);
-	table[name] = dummy;
-	return &table.find(name)->second;
+	Structure dummy(id, name);
+	table[id] = dummy;
+
+	auto& nameList = QualifiedNameTable[name];
+	if (std::find(nameList.begin(), nameList.end(), &table.find(id)->second) == nameList.end()) {
+		nameList.push_back(&table.find(id)->second);
+	}
+	return &table.find(id)->second;
 }
 
-Structure* StructuresTable::Insert(const std::string& name, Structure& structure) {
-	auto it = table.find(name);
+Structure* StructuresTable::Insert(ID_T id, Structure& structure) {
+	auto it = table.find(id);
 	if (it != table.end() && it->second.GetStructureType() != StructureType::Undefined)
 		return &it->second;
 
-	table[name] = structure;
-	return &table.find(name)->second;
+	table[id] = structure;
+
+	auto& nameList = QualifiedNameTable[structure.GetQualifiedName()];
+	if (std::find(nameList.begin(), nameList.end(), &table.find(id)->second) == nameList.end()) {
+		nameList.push_back(&table.find(id)->second);
+	}
+	return &table.find(id)->second;
 }
 
-Structure* StructuresTable::Get(const std::string& name) {
-	auto it = table.find(name);
+Structure* StructuresTable::Get(ID_T id) {
+	auto it = table.find(id);
 	if (it != table.end())
 		return &it->second;
 	else
 		return nullptr;
+}
+
+
+Structure* StructuresTable::Get(const std::string& structureName) {
+	if (QualifiedNameTable.find(structureName) != QualifiedNameTable.end()) {
+		auto& nameList = QualifiedNameTable[structureName];
+		//assert(nameList.size() == 1);
+		return nameList.front();			
+	}
+	return nullptr;
 }
 
 void StructuresTable::Print() {

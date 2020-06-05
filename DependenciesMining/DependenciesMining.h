@@ -3,7 +3,7 @@
 #pragma warning(disable : 4146)
 
 #include <iostream>
-#include "StructuresTableID.h"
+#include "StructuresTable.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
