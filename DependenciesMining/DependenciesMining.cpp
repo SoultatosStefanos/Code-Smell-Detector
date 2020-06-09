@@ -10,6 +10,7 @@
 using namespace DependenciesMining;
 
 StructuresTable DependenciesMining::structuresTable;
+IgnoredNamespaces DependenciesMining::ignoredNamespaces;
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
@@ -81,26 +82,26 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetID(structID);
 	
 	// Templates
-	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-	//if (structure.IsTemplateInstatiationSpecialization()){
+	//if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
+	if (structure.IsTemplateInstatiationSpecialization()){
 		// Template parent
 		std::string parentName;
 		ID_T parentID; 
 
 		Structure* templateParent;
-		if (structure.IsTemplateInstatiationSpecialization()) {
+	//	if (structure.IsTemplateInstatiationSpecialization()) {
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = parent->getID();
 			assert(parentID); 
 			parentName = GetFullStructureName(parent);
 			templateParent = structuresTable.Get(parentID);
-		}
+	/*	}
 		else {
 			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
 			templateParent = structuresTable.Get(parentName);
 			assert(templateParent);
 			parentID = templateParent->GetID();
-		}
+		}*/
 		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
 			templateParent = structuresTable.Insert(parentID, parentName);
@@ -134,7 +135,11 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	auto* enclosingNamespace = d->getEnclosingNamespaceContext();
 	std::string fullEnclosingNamespace = "";
 	while (enclosingNamespace->isNamespace()) {
-		fullEnclosingNamespace = ((NamespaceDecl*)enclosingNamespace)->getNameAsString() + "::" + fullEnclosingNamespace;
+		auto enclosingNamespaceName = ((NamespaceDecl*)enclosingNamespace)->getNameAsString();
+		/*if (ignoredNamespaces.isIgnored(enclosingNamespaceName)) {
+			return;
+		}*/
+		fullEnclosingNamespace = enclosingNamespaceName + "::" + fullEnclosingNamespace;
 		enclosingNamespace = enclosingNamespace->getParent()->getEnclosingNamespaceContext();
 	}
 	structure.SetEnclosingNamespace(fullEnclosingNamespace);
@@ -193,7 +198,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				structure.InsertFriend(parentClassID, parentStructure);
 			}
 			else if (decl->isTemplateDecl()) {																// Template Classes
-				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();
+				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();			
 				auto structureDefinition = recdecl->getDefinition(); 
 				assert(structureDefinition);
 				auto parentID = structureDefinition->getID();
@@ -284,6 +289,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		Structure* parentStructure = structuresTable.Get(parentID);
+		//assert(parentStructure);
+		if(!parentStructure)
+			parentStructure = structuresTable.Insert(parentID, parentName);
 		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
 		Method method(methodID, parentStructure->GetEnclosingNamespace(), GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());

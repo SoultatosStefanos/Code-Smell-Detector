@@ -1,4 +1,4 @@
-//#include <string>
+#include <stdio.h>
 
 namespace template_methods {
     struct A; 

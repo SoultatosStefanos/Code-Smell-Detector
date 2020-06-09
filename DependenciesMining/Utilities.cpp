@@ -141,3 +141,4 @@ bool isStructureOrStructurePointerType(clang::QualType type) {
 	}
 	return true;
 }
+

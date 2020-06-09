@@ -64,27 +64,28 @@ namespace DependenciesMining {
 	class Symbol {
 		ID_T id;
 		std::string qualifiedName;
-		std::string enclosingNamespace = "";
+		std::string enclosingNamespace = "-";
 		SourceInfo srcInfo;
-		ClassType classType;
+		ClassType classType = ClassType::Undefined;
 
 	public:
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
-		Symbol(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1) : id(id), qualifiedName(qualifiedName), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
+		Symbol(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace = "-", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1) 
+			: id(id), qualifiedName(qualifiedName), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
 
-		ID_T GetID() const;
-		std::string GetQualifiedName() const;
-		ClassType GetClassType() const; 
-		const SourceInfo& GetSourceInfo() const;
-		std::string GetEnclosingNamespace() const;
+		virtual ID_T GetID() const;
+		virtual std::string GetQualifiedName() const;
+		virtual ClassType GetClassType() const;
+		virtual const SourceInfo& GetSourceInfo() const;
+		virtual std::string GetEnclosingNamespace() const;
 
-		void SetID(const ID_T id); 
-		void SetQualifiedName(const std::string& qualifiedName);
-		void SetClassType(ClassType type);
-		void SetSourceInfo(const SourceInfo& info);
-		void SetSourceInfo(const std::string& fileName, int line, int column);
-		void SetEnclosingNamespace(const std::string& enclosingNamespace);
+		virtual void SetID(const ID_T id);
+		virtual void SetQualifiedName(const std::string& qualifiedName);
+		virtual void SetClassType(ClassType type);
+		virtual void SetSourceInfo(const SourceInfo& info);
+		virtual void SetSourceInfo(const std::string& fileName, int line, int column);
+		virtual void SetEnclosingNamespace(const std::string& enclosingNamespace);
 	};
 
 
@@ -96,8 +97,10 @@ namespace DependenciesMining {
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
-		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type) : Symbol( id, qualifiedName, enclosingNamespace, ClassType::Definition) , type(type) {};
-		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type, const std::string& fileName, int line, int column) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Definition, fileName, line, column), type(type) {};
+		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type) 
+			: Symbol( id, qualifiedName, enclosingNamespace, ClassType::Definition) , type(type) {};
+		Definition(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, Structure* type, const std::string& fileName, int line, int column) 
+			: Symbol(id, qualifiedName, enclosingNamespace, ClassType::Definition, fileName, line, column), type(type) {};
 		
 		const Structure* GetType() const;
 		void SetType(Structure* structure);
@@ -139,13 +142,14 @@ namespace DependenciesMining {
 			void SetType(Structure* type);
 		};
 
-		class MemberExpr : public SourceInfo {					// SourceInfo: expr position on src code		
+		class MemberExpr {					
 			std::string expr;
-			SourceInfo locEnd;									// to store the longer expr
+			SourceInfo srcInfo;									// srcInfo: expr position on src code		
+			SourceInfo locEnd;									// to store the longer expr (as string)
 			std::vector<Member> members;
 		public:
 			MemberExpr() = default;
-			MemberExpr(std::string expr, SourceInfo locEnd, std::string file, int line, int column) : expr(expr), locEnd(locEnd), SourceInfo(file, line, column) {};
+			MemberExpr(std::string expr, SourceInfo locEnd, std::string fileName, int line, int column) : expr(expr), locEnd(locEnd), srcInfo(SourceInfo(fileName, line, column)) {};
 			std::string GetExpr() const;
 			std::vector<Member> GetMembers() const;
 			SourceInfo GetLocEnd() const;
@@ -164,7 +168,8 @@ namespace DependenciesMining {
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Method) {};
-		Method(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, const std::string& fileName, int line, int column) : Symbol(id, qualifiedName, enclosingNamespace, ClassType::Method, fileName, line, column) {};
+		Method(ID_T id, const std::string& qualifiedName, const std::string& enclosingNamespace, const std::string& fileName, int line, int column) 
+			: Symbol(id, qualifiedName, enclosingNamespace, ClassType::Method, fileName, line, column) {};
 
 		std::unordered_map<ID_T, Definition>& GetArguments();
 		std::unordered_map<ID_T, Definition>& GetDefinitions();

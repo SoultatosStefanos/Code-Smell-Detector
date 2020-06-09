@@ -95,15 +95,29 @@ int main(){
 }
 */
 
+
+//#include <iostream>
+
 template <typename T> struct  template_T;
+template <> struct  template_T<char>;
 
 template <> struct template_T<int>{
   char c; 
 };
 
-template <typename T> struct template_T{
-  int x; 
-};
+// template <typename T> struct template_T{
+//   int x; 
+// };
+
+// void template_T<char>::method(){
+//   int x; 
+// }
+
+
+// template <> struct template_T<char>{
+//   char c; 
+//   void method();
+// };
 
 int main(){
   return 0;

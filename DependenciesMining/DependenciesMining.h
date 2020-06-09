@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "StructuresTable.h"
+#include "IgnoredNamespaces.h";
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
@@ -18,6 +19,7 @@ using namespace clang::tooling;
 
 namespace DependenciesMining {
 	extern StructuresTable structuresTable;
+	extern IgnoredNamespaces ignoredNamespaces;
 	
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
