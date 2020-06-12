@@ -17,11 +17,13 @@ bool isStructureOrStructurePointerType(clang::QualType type);
 
 template<typename Callback, typename ...Types>
 void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types... args);
+clang::QualType GetTemplateArgType(clang::TemplateArgument arg);
+void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args);
+std::string GetInnerTemplateArgs(const RecordDecl* d);
 std::string GetFullStructureName(const RecordDecl* d);
 std::string GetFullMethodName(const CXXMethodDecl* d);
-clang::QualType GetTemplateArgType(clang::TemplateArgument arg);
-std::string GetInnerTemplateArgs(const RecordDecl* d);
-void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args);
+
+std::string GetFullNamespaceName(const RecordDecl* d);
 
 
 // ---------------------------- template function definition ---------------------------------

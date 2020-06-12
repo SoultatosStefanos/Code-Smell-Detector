@@ -262,6 +262,22 @@ namespace DependenciesMining {
 		void Print();
 	};
 
+
+	// For the refactoring
+	class SymbolTable {
+	private:
+		std::unordered_map<ID_T, Symbol*> byId;
+		std::unordered_map<std::string, std::list<Symbol*>> byName;
+	public:
+		Symbol* Install (ID_T id, const std::string& name);
+		Symbol* Install (ID_T id, const Symbol& sym);
+		Symbol* Lookup (ID_T id);
+		Symbol* Lookup (const std::string& name);
+		const Symbol* Lookup (ID_T id) const;
+		const Symbol* Lookup (const std::string& name) const;
+		
+		void Print();
+	};
 	// Returns the number of dependencies that Structure "from" has on Structure "to"
 	int GetIntencity(Structure* from, Structure* to);
 	//int GetIntencity(std::string* from, std::string* to);

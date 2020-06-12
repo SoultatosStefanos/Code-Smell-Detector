@@ -10,7 +10,8 @@
 using namespace DependenciesMining;
 
 StructuresTable DependenciesMining::structuresTable;
-IgnoredNamespaces DependenciesMining::ignoredNamespaces;
+std::unordered_map<std::string, Ignored*> DependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()}, 
+																			{"filePaths", new IgnoredFilePaths()} };
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
@@ -31,20 +32,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
-	//if (d->isInStdNamespace() || !d->hasDefinition()) {
-	
-
-	/*if (!(d->isCompleteDefinition())) {
-		return; 
-	}*/
+	if (d->isImplicit()) {
+		return;
+	}
 
 	if (!d->hasDefinition()) {
 		return;														// ignore std && declarations
-	}
-
-
-	if (d->isImplicit()) {
-		return;
 	}
 
 	// gia ta declerations
@@ -72,14 +65,24 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
-	//std::cout << "Name: " << d->getNameAsString() << "\tQualifiedName: " << d->getQualifiedNameAsString() << "\nMy Name: " << GetFullStructureName(d) << "\n\n";
 	auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 	structure.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-	
+	if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+		return;
+	}
+
 	auto structID = d->getID(); 
 	assert(structID); 
 	structure.SetQualifiedName(GetFullStructureName(d));
 	structure.SetID(structID);
+	
+	// Namespace
+	std::string fullEnclosingNamespace = GetFullNamespaceName(d);
+	if (ignored["namespaces"]->isIgnored(fullEnclosingNamespace)) {
+		return;
+	}
+	structure.SetEnclosingNamespace(fullEnclosingNamespace);
+
 	
 	// Templates
 	//if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
@@ -131,19 +134,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 	
-	// Namespace
-	auto* enclosingNamespace = d->getEnclosingNamespaceContext();
-	std::string fullEnclosingNamespace = "";
-	while (enclosingNamespace->isNamespace()) {
-		auto enclosingNamespaceName = ((NamespaceDecl*)enclosingNamespace)->getNameAsString();
-		/*if (ignoredNamespaces.isIgnored(enclosingNamespaceName)) {
-			return;
-		}*/
-		fullEnclosingNamespace = enclosingNamespaceName + "::" + fullEnclosingNamespace;
-		enclosingNamespace = enclosingNamespace->getParent()->getEnclosingNamespaceContext();
-	}
-	structure.SetEnclosingNamespace(fullEnclosingNamespace);
-	
+
 	// Bases
 	for(auto it : d->bases()){
 		auto* baseRecord = it.getType()->getAsCXXRecordDecl();	
@@ -239,6 +230,17 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 
 		const RecordDecl* parent = d->getParent();
+
+		// Namespace
+		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+			return;
+		}
+		
+		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
+			return;
+		}
+
 		if (parent->isClass() || parent->isStruct()) {
 			std::string parentName = GetFullStructureName(parent);
 			std::string typeName;
@@ -267,7 +269,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			auto fieldID = d->getID();
 			assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetEnclosingNamespace(), typeStructure);
-			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			parentStructure->InsertField(fieldID, field);
 		}
@@ -288,13 +289,19 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 		}
 
-		Structure* parentStructure = structuresTable.Get(parentID);
-		//assert(parentStructure);
-		if(!parentStructure)
-			parentStructure = structuresTable.Insert(parentID, parentName);
-		//llvm::outs() << "Method:  " << GetFullMethodName(d) << "\n\tParent: " << parentName << "\n\n";
-		Method method(methodID, parentStructure->GetEnclosingNamespace(), GetFullMethodName(d));
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+			return;
+		}
+		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
+			return;
+		}
+
+		Structure* parentStructure = structuresTable.Get(parentID);
+		assert(parentStructure);
+		//if(!parentStructure)
+		//	parentStructure = structuresTable.Insert(parentID, parentName);
+		Method method(methodID, parentStructure->GetEnclosingNamespace(), GetFullMethodName(d));
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
@@ -432,7 +439,8 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 			}
 			end++;
 		}
-		exprString = std::string(sm->getCharacterData(range.getBegin()), end);
+		const char* beginstr = sm->getCharacterData(range.getBegin());
+		exprString = std::string(beginstr, end);
 	}
 	else {
 		exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
@@ -496,6 +504,15 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				return;
 
 			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
+
+			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+			if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+				return;
+			}
+			if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parentClass))) {
+				return;
+			}
+			
 			auto parentClassName = GetFullStructureName(parentClass);
 			auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
 			auto parentClassID = parentClass->getID(); 
@@ -528,7 +545,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			auto defID = d->getID();
 			assert(defID);
 			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetEnclosingNamespace(), typeStructure);
-			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			def.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
 				parentMethod->InsertDefinition(defID, def);

@@ -19,6 +19,7 @@ int main(int argc, const char** argv) {
 	//srcs.push_back(path + "\\member_classes.cpp");			// den eida polu, fainetai OK
 	//srcs.push_back(path + "\\methods_args_vars.cpp");			// OK
 	//srcs.push_back(path + "\\methods.cpp");					// OK
+	//srcs.push_back(path + "\\namespaces.cpp");				// OK
 	//srcs.push_back(path + "\\objects_used_on_methods.cpp");	// OK
 	//srcs.push_back(path + "\\template_methods.cpp");			// OK  - problem me full special mesa se template class
 	//srcs.push_back(path + "\\template_types.cpp");			// OK

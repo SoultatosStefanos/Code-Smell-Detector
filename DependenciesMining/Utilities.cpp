@@ -1,5 +1,21 @@
 #include "Utilities.h"
 
+
+bool isStructureOrStructurePointerType(clang::QualType type) {
+	if (!type->isStructureOrClassType()) {
+		if (type->isPointerType()) {
+			if (!type->getPointeeType()->isStructureOrClassType()) {
+				return false;
+			}
+		}
+		else {
+			return false;
+		}
+	}
+	return true;
+}
+
+
 QualType GetTemplateArgType(TemplateArgument arg) {
 	switch (arg.getKind()) {
 	case TemplateArgument::Null:
@@ -127,18 +143,13 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	return name;
 }
 
-
-bool isStructureOrStructurePointerType(clang::QualType type) {
-	if (!type->isStructureOrClassType()) {
-		if (type->isPointerType()) {
-			if (!type->getPointeeType()->isStructureOrClassType()) {
-				return false;
-			}
-		}
-		else {
-			return false;
-		}
+std::string GetFullNamespaceName(const RecordDecl* d) {
+	auto* enclosingNamespace = d->getEnclosingNamespaceContext();
+	std::string fullEnclosingNamespace = "";
+	while (enclosingNamespace->isNamespace()) {
+		auto enclosingNamespaceName = ((NamespaceDecl*)enclosingNamespace)->getNameAsString();
+		fullEnclosingNamespace = enclosingNamespaceName + "::" + fullEnclosingNamespace;
+		enclosingNamespace = enclosingNamespace->getParent()->getEnclosingNamespaceContext();
 	}
-	return true;
+	return fullEnclosingNamespace;
 }
-
