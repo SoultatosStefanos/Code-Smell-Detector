@@ -36,13 +36,22 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
-	if (!d->hasDefinition()) {
+/*	if (!d->hasDefinition()) {
 		return;														// ignore std && declarations
-	}
+	}*/
 
 	// gia ta declerations
 	if (!(d->isCompleteDefinition())) {
-		d = d->getDefinition(); 
+		if (!d->hasDefinition()){									// for templateDefinition Declarations only
+			if(!d->getDescribedClassTemplate())
+				return;
+			else {
+				d;
+			}
+		}
+		else {
+			d = d->getDefinition();
+		}
 	}
 
 	// Templates
@@ -83,28 +92,34 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 	structure.SetEnclosingNamespace(fullEnclosingNamespace);
 
+	if (!d->hasDefinition()) {
+		assert(structure.GetStructureType() == StructureType::TemplateDefinition);
+		structure.SetStructureType(StructureType::Undefined);
+		structuresTable.Insert(structure.GetID(), structure);
+		return;
+	}
 	
 	// Templates
-	//if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-	if (structure.IsTemplateInstatiationSpecialization()){
+	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
+	//if (structure.IsTemplateInstatiationSpecialization()){
 		// Template parent
 		std::string parentName;
 		ID_T parentID; 
 
 		Structure* templateParent;
-	//	if (structure.IsTemplateInstatiationSpecialization()) {
+		if (structure.IsTemplateInstatiationSpecialization()) {
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = parent->getID();
 			assert(parentID); 
 			parentName = GetFullStructureName(parent);
 			templateParent = structuresTable.Get(parentID);
-	/*	}
+		}
 		else {
 			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
 			templateParent = structuresTable.Get(parentName);
 			assert(templateParent);
 			parentID = templateParent->GetID();
-		}*/
+		}
 		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
 			templateParent = structuresTable.Insert(parentID, parentName);
