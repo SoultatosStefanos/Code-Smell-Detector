@@ -9,7 +9,7 @@
 
 using namespace DependenciesMining;
 
-StructuresTable DependenciesMining::structuresTable;
+SymbolTable<Structure> DependenciesMining::structuresTable;
 std::unordered_map<std::string, Ignored*> DependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()}, 
 																			{"filePaths", new IgnoredFilePaths()} };
 
@@ -82,7 +82,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	auto structID = d->getID(); 
 	assert(structID); 
-	structure.SetQualifiedName(GetFullStructureName(d));
+	structure.SetName(GetFullStructureName(d));
 	structure.SetID(structID);
 	
 	// Namespace
@@ -90,12 +90,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (ignored["namespaces"]->isIgnored(fullEnclosingNamespace)) {
 		return;
 	}
-	structure.SetEnclosingNamespace(fullEnclosingNamespace);
+	structure.SetNamespace(fullEnclosingNamespace);
 
 	if (!d->hasDefinition()) {
 		assert(structure.GetStructureType() == StructureType::TemplateDefinition);
 		structure.SetStructureType(StructureType::Undefined);
-		structuresTable.Insert(structure.GetID(), structure);
+		structuresTable.Install(structure.GetID(), structure);
 		return;
 	}
 	
@@ -112,17 +112,17 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			parentID = parent->getID();
 			assert(parentID); 
 			parentName = GetFullStructureName(parent);
-			templateParent = structuresTable.Get(parentID);
+			templateParent = (Structure*)structuresTable.Lookup(parentID);
 		}
 		else {
 			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
-			templateParent = structuresTable.Get(parentName);
+			templateParent = (Structure*)structuresTable.Lookup(parentName);
 			assert(templateParent);
 			parentID = templateParent->GetID();
 		}
 		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
-			templateParent = structuresTable.Insert(parentID, parentName);
+			templateParent = (Structure*)structuresTable.Install(parentID, parentName);
 		structure.SetTemplateParent(templateParent);
 
 		//Template Arguments		
@@ -137,13 +137,13 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
-						std::string argName = GetFullStructureName(d);
-						auto argID = d->getID(); 
-						assert(argID); 
-						Structure* arg = structuresTable.Get(argID);
-						if(arg == nullptr)
-							arg = structuresTable.Insert(argID, argName);
-						structure->InsertTemplateSpecializationArguments(argID, arg);
+						std::string argStructName = GetFullStructureName(d);
+						auto argStructID = d->getID(); 
+						assert(argStructID);
+						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
+						if(argStruct == nullptr)
+							argStruct = (Structure*)structuresTable.Install(argStructID, argStructName);
+						structure->InstallTemplateSpecializationArguments(argStructID, argStruct);
 					}
 				}, &structure);			
 		}
@@ -158,10 +158,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string baseName = GetFullStructureName(baseRecord);
 		auto baseID = baseRecord->getID();
 		assert(baseID);
-		Structure* base = structuresTable.Get(baseID);
+		Structure* base = (Structure*)structuresTable.Lookup(baseID);
 		if (!base)
-			base = structuresTable.Insert(baseID, baseName);
-		structure.InsertBase(baseID, base);
+			base = (Structure*)structuresTable.Install(baseID, baseName);
+		structure.InstallBase(baseID, base);
 	}
 
 	// Friends 
@@ -174,10 +174,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			auto parentID = parent->getID();
 			assert(parentID);
 			std::string parentName = GetFullStructureName(type->getType()->getAsCXXRecordDecl()) ;
-			Structure* parentStructure = structuresTable.Get(parentID);
+			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			if (!parentStructure)
-				parentStructure = structuresTable.Insert(parentID, parentName);
-			structure.InsertFriend(parentID, parentStructure);
+				parentStructure = (Structure*)structuresTable.Install(parentID, parentName);
+			structure.InstallFriend(parentID, parentStructure);
 		}
 		else {																								// Methods			
 			auto* decl = it->getFriendDecl();
@@ -198,10 +198,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				auto* parentClass = methodDecl->getParent();
 				auto parentClassID = parentClass->getID();
 				assert(parentClassID);
-				Structure* parentStructure = structuresTable.Get(parentClassID);
+				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
 				if (!parentStructure) continue;
 				// meta thn allagh se ids ws keys den krataw info gia to idio to method alla mono gia to structure pou anoikei
-				structure.InsertFriend(parentClassID, parentStructure);
+				structure.InstallFriend(parentClassID, parentStructure);
 			}
 			else if (decl->isTemplateDecl()) {																// Template Classes
 				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();			
@@ -209,14 +209,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				assert(structureDefinition);
 				auto parentID = structureDefinition->getID();
 				auto parentName = GetFullStructureName(structureDefinition);
-				Structure* parentStructure = structuresTable.Get(parentID);
+				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 				if (!parentStructure) {
-					parentStructure = structuresTable.Get(parentName);
+					parentStructure = (Structure*)structuresTable.Lookup(parentName);
 					if (!parentStructure) {
-						parentStructure = structuresTable.Insert(parentID, parentName);
+						parentStructure = (Structure*)structuresTable.Install(parentID, parentName);
 					}
 				}
-				structure.InsertFriend(parentID, parentStructure);
+				structure.InstallFriend(parentID, parentStructure);
 			}
 		}
 	}
@@ -228,14 +228,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
 		auto parentID = ((RecordDecl*)parent)->getID();
 		assert(parentID);
-		if (parentName != structure.GetQualifiedName()) {
-			Structure* parentStructure = structuresTable.Get(parentID);
+		if (parentName != structure.GetName()) {
+			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			auto* inst = d->getInstantiatedFromMemberClass();
 			structure.SetNestedParent(parentStructure);
-			parentStructure->InsertNestedClass(structure.GetID(), structuresTable.Insert(structure.GetID(), structure.GetQualifiedName()));
+			parentStructure->InstallNestedClass(structure.GetID(), (Structure*)structuresTable.Install(structure.GetID(), structure.GetName()));
 		}
 	}
-	structuresTable.Insert(structure.GetID(), structure);
+	structuresTable.Install(structure.GetID(), structure);
 }
 
 // Hanlde all the Fields in classes/structs
@@ -272,20 +272,20 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			assert(parentID);
 			assert(typeID);
 
-			Structure* parentStructure = structuresTable.Get(parentID);
-			Structure* typeStructure = structuresTable.Get(typeID);
+			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
+			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 			if (parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
 				return;
 			if (!typeStructure)
-				typeStructure = structuresTable.Insert(typeID, typeName);
+				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
 			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
 
 			auto fieldID = d->getID();
 			assert(fieldID);
-			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetEnclosingNamespace(), typeStructure);
+			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-			parentStructure->InsertField(fieldID, field);
+			parentStructure->InstallField(fieldID, field);
 		}
 	}
 }
@@ -312,11 +312,11 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 		}
 
-		Structure* parentStructure = structuresTable.Get(parentID);
+		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 		assert(parentStructure);
 		//if(!parentStructure)
 		//	parentStructure = structuresTable.Insert(parentID, parentName);
-		Method method(methodID, parentStructure->GetEnclosingNamespace(), GetFullMethodName(d));
+		Method method(methodID, parentStructure->GetNamespace(), GetFullMethodName(d));
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
@@ -382,13 +382,13 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 					if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();
-						std::string argName = GetFullStructureName(d);
-						auto argID = d->getID(); 
-						assert(argID);
-						Structure* arg = structuresTable.Get(argID);
-						if (arg == nullptr)
-							arg = structuresTable.Insert(argID, argName);
-						method->InsertTemplateSpecializationArguments(argID, arg);
+						std::string argStructName = GetFullStructureName(d);
+						auto argStructID = d->getID(); 
+						assert(argStructID);
+						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
+						if (argStruct == nullptr)
+							argStruct = (Structure*)structuresTable.Install(argStructID, argStructName);
+						method->InstallTemplateSpecializationArguments(argStructID, argStruct);
 					}
 					}, &method);
 			}
@@ -408,13 +408,13 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				typeID = returnType->getAsCXXRecordDecl()->getID();
 			}
 			assert(typeID);
-			Structure* typeStructure = structuresTable.Get(typeID);
+			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 			if (!typeStructure)
-				typeStructure = structuresTable.Insert(typeID, typeName);
+				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 			method.SetReturnType(typeStructure);
 		}
 
-		currentMethod = parentStructure->InsertMethod(methodID, method);
+		currentMethod = (Method*)parentStructure->InstallMethod(methodID, method);
 		sm = result.SourceManager;
 		
 		// Body - MemberExpr
@@ -489,9 +489,9 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 		typeID = type->getAsCXXRecordDecl()->getID();
 	}
 	assert(typeID); 
-	Structure* typeStructure = structuresTable.Get(typeID);
+	Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 	if (!typeStructure)
-		typeStructure = structuresTable.Insert(typeID, typeName);
+		typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 	
 	Method::Member member(decl->getNameAsString(), typeStructure, locEnd);
 	MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, locBegin.toString());
@@ -534,8 +534,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			auto parentMethodID = ((CXXMethodDecl*)parentMethodDecl)->getID();
 			assert(parentClassID);
 			assert(parentMethodID);
-			Structure* parentStructure = structuresTable.Get(parentClassID);
-			Method* parentMethod = parentStructure->GetMethod(parentMethodID);
+			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
+			Method* parentMethod = (Method*)parentStructure->LookupMethod(parentMethodID);
 			assert(parentMethod);
 			
 			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
@@ -554,18 +554,18 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				typeID = d->getType()->getAsCXXRecordDecl()->getID();
 			}
 			assert(typeID);
-			Structure* typeStructure = structuresTable.Get(typeID);
+			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 			if (!typeStructure)
-				typeStructure = structuresTable.Insert(typeID, typeName);
+				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 			auto defID = d->getID();
 			assert(defID);
-			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetEnclosingNamespace(), typeStructure);
+			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
 			def.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			if (d->isLocalVarDecl()) {
-				parentMethod->InsertDefinition(defID, def);
+				parentMethod->InstallDefinition(defID, def);
 			}
 			else {
-				parentMethod->InsertArg(defID, def);
+				parentMethod->InstallArg(defID, def);
 			}
 		}
 	}

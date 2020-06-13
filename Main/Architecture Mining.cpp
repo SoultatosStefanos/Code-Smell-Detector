@@ -23,9 +23,9 @@ int main(int argc, const char** argv) {
 	//srcs.push_back(path + "\\objects_used_on_methods.cpp");	// OK
 	//srcs.push_back(path + "\\template_methods.cpp");			// OK  - problem me full special mesa se template class
 	//srcs.push_back(path + "\\template_types.cpp");			// OK
-	//srcs.push_back(path + "\\templates.cpp");					// OK
+	srcs.push_back(path + "\\templates.cpp");					// OK
 	
-	srcs.push_back(path + "\\test0.cpp");					
+	//srcs.push_back(path + "\\test0.cpp");					
 	
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";

@@ -1,7 +1,7 @@
 #include "Utilities.h"
 
 
-bool isStructureOrStructurePointerType(clang::QualType type) {
+bool isStructureOrStructurePointerType(const clang::QualType& type) {
 	if (!type->isStructureOrClassType()) {
 		if (type->isPointerType()) {
 			if (!type->getPointeeType()->isStructureOrClassType()) {
@@ -16,7 +16,7 @@ bool isStructureOrStructurePointerType(clang::QualType type) {
 }
 
 
-QualType GetTemplateArgType(TemplateArgument arg) {
+QualType GetTemplateArgType(const TemplateArgument& arg) {
 	switch (arg.getKind()) {
 	case TemplateArgument::Null:
 		assert(0);

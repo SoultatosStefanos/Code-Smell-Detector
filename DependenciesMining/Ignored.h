@@ -26,7 +26,7 @@ public:
 class IgnoredFilePaths : public Ignored {
 public:
 	//IgnoredFilePaths();
-	IgnoredFilePaths(const std::string& inputFile = "C:\\Users\\Krystallia Savvaki\\Desktop\\Git\\Architecture-Mining\\DependenciesMining\\Ignore.txt");
+	IgnoredFilePaths(const std::string& inputFile = "C:\\Users\\user\\Desktop\\Git\\Architecture-Mining\\DependenciesMining\\Ignore.txt");
 	virtual bool isIgnored(const std::string& file);
 
 

@@ -13,11 +13,11 @@ using namespace llvm;
 template<typename T> 
 void PrintLocation(T d, const MatchFinder::MatchResult& result);
 
-bool isStructureOrStructurePointerType(clang::QualType type);
+bool isStructureOrStructurePointerType(const clang::QualType& type);
 
 template<typename Callback, typename ...Types>
-void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types... args);
-clang::QualType GetTemplateArgType(clang::TemplateArgument arg);
+void TemplateArgsVisit(const TemplateArgument& templateArg, const Callback& callback, Types... args);
+clang::QualType GetTemplateArgType(const clang::TemplateArgument& arg);
 void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args);
 std::string GetInnerTemplateArgs(const RecordDecl* d);
 std::string GetFullStructureName(const RecordDecl* d);
@@ -28,7 +28,7 @@ std::string GetFullNamespaceName(const RecordDecl* d);
 
 // ---------------------------- template function definition ---------------------------------
 template<typename Callback, typename ...Types>
-void TemplateArgsVisit(TemplateArgument templateArg, Callback callback, Types... args) {
+void TemplateArgsVisit(const TemplateArgument& templateArg, const Callback& callback, Types... args) {
 	if (templateArg.getKind() == templateArg.Pack) {
 		auto argArray = templateArg.getPackAsArray();
 		for (auto it : argArray) {
