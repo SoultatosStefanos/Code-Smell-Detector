@@ -134,7 +134,7 @@ namespace DependenciesMining {
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
-		Definition(ID_T id, const std::string& name, const std::string& nameSpace, Structure* type)
+		Definition(ID_T id, const std::string& name, const std::string& nameSpace = "", Structure* type = nullptr)
 			: Symbol(id, name, nameSpace, ClassType::Definition), type(type) {};
 		Definition(ID_T id, const std::string& name, const std::string& nameSpace, Structure* type, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Definition, fileName, line, column), type(type) {};
@@ -184,12 +184,12 @@ namespace DependenciesMining {
 		MethodType methodType = MethodType::Undefined;
 		Structure* returnType = nullptr;
 		Template<Method> templateInfo;								// Template Parent is *not* used
-		SymbolTable<Symbol> arguments;
-		SymbolTable<Symbol> definitions;
+		SymbolTable<Definition> arguments;
+		SymbolTable<Definition> definitions;
 		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
 	public:
 		Method() : Symbol(ClassType::Method) {};
-		Method(ID_T id, const std::string& name, const std::string& nameSpace) : Symbol(id, name, nameSpace, ClassType::Method) {};
+		Method(ID_T id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
 		Method(ID_T id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column) 
 			: Symbol(id, name, nameSpace, ClassType::Method, fileName, line, column) {};
 
@@ -222,12 +222,12 @@ namespace DependenciesMining {
 		StructureType structureType = StructureType::Undefined;
 		Template<Structure> templateInfo;
 		Structure* nestedParent = nullptr;
-		SymbolTable<Symbol> methods;
-		SymbolTable<Symbol> fields;
-		SymbolTable<Symbol> bases;
-		SymbolTable<Symbol> contains;
-		SymbolTable<Symbol> friends;	// About Structures: Key->structureID, Value->Structure*
-								// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
+		SymbolTable<Method> methods;
+		SymbolTable<Definition> fields;
+		SymbolTable<Structure> bases;
+		SymbolTable<Structure> contains;
+		SymbolTable<Structure> friends;	// About Structures: Key->structureID, Value->Structure*
+										// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
 		Structure(ID_T id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
@@ -259,96 +259,4 @@ namespace DependenciesMining {
 		bool IsTemplate();
 		bool IsNestedClass();
 	};
-
-
-	template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, const std::string& name) {
-		auto it = byID.find(id);
-		if (it != byID.end())
-			return it->second;
-
-		//Symbol* dummy = new Symbol(id, name, "", type);
-		T* dummy = new T(id, name, "");
-		byID[id] = dummy;
-		auto& nameList = byName[name];
-		nameList.push_back(dummy);
-
-		return dummy;
-	}
-
-	template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, const T& symbol) {
-		auto it = byID.find(id);
-		if (it != byID.end()) {
-			if (symbol.GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
-				*(it->second) = symbol;
-			}
-			return it->second;
-		}
-
-		T* newSymbol = new T(symbol);
-		byID[id] = newSymbol;
-		auto& nameList = byName[symbol.GetName()];
-		nameList.push_back(newSymbol);
-		return newSymbol;
-	}
-
-	template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, T* symbol) {
-		auto it = byID.find(id);
-		if (it != byID.end()) {
-			if (symbol->GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
-				it->second = symbol;
-			}
-			return it->second;
-		}
-
-		byID[id] = symbol;
-		auto& nameList = byName[symbol->GetName()];
-		nameList.push_back(symbol);
-
-		return symbol;
-	}
-
-	template<typename T> Symbol* SymbolTable<T>::Lookup(ID_T id) {
-		auto it = byID.find(id);
-		if (it != byID.end())
-			return it->second;
-		else
-			return nullptr;
-	}
-
-
-	template<typename T> Symbol* SymbolTable<T>::Lookup(const std::string& name) {
-		auto it = byName.find(name);
-		if (it != byName.end()) {
-			//assert(it->second.size() == 1);
-			return it->second.front();
-		}
-		else
-			return nullptr;
-	}
-
-	template<typename T> const Symbol* SymbolTable<T>::Lookup(ID_T id) const {
-		auto it = byID.find(id);
-		if (it != byID.end())
-			return it->second;
-		else
-			return nullptr;
-	}
-
-
-	template<typename T> const Symbol* SymbolTable<T>::Lookup(const std::string& name) const {
-		auto it = byName.find(name);
-		if (it != byName.end()) {
-			//assert(it->second.size() == 1);
-			return it->second.front();
-		}
-		else
-			return nullptr;
-	}
-
-	template<typename T> void SymbolTable<T>::Print() {
-		for (auto& t : byName) {
-			std::cout << "Name: " << t.first << std::endl;
-			std::cout << "--------------------------------------------\n";
-		}
-	}
 }

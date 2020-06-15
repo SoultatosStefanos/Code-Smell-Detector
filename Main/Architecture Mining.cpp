@@ -5,14 +5,15 @@
 #include "../DependenciesMining/DependenciesMining.h"
 
 int main(int argc, const char** argv) {
-	/*sourceLoader::SourceLoader srcLoader("C:\\Users\\user\\Desktop\\demo");
+	std::string path = argv[1];
+	sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();
-	srcLoader.PrintSourceFiles();
-	*/
+	//srcLoader.PrintSourceFiles();
+	
 
-	std::vector<std::string> srcs;
-	std::string path = argv[1];
+	//std::vector<std::string> srcs;
+	//std::string path = argv[1];
 	//srcs.push_back(path + "\\classes_simple.cpp");			// OK
 	//srcs.push_back(path + "\\fields.cpp");					// OK 
 	//srcs.push_back(path + "\\friends.cpp");					// OK 
@@ -23,7 +24,7 @@ int main(int argc, const char** argv) {
 	//srcs.push_back(path + "\\objects_used_on_methods.cpp");	// OK
 	//srcs.push_back(path + "\\template_methods.cpp");			// OK  - problem me full special mesa se template class
 	//srcs.push_back(path + "\\template_types.cpp");			// OK
-	srcs.push_back(path + "\\templates.cpp");					// OK
+	//srcs.push_back(path + "\\templates.cpp");					// OK
 	
 	//srcs.push_back(path + "\\test0.cpp");					
 	

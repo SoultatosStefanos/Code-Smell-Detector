@@ -376,3 +376,98 @@ bool Structure::IsNestedClass() {
 		return true;
 	return false;
 }
+
+
+template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, const std::string& name) {
+	auto it = byID.find(id);
+	if (it != byID.end())
+		return it->second;
+
+	T* dummy = new T(id, name, "");
+	byID[id] = dummy;
+	auto& nameList = byName[name];
+	nameList.push_back(dummy);
+
+	return dummy;
+}
+
+template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, const T& symbol) {
+	auto it = byID.find(id);
+	if (it != byID.end()) {
+		if (symbol.GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
+			*(it->second) = symbol;
+		}
+		return it->second;
+	}
+
+	T* newSymbol = new T(symbol);
+	byID[id] = newSymbol;
+	auto& nameList = byName[symbol.GetName()];
+	nameList.push_back(newSymbol);
+	return newSymbol;
+}
+
+template<typename T> Symbol* SymbolTable<T>::Install(ID_T id, T* symbol) {
+	auto it = byID.find(id);
+	if (it != byID.end()) {
+		if (symbol->GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
+			it->second = symbol;
+		}
+		return it->second;
+	}
+
+	byID[id] = symbol;
+	auto& nameList = byName[symbol->GetName()];
+	nameList.push_back(symbol);
+
+	return symbol;
+}
+
+template<typename T> Symbol* SymbolTable<T>::Lookup(ID_T id) {
+	auto it = byID.find(id);
+	if (it != byID.end())
+		return it->second;
+	else
+		return nullptr;
+}
+
+
+template<typename T> Symbol* SymbolTable<T>::Lookup(const std::string& name) {
+	auto it = byName.find(name);
+	if (it != byName.end()) {
+		//assert(it->second.size() == 1);
+		return it->second.front();
+	}
+	else
+		return nullptr;
+}
+
+template<typename T> const Symbol* SymbolTable<T>::Lookup(ID_T id) const {
+	auto it = byID.find(id);
+	if (it != byID.end())
+		return it->second;
+	else
+		return nullptr;
+}
+
+
+template<typename T> const Symbol* SymbolTable<T>::Lookup(const std::string& name) const {
+	auto it = byName.find(name);
+	if (it != byName.end()) {
+		//assert(it->second.size() == 1);
+		return it->second.front();
+	}
+	else
+		return nullptr;
+}
+
+template<typename T> void SymbolTable<T>::Print() {
+	for (auto& t : byName) {
+		std::cout << "Name: " << t.first << std::endl;
+		std::cout << "--------------------------------------------\n";
+	}
+}
+
+template class SymbolTable<Structure>;
+template class SymbolTable<Definition>;
+template class SymbolTable<Method>;

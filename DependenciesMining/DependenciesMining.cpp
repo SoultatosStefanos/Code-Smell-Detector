@@ -36,10 +36,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
-/*	if (!d->hasDefinition()) {
-		return;														// ignore std && declarations
-	}*/
-
 	// gia ta declerations
 	if (!(d->isCompleteDefinition())) {
 		if (!d->hasDefinition()){									// for templateDefinition Declarations only
@@ -92,14 +88,15 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 	structure.SetNamespace(fullEnclosingNamespace);
 
+
+	// Templates
 	if (!d->hasDefinition()) {
 		assert(structure.GetStructureType() == StructureType::TemplateDefinition);
 		structure.SetStructureType(StructureType::Undefined);
 		structuresTable.Install(structure.GetID(), structure);
 		return;
 	}
-	
-	// Templates
+
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 	//if (structure.IsTemplateInstatiationSpecialization()){
 		// Template parent
@@ -115,7 +112,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			templateParent = (Structure*)structuresTable.Lookup(parentID);
 		}
 		else {
-			parentName = d->getQualifiedNameAsString();				// mporei kai na mhn xreiazetai na orisw parent mia kai to full specialization einai mia diaforetikh class (partial specialization einai san new template)
+			parentName = d->getQualifiedNameAsString();	
 			templateParent = (Structure*)structuresTable.Lookup(parentName);
 			assert(templateParent);
 			parentID = templateParent->GetID();
@@ -244,9 +241,9 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (!isStructureOrStructurePointerType(d->getType()))
 			return;
 
-		const RecordDecl* parent = d->getParent();
+		auto* parent = d->getParent();
 
-		// Namespace
+		// Ignored
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
@@ -279,8 +276,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-			//llvm::outs() << "Field:  " << d->getName() << "\tQualified Name: " << d->getQualifiedNameAsString() << "\n\tParent: " << parentName << "   " << typeName << "\n";
-
 			auto fieldID = d->getID();
 			assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
@@ -304,6 +299,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 		}
 
+		// Ignored
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
@@ -316,7 +312,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(parentStructure);
 		//if(!parentStructure)
 		//	parentStructure = structuresTable.Insert(parentID, parentName);
-		Method method(methodID, parentStructure->GetNamespace(), GetFullMethodName(d));
+		Method method(methodID, GetFullMethodName(d), parentStructure->GetNamespace());
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
@@ -352,8 +348,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		//Template
 		if (method.isTemplateFullSpecialization() || method.isTemplateInstatiationSpecialization()) {
-		/*	
-			// Tempalte Method's parent
+		/*	// Tempalte Method's parent
 			Method* templateParentMethod = nullptr;
 			std::string parentMethodName = GetFullMethodName(d);
 			size_t start = parentMethodName.find("<");
@@ -496,10 +491,6 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	Method::Member member(decl->getNameAsString(), typeStructure, locEnd);
 	MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, locBegin.toString());
 
-	//std::cout << "Member Expr:  " << exprString << "\n";
-	//llvm::outs() << "Kind: " << decl->getDeclKindName() << "\n";
-	//llvm::outs() << "Name: " << decl->getNameAsString() << "\n";
-	//std::cout << "~~~~~~~~~~~~~~~\n\n";
 	return true;
 }
 
