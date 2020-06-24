@@ -3,8 +3,8 @@
 #pragma warning(disable : 4146)
 
 #include <iostream>
-//#include "SymbolTable.h"
-#include "SymbolTableTempl.h"
+#include "SymbolTable.h"
+//#include "SymbolTableTempl.h"
 #include "Ignored.h";
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -19,8 +19,8 @@ using namespace llvm;
 using namespace clang::tooling;
 
 namespace DependenciesMining {
-	//extern SymbolTable structuresTable;
-	extern SymbolTable<Structure> structuresTable;
+	extern SymbolTable structuresTable;
+	//extern SymbolTable<Structure> structuresTable;
 	extern std::unordered_map<std::string, Ignored*> ignored; 
 	
 	

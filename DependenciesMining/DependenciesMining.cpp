@@ -9,7 +9,8 @@
 
 using namespace DependenciesMining;
 
-SymbolTable<Structure> DependenciesMining::structuresTable;
+SymbolTable DependenciesMining::structuresTable;
+//SymbolTable<Structure> DependenciesMining::structuresTable;
 std::unordered_map<std::string, Ignored*> DependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()}, 
 																			{"filePaths", new IgnoredFilePaths()} };
 

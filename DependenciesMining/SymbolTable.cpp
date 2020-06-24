@@ -398,7 +398,6 @@ Symbol* SymbolTable::Install(ID_T id, const std::string& name, const ClassType& 
 		assert(0);
 	}
 
-	//Symbol* dummy = new Symbol(id, name, "", type);
 	byID[id] = dummy;
 	auto& nameList = byName[name];
 	nameList.push_back(dummy);
@@ -478,20 +477,6 @@ Symbol* SymbolTable::Install(ID_T id, Symbol* symbol) {
 		}
 		return it->second;
 	}
-
-	/*Symbol* newSym = nullptr;
-	if (sym->GetClassType() == ClassType::Structure) {
-		newSym = new Structure((const Structure&)(*sym));
-	}
-	else if (sym->GetClassType() == ClassType::Method) {
-		newSym = new Method((const Method&)(*sym));
-	}
-	else if (sym->GetClassType() == ClassType::Definition) {
-		newSym = new Definition((const Definition&)(*sym));
-	}
-	else {
-		assert(0);
-	}*/
 
 	byID[id] = symbol;
 	auto& nameList = byName[symbol->GetName()];

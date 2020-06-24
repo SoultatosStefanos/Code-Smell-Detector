@@ -1,6 +1,6 @@
 #include "SymbolTableTempl.h"
 
-using namespace DependenciesMining;
+using namespace DependenciesMining_Ignore;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {

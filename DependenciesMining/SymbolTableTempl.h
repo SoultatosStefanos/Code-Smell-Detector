@@ -8,7 +8,7 @@
 
 #define ID_T int64_t 
 
-namespace DependenciesMining {
+namespace DependenciesMining_Ignore  {
 
 	template<typename T> class SymbolTable;
 	class Structure;
