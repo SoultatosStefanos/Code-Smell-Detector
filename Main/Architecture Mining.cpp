@@ -3,6 +3,8 @@
 #include <iostream>
 #include "../SourceLoader/SourceLoader.h"
 #include "../DependenciesMining/DependenciesMining.h"
+#include "../Graph/Graph.h"
+
 
 int main(int argc, const char** argv) {
 	std::string path = argv[1];
@@ -13,7 +15,6 @@ int main(int argc, const char** argv) {
 	
 
 	//std::vector<std::string> srcs;
-	//std::string path = argv[1];
 	//srcs.push_back(path + "\\classes_simple.cpp");			// OK
 	//srcs.push_back(path + "\\fields.cpp");					// OK 
 	//srcs.push_back(path + "\\friends.cpp");					// OK 
@@ -31,6 +32,7 @@ int main(int argc, const char** argv) {
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int result = DependenciesMining::CreateClangTool(argc, argv, srcs);
+	DependenciesGraph::Graph graph(DependenciesMining::structuresTable);
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 
 	//return result;

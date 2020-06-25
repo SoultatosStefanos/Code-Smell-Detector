@@ -15,7 +15,7 @@ namespace DependenciesMining {
 	class Method;
 
 	enum class StructureType {
-		Undefined,
+		Undefined = -1,
 		Class,
 		Struct,
 		TemplateDefinition,
@@ -26,7 +26,7 @@ namespace DependenciesMining {
 
 
 	enum class MethodType {
-		Undefined,
+		Undefined = -1,
 		Constructor,
 		Destructor,
 		UserMethod,
@@ -37,7 +37,7 @@ namespace DependenciesMining {
 
 
 	enum class ClassType {
-		Undefined,
+		Undefined = -1,
 		Structure,
 		Method, 
 		Definition
@@ -113,6 +113,19 @@ namespace DependenciesMining {
 		const Symbol* Lookup(const std::string& name) const;
 
 		void Print();
+
+
+		using iterator = std::unordered_map <ID_T, Symbol*>::iterator;
+		using const_iterator = std::unordered_map <ID_T, Symbol*>::const_iterator;
+
+		iterator begin() { return byID.begin(); }
+
+		const_iterator begin() const { return byID.begin(); }
+
+		iterator end() { return byID.end(); }
+
+		const_iterator end() const { return byID.end(); }
+
 	};
 
 
@@ -125,6 +138,7 @@ namespace DependenciesMining {
 		Template() = default;
 
 		Parent_T* GetParent() const;
+		SymbolTable GetArguments() const;
 		void SetParent(Parent_T* structure); 
 		Symbol* InstallArguments(ID_T id, Structure* structure);
 	};
@@ -198,6 +212,10 @@ namespace DependenciesMining {
 		MethodType GetMethodType() const;
 		Structure* GetReturnType() const;
 
+		SymbolTable GetArguments() const;
+		SymbolTable GetDefinitions() const;
+		SymbolTable GetTemplateArguments() const;
+
 		void SetMethodType(const MethodType& type);
 		void SetReturnType(Structure* structure);
 		void SetTemplateParent(Method* structure);
@@ -240,6 +258,13 @@ namespace DependenciesMining {
 		StructureType GetStructureType() const;
 		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
+
+		SymbolTable GetMethods() const; 
+		SymbolTable GetFields() const; 
+		SymbolTable GetBases() const; 
+		SymbolTable GetContains() const;
+		SymbolTable GetFriends() const;
+		SymbolTable GetTemplateArguments() const; 
 
 		void SetStructureType(const StructureType& structureType);
 		void SetTemplateParent(Structure* structure);

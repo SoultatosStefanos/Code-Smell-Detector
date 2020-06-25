@@ -13,6 +13,7 @@ namespace fields{
     struct struct_S {
         int i;                                  // no 
         class_A a;                              // yes
+        class_A a2;                              // yes
     };
       
     template<typename T1, typename T2> class template_Z {  

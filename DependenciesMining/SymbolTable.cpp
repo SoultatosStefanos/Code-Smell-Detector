@@ -124,6 +124,10 @@ template<typename Parent_T> Parent_T* Template<Parent_T>::GetParent() const {
 	return parent;
 }
 
+template<typename Parent_T> SymbolTable Template<Parent_T>::GetArguments() const {
+	return arguments;
+}
+
 template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent) {
 	this->parent = parent;
 }
@@ -149,6 +153,18 @@ MethodType Method::GetMethodType() const {
 
 Structure* Method::GetReturnType() const {
 	return returnType;
+}
+
+SymbolTable Method::GetArguments() const {
+	return arguments;
+}
+
+SymbolTable Method::GetDefinitions() const {
+	return definitions;
+}
+
+SymbolTable Method::GetTemplateArguments() const {
+	return templateInfo.GetArguments();
 }
 
 void Method::SetMethodType(const MethodType& type) {
@@ -300,6 +316,31 @@ Structure* Structure::GetTemplateParent() const {
 Structure* Structure::GetNestedParent() const {
 	return nestedParent;
 }
+
+SymbolTable Structure::GetMethods() const {
+	return methods;
+}
+
+SymbolTable Structure::GetFields() const {
+	return fields;
+}
+
+SymbolTable Structure::GetBases() const {
+	return bases;
+}
+
+SymbolTable Structure::GetContains() const {
+	return contains;
+}
+
+SymbolTable Structure::GetFriends() const {
+	return friends;
+}
+
+SymbolTable Structure::GetTemplateArguments() const {
+	return templateInfo.GetArguments(); 
+}
+
 
 void  Structure::SetStructureType(const StructureType& structureType) {
 	this->structureType = structureType;
