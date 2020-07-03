@@ -53,6 +53,10 @@ void Node::AddEdge(Edge* edge) {
 	outEdges.push_back(edge);
 }
 
+bool Node::isAnalyzed() const {
+	return outEdges.size() != 0; 
+}
+
 
 std::map<ID_T, Edge*>& Graph::AddEdge(std::map<ID_T, Edge*>& to, const Edge& edge) {
 	ID_T id = edge.GetTo()->GetSymbol()->GetID();
@@ -89,7 +93,11 @@ Node* Graph::GetOrCreateNode(Symbol* symbol) {
 	return node;
 }
 
-
+void freeMap(std::map<ID_T, Edge*> m) {
+	for (auto it : m) {
+		delete it.second;
+	}
+}
 
 std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::DependencyType& depType) {
 	std::map<ID_T, Edge*> m;
@@ -97,8 +105,15 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 		Symbol* symbol = it.second;
 
 		if (symbol->GetClassType() == ClassType::Structure) {
+			// Destination Structure ID, edge
 			std::map<ID_T, Edge*> sm;
 			Node* node = GetOrCreateNode(it.second);
+			if (node->isAnalyzed()) {
+				Edge edge(node);
+				edge.AddDependency(depType);
+				m = AddEdge(m, edge);
+				continue;
+			}
 			Structure* s = (Structure*)symbol;
 			auto m1 = AnalyzeST(s->GetMethods());
 			auto m2 = AnalyzeST(s->GetFields(), Edge::DependencyType::ClassField);
@@ -113,6 +128,11 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 			sm = AddEdges(sm, m5);
 
 			// free the m1,2,3,4,5 !!!!!!!
+			freeMap(m1);
+			freeMap(m2);
+			freeMap(m3);
+			freeMap(m4);
+			freeMap(m5);
 
 			// TemplateParent
 			if (s->GetTemplateParent()) {
@@ -138,7 +158,6 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 
 			// vazei kai epistrefei ton eayto toy (an einai base, friend, ..)
 			Edge edge(node);
-			//assert(depType != Edge::DependencyType::Undefined);
 			edge.AddDependency(depType);
 			m = AddEdge(m, edge);
 
@@ -148,12 +167,29 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 			auto m1 = AnalyzeST(meth->GetArguments(), Edge::DependencyType::MethodArg);
 			auto m2 = AnalyzeST(meth->GetDefinitions(), Edge::DependencyType::MethodDefinition);
 			auto m3 = AnalyzeST(meth->GetTemplateArguments(), Edge::DependencyType::MethodTemplateArg);
-	
+			
+			// MemberExpr
+			std::map<ID_T, Edge*> m4;
+			for (auto it2 : meth->GetMemberExpr()) {
+				for (auto it3 : it2.second.GetMembers()) {
+					auto memberType = it3.GetType();
+					Node* toNode = GetOrCreateNode(memberType);
+					Edge edge(toNode);
+					edge.AddDependency(Edge::DependencyType::MemberExpr);
+					m4 = AddEdge(m4, edge);
+				}
+			}
+
 			m = AddEdges(m, m1);
 			m = AddEdges(m, m2);
 			m = AddEdges(m, m3);
+			m = AddEdges(m, m4);
 
-			// free m1,2,3
+			// free m1,2,3,4
+			freeMap(m1);
+			freeMap(m2);
+			freeMap(m3);
+			freeMap(m4);
 
 			// Return
 			if (meth->GetReturnType()) {
@@ -163,8 +199,6 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 				edge.AddDependency(Edge::DependencyType::MethodReturn);
 				m = AddEdge(m, edge);
 			}
-
-			//Edge::DependencyType::MemberExpr  !!!!!!!!!!!!!!!!!!!!!!
 
 		}
 		else if (symbol->GetClassType() == ClassType::Definition) {

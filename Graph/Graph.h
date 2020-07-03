@@ -57,6 +57,8 @@ namespace DependenciesGraph {
         unsigned EdgesSize() const;
         void AddEdge(Edge* edge);
 
+        bool isAnalyzed() const;
+
         // iterator for edges
     };
 

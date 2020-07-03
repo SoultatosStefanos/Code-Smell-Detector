@@ -8,16 +8,16 @@
 
 int main(int argc, const char** argv) {
 	std::string path = argv[1];
-	sourceLoader::SourceLoader srcLoader(path);
+	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
-	std::vector<std::string> srcs = srcLoader.GetSources();
+	std::vector<std::string> srcs = srcLoader.GetSources();*/
 	//srcLoader.PrintSourceFiles();
 	
 
-	//std::vector<std::string> srcs;
+	std::vector<std::string> srcs;
 	//srcs.push_back(path + "\\classes_simple.cpp");			// OK
 	//srcs.push_back(path + "\\fields.cpp");					// OK 
-	//srcs.push_back(path + "\\friends.cpp");					// OK 
+	srcs.push_back(path + "\\friends.cpp");					// OK 
 	//srcs.push_back(path + "\\member_classes.cpp");			// den eida polu, fainetai OK
 	//srcs.push_back(path + "\\methods_args_vars.cpp");			// OK
 	//srcs.push_back(path + "\\methods.cpp");					// OK

@@ -69,6 +69,7 @@ namespace DependenciesMining {
 
 
 	class Symbol {
+	protected:
 		ID_T id = -1;
 		std::string name;
 		std::string nameSpace = "";
@@ -215,6 +216,7 @@ namespace DependenciesMining {
 		SymbolTable GetArguments() const;
 		SymbolTable GetDefinitions() const;
 		SymbolTable GetTemplateArguments() const;
+		std::unordered_map<std::string, MemberExpr> GetMemberExpr() const;
 
 		void SetMethodType(const MethodType& type);
 		void SetReturnType(Structure* structure);
@@ -254,6 +256,7 @@ namespace DependenciesMining {
 			: Symbol(id, name, nameSpace, ClassType::Structure), structureType(structureType) {};
 		Structure(ID_T id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Structure, fileName, line, column), structureType(structureType) {};
+		Structure(const Structure& s); 
 		
 		StructureType GetStructureType() const;
 		Structure* GetTemplateParent() const;

@@ -167,6 +167,10 @@ SymbolTable Method::GetTemplateArguments() const {
 	return templateInfo.GetArguments();
 }
 
+std::unordered_map<std::string, Method::MemberExpr>  Method::GetMemberExpr() const {
+	return memberExprs;
+}
+
 void Method::SetMethodType(const MethodType& type) {
 	methodType = type;
 }
@@ -305,6 +309,23 @@ void Method::MemberExpr::InsertMember(Member member) {
 
 
 // Structure
+Structure::Structure(const Structure& s) {
+	id = s.id;
+	name = s.name;
+	nameSpace = s.nameSpace;
+	srcInfo = s.srcInfo;
+	classType = s.classType;
+
+	structureType = s.structureType;
+	templateInfo = s.templateInfo;
+	nestedParent = s.nestedParent;
+	methods = s.methods;
+	fields = s.fields;
+	bases = s.bases;
+	contains = s.contains;
+	friends = s.friends;
+}
+
 StructureType Structure::GetStructureType() const {
 	return structureType;
 }
@@ -469,8 +490,8 @@ Symbol* SymbolTable::Install(ID_T id, const Symbol& symbol) {
 Symbol* SymbolTable::Install(ID_T id, const Structure& symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) {
-		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
-			*(it->second) = symbol;
+		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {	
+			(*(Structure*)(it->second)) = symbol;
 		}
 		return it->second;		
 	}
