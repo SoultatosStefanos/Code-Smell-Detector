@@ -96,7 +96,7 @@ int main(){
 */
 
 
-// #include <iostream>
+#include "include2.h"
 
 template <typename T> struct  template_T;
 template <> struct  template_T<char>;
@@ -120,5 +120,6 @@ template <> struct template_T<int>{
 // };
 
 int main(){
+  Symbol s; 
   return 0;
 };

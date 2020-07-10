@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <cassert>
 #include <Vector>
+#include "STVisitor.h"
 
 #define ID_T int64_t 
 
@@ -36,7 +37,7 @@ namespace DependenciesMining {
 	};
 
 
-	enum class ClassType {
+	enum class ClassType : char {
 		Undefined = -1,
 		Structure,
 		Method, 
@@ -85,6 +86,7 @@ namespace DependenciesMining {
 		virtual ID_T GetID() const;
 		virtual std::string GetName() const;
 		virtual ClassType GetClassType() const;
+		virtual std::string GetClassTypeAsString() const;
 		virtual const SourceInfo& GetSourceInfo() const;
 		virtual std::string GetNamespace() const;
 
@@ -114,7 +116,7 @@ namespace DependenciesMining {
 		const Symbol* Lookup(const std::string& name) const;
 
 		void Print();
-
+		void Accept(STVisitor* visitor);
 
 		using iterator = std::unordered_map <ID_T, Symbol*>::iterator;
 		using const_iterator = std::unordered_map <ID_T, Symbol*>::const_iterator;
@@ -181,7 +183,7 @@ namespace DependenciesMining {
 			void SetType(Structure* type);
 		};
 
-		class MemberExpr {					
+		class MemberExpr {
 			std::string expr;
 			SourceInfo srcInfo;									// srcInfo: expr position on src code		
 			SourceInfo locEnd;									// to store the longer expr (as string)
@@ -192,6 +194,7 @@ namespace DependenciesMining {
 			std::string GetExpr() const;
 			std::vector<Member> GetMembers() const;
 			SourceInfo GetLocEnd() const;
+			SourceInfo GetSourceInfo() const;
 			void SetExpr(std::string expr);
 			void SetLocEnd(SourceInfo locEnd);
 			void InsertMember(Member member);
@@ -207,10 +210,11 @@ namespace DependenciesMining {
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(ID_T id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
-		Method(ID_T id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column) 
+		Method(ID_T id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Method, fileName, line, column) {};
 
 		MethodType GetMethodType() const;
+		std::string GetMethodTypeAsString() const;
 		Structure* GetReturnType() const;
 
 		SymbolTable GetArguments() const;
@@ -229,12 +233,12 @@ namespace DependenciesMining {
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
 
-		bool isConstructor(); 
-		bool isDestructor();
-		bool isUserMethod();
-		bool isTemplateDefinition();
-		bool isTemplateFullSpecialization();
-		bool isTemplateInstatiationSpecialization();
+		bool IsConstructor () const;
+		bool IsDestructor() const;
+		bool IsUserMethod() const;
+		bool IsTemplateDefinition() const;
+		bool IsTemplateFullSpecialization() const;
+		bool IsTemplateInstatiationSpecialization() const;
 	};
 
 
@@ -259,6 +263,7 @@ namespace DependenciesMining {
 		Structure(const Structure& s); 
 		
 		StructureType GetStructureType() const;
+		std::string GetStructureTypeAsString() const;
 		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
 
@@ -282,11 +287,11 @@ namespace DependenciesMining {
 		Symbol* InstallFriend(ID_T id, Structure* structure);
 		Symbol* InstallTemplateSpecializationArguments(ID_T id, Structure* structure);
 
-		bool IsTemplateDefinition();
-		bool IsTemplateFullSpecialization();
-		bool IsTemplateInstatiationSpecialization();
-		bool IsTemplatePartialSpecialization();
-		bool IsTemplate();
-		bool IsNestedClass();
+		bool IsTemplateDefinition() const;
+		bool IsTemplateFullSpecialization() const;
+		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTemplatePartialSpecialization() const;
+		bool IsTemplate() const;
+		bool IsNestedClass() const;
 	};
 }

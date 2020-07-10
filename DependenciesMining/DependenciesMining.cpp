@@ -48,8 +48,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		else {
 			d = d->getDefinition();
+			return;
 		}
 	}
+	
 
 	// Templates
 	if (d->getDescribedClassTemplate()) {	
@@ -81,7 +83,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	assert(structID); 
 	structure.SetName(GetFullStructureName(d));
 	structure.SetID(structID);
-	
+
+
 	// Namespace
 	std::string fullEnclosingNamespace = GetFullNamespaceName(d);
 	if (ignored["namespaces"]->isIgnored(fullEnclosingNamespace)) {
@@ -348,7 +351,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		//Template
-		if (method.isTemplateFullSpecialization() || method.isTemplateInstatiationSpecialization()) {
+		if (method.IsTemplateFullSpecialization() || method.IsTemplateInstatiationSpecialization()) {
 		/*	// Tempalte Method's parent
 			Method* templateParentMethod = nullptr;
 			std::string parentMethodName = GetFullMethodName(d);

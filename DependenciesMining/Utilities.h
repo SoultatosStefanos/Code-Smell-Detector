@@ -26,6 +26,7 @@ std::string GetFullMethodName(const CXXMethodDecl* d);
 std::string GetFullNamespaceName(const RecordDecl* d);
 
 
+
 // ---------------------------- template function definition ---------------------------------
 template<typename Callback, typename ...Types>
 void TemplateArgsVisit(const TemplateArgument& templateArg, const Callback& callback, Types... args) {
@@ -48,3 +49,4 @@ template<typename T> void PrintLocation(T d, const MatchFinder::MatchResult& res
 	auto loc = d->getLocation().printToString(sm);
 	std::cout << "\t" << loc << "\n\n";
 }
+

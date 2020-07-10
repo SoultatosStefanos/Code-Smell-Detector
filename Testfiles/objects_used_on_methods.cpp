@@ -41,8 +41,8 @@ namespace memberExpr{
 			return b;
 		};
 
-		A* m_a(){
-			return new A();
+		A<T>* m_a(){
+			return new A<T>();
 		}
 
 		B method(){
@@ -62,7 +62,7 @@ namespace memberExpr{
 			bb.c.x.m1(1)->k;		
 
 			m_b(2).c.x;			// den ta bazei mesa sto template
-			m_a()->b2->pc;		// den ta vazei mesa sto template
+			m_a()->b2->pc;		// den ta vazei mesa sto template // den vazei to a pou kanei return h m_a() giati h method anoikei sto this
 			auto auto_c = f(b).c;
 
 			bb.c.i + b.c.i;

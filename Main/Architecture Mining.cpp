@@ -1,10 +1,10 @@
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4146)
 #include <iostream>
-#include "../SourceLoader/SourceLoader.h"
-#include "../DependenciesMining/DependenciesMining.h"
-#include "../Graph/Graph.h"
-
+#include "SourceLoader.h"
+#include "DependenciesMining.h"
+#include "Graph.h"
+#include "GraphGeneration.h"
 
 int main(int argc, const char** argv) {
 	std::string path = argv[1];
@@ -15,9 +15,9 @@ int main(int argc, const char** argv) {
 	
 
 	std::vector<std::string> srcs;
-	//srcs.push_back(path + "\\classes_simple.cpp");			// OK
+	srcs.push_back(path + "\\classes_simple.cpp");			// OK
 	//srcs.push_back(path + "\\fields.cpp");					// OK 
-	srcs.push_back(path + "\\friends.cpp");					// OK 
+	//srcs.push_back(path + "\\friends.cpp");					// OK 
 	//srcs.push_back(path + "\\member_classes.cpp");			// den eida polu, fainetai OK
 	//srcs.push_back(path + "\\methods_args_vars.cpp");			// OK
 	//srcs.push_back(path + "\\methods.cpp");					// OK
@@ -27,13 +27,14 @@ int main(int argc, const char** argv) {
 	//srcs.push_back(path + "\\template_types.cpp");			// OK
 	//srcs.push_back(path + "\\templates.cpp");					// OK
 	
-	//srcs.push_back(path + "\\test0.cpp");					
-	
-
+	/*srcs.push_back(path + "\\test0.cpp");					
+	srcs.push_back(path + "\\include.h");						
+	srcs.push_back(path + "\\include2.h");		*/
+				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int result = DependenciesMining::CreateClangTool(argc, argv, srcs);
-	DependenciesGraph::Graph graph(DependenciesMining::structuresTable);
+	
+	//DependenciesGraph::Graph graph(DependenciesMining::structuresTable);
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 
-	//return result;
 }

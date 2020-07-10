@@ -37,12 +37,17 @@ void Edge::AddDependency(const Edge::DependencyType& depType, Edge::Cardinality 
 
 // Node
 Node::Node(const Node& node) {
-	curr = node.curr;
+	data = node.data;
 	outEdges = node.outEdges; // shallow copy
+	byDestinationID = node.byDestinationID;
 }
 
-Symbol* Node::GetSymbol() const {
-	return curr;
+ID_T Node::GetID() const {
+	return data.Get("id").ToNumber_i64();
+}
+
+untyped::Object& Node::GetData() {
+	return data; 
 }
 
 unsigned Node::EdgesSize() const {
@@ -51,13 +56,37 @@ unsigned Node::EdgesSize() const {
 
 void Node::AddEdge(Edge* edge) {
 	outEdges.push_back(edge);
+	byDestinationID[edge->GetTo()->GetID()] = edge;
 }
 
-bool Node::isAnalyzed() const {
-	return outEdges.size() != 0; 
+void Node::AddEdge(Node* to, const Edge::DependencyType& depType, Edge::Cardinality card) {
+	if (byDestinationID.find(to->GetID()) != byDestinationID.end()) {
+		byDestinationID[to->GetID()]->AddDependency(depType, card);
+	}
+	else {
+		Edge* edge = new Edge(to);
+		edge->AddDependency(depType, card);
+		outEdges.push_back(edge);
+		byDestinationID[to->GetID()] = edge;
+	}
 }
 
 
+// Graph 
+Node* Graph::Get(ID_T id) const {
+	Node* node = nullptr;
+	if (byID.find(id) != byID.end()) {
+		node = byID.find(id)->second; 
+	}
+	return node;
+}
+
+void Graph::AddEdge(Node* from, Node* to, const Edge::DependencyType& depType, Edge::Cardinality card) {
+	from->AddEdge(to, depType, card);
+}
+
+
+/*
 std::map<ID_T, Edge*>& Graph::AddEdge(std::map<ID_T, Edge*>& to, const Edge& edge) {
 	ID_T id = edge.GetTo()->GetSymbol()->GetID();
 	if (to.find(id) == to.end()) {
@@ -82,13 +111,13 @@ std::map<ID_T, Edge*>& Graph::AddEdges(std::map<ID_T, Edge*>& to, const std::map
 
 Node* Graph::GetOrCreateNode(Symbol* symbol) {
 	Node* node;
-	if (bySymbolID.find(symbol->GetID()) != bySymbolID.end()) {
-		node = bySymbolID[symbol->GetID()];
+	if (byID.find(symbol->GetID()) != byID.end()) {
+		node = byID[symbol->GetID()];
 	}
 	else {
 		node = new Node(symbol);
 		nodes.insert(node);
-		bySymbolID[symbol->GetID()] = node;
+		byID[symbol->GetID()] = node;
 	}
 	return node;
 }
@@ -222,4 +251,4 @@ std::map<ID_T, Edge*> Graph::AnalyzeST(const SymbolTable& st, const Edge::Depend
 // Graph 
 Graph::Graph(const SymbolTable& st) {
 	AnalyzeST(st);
-}
+}*/

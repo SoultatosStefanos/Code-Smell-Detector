@@ -86,6 +86,22 @@ ClassType Symbol::GetClassType() const {
 	return classType;
 }
 
+std::string Symbol::GetClassTypeAsString() const {
+	if (classType == ClassType::Structure) {
+		return "Structure";
+	}
+	else if(classType == ClassType::Method){
+		return "Method";
+	}
+	else if (classType == ClassType::Definition) {
+		return "Definition";
+	}
+	else {
+		assert(0);
+	}
+}
+
+
 const SourceInfo& Symbol::GetSourceInfo() const {
 	return srcInfo;
 }
@@ -149,6 +165,30 @@ void Definition::SetType(Structure* structure) {
 // Method
 MethodType Method::GetMethodType() const {
 	return methodType;
+}
+
+std::string Method::GetMethodTypeAsString() const {
+	if (methodType == MethodType::Constructor) {
+		return "Constructor";
+	}
+	else if (methodType == MethodType::Destructor) {
+		return "Destructor";
+	}
+	else if (methodType == MethodType::UserMethod) {
+		return "UserMethod";
+	}
+	else if (methodType == MethodType::TemplateDefinition) {
+		return "TemplateDefinition";
+	}
+	else if (methodType == MethodType::TemplateFullSpecialization) {
+		return "TemplateFullSpecialization";
+	}
+	else if (methodType == MethodType::TemplateInstatiationSpecialization) {
+		return "TemplateInstatiationSpecialization";
+	}
+	else {
+		assert(0); 
+	}
 }
 
 Structure* Method::GetReturnType() const {
@@ -220,37 +260,37 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 	}
 }
 
-bool Method::isConstructor() {
+bool Method::IsConstructor() const {
 	if (methodType == MethodType::Constructor)
 		return true; 
 	return false;
 }
 
-bool Method::isDestructor() {
+bool Method::IsDestructor() const {
 	if (methodType == MethodType::Destructor)
 		return true;
 	return false;
 }
 
-bool Method::isUserMethod() {
+bool Method::IsUserMethod() const {
 	if (methodType == MethodType::UserMethod)
 		return true;
 	return false;
 }
 
-bool Method::isTemplateDefinition() {
+bool Method::IsTemplateDefinition() const {
 	if (methodType == MethodType::TemplateDefinition)
 		return true;
 	return false;
 }
 
-bool Method::isTemplateFullSpecialization() {
+bool Method::IsTemplateFullSpecialization() const {
 	if (methodType == MethodType::TemplateFullSpecialization)
 		return true;
 	return false;
 }
 
-bool Method::isTemplateInstatiationSpecialization() {
+bool Method::IsTemplateInstatiationSpecialization() const {
 	if (methodType == MethodType::TemplateInstatiationSpecialization)
 		return true;
 	return false;
@@ -295,6 +335,11 @@ std::vector<Method::Member> Method::MemberExpr::GetMembers() const {
 SourceInfo Method::MemberExpr::GetLocEnd() const {
 	return locEnd;
 }
+
+SourceInfo Method::MemberExpr::GetSourceInfo() const {
+	return srcInfo;
+}
+
 void Method::MemberExpr::SetExpr(std::string expr) {
 	this->expr = expr;
 }
@@ -328,6 +373,30 @@ Structure::Structure(const Structure& s) {
 
 StructureType Structure::GetStructureType() const {
 	return structureType;
+}
+
+std::string Structure::GetStructureTypeAsString() const{
+	if (structureType == StructureType::Class) {
+		return "Class";
+	}
+	else if (structureType == StructureType::Struct) {
+		return "Struct";
+	}
+	else if (structureType == StructureType::TemplateDefinition) {
+		return "TemplateDefinition";
+	}
+	else if (structureType == StructureType::TemplateFullSpecialization) {
+		return "TemplateFullSpecialization";
+	}
+	else if (structureType == StructureType::TemplateInstatiationSpecialization) {
+		return "TemplateInstatiationSpecialization";
+	}
+	else if (structureType == StructureType::TemplatePartialSpecialization) {
+		return "TemplatePartialSpecialization";
+	}
+	else {
+		return "Undefined";
+	}
 }
 
 Structure* Structure::GetTemplateParent() const {
@@ -403,37 +472,37 @@ Symbol* Structure::InstallTemplateSpecializationArguments(ID_T id, Structure* st
 	return templateInfo.InstallArguments(id, structure);
 }
 
-bool Structure::IsTemplateDefinition() {
+bool Structure::IsTemplateDefinition() const {
 	if (structureType == StructureType::TemplateDefinition)
 		return true;
 	return false;
 }
 
-bool Structure::IsTemplateFullSpecialization() {
+bool Structure::IsTemplateFullSpecialization() const {
 	if (structureType == StructureType::TemplateFullSpecialization)
 		return true;
 	return false;
 }
 
-bool Structure::IsTemplateInstatiationSpecialization() {
+bool Structure::IsTemplateInstatiationSpecialization() const {
 	if (structureType == StructureType::TemplateInstatiationSpecialization)
 		return true;
 	return false;
 }
 
-bool Structure::IsTemplatePartialSpecialization() {
+bool Structure::IsTemplatePartialSpecialization() const {
 	if (structureType == StructureType::TemplatePartialSpecialization)
 		return true;
 	return false;
 }
 
-bool Structure::IsTemplate() {
+bool Structure::IsTemplate() const {
 	if (structureType >= StructureType::TemplateDefinition && structureType <= StructureType::TemplatePartialSpecialization)
 		return true;
 	return false;
 }
 
-bool Structure::IsNestedClass() {
+bool Structure::IsNestedClass() const {
 	if (nestedParent)
 		return true;
 	return false;
@@ -589,6 +658,24 @@ void SymbolTable::Print() {
 	for (auto& t : byName) {
 		std::cout << "Name: " << t.first << std::endl;
 		std::cout << "--------------------------------------------\n";
+	}
+}
+
+void SymbolTable::Accept(STVisitor* visitor) {
+	for (auto it : byID) {
+		auto* symbol = it.second;
+		if (symbol->GetClassType() == ClassType::Structure) {
+			visitor->VisitStructure((Structure*)symbol);
+		}
+		else if (symbol->GetClassType() == ClassType::Method) {
+			visitor->VisitMethod((Method*)symbol);
+		}
+		else if (symbol->GetClassType() == ClassType::Definition) {
+			visitor->VisitDefinition((Definition*)symbol);
+		}
+		else {
+			assert(0);
+		}
 	}
 }
 
