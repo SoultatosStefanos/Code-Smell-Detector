@@ -1,6 +1,7 @@
 #include "SymbolTable.h"
+#include "STVisitor.h"
 
-using namespace DependenciesMining;
+using namespace dependenciesMining;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {
@@ -562,6 +563,9 @@ Symbol* SymbolTable::Install(ID_T id, const Structure& symbol) {
 		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {	
 			(*(Structure*)(it->second)) = symbol;
 		}
+		else {							// Ignpre it, only for debugging use
+			return it->second;			//
+		}								//
 		return it->second;		
 	}
 
@@ -679,3 +683,21 @@ void SymbolTable::Accept(STVisitor* visitor) {
 	}
 }
 
+
+void SymbolTable::Accept(STVisitor* visitor) const {
+	for (auto it : byID) {
+		auto* symbol = it.second;
+		if (symbol->GetClassType() == ClassType::Structure) {
+			visitor->VisitStructure((Structure*)symbol);
+		}
+		else if (symbol->GetClassType() == ClassType::Method) {
+			visitor->VisitMethod((Method*)symbol);
+		}
+		else if (symbol->GetClassType() == ClassType::Definition) {
+			visitor->VisitDefinition((Definition*)symbol);
+		}
+		else {
+			assert(0);
+		}
+	}
+}

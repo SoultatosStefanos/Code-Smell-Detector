@@ -7,7 +7,7 @@ namespace CS{
   namespace CS_1{
     class class_X;  
     class class_B;  
-    class class_B {};
+    class class_B {class_B* b;};
     class class_A { class_B b;};    
     struct struct_S {};
     class class_X : public class_A, class_B {}; 

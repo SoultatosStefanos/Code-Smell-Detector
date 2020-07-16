@@ -4,16 +4,16 @@
 #include <unordered_map>
 #include <cassert>
 #include <Vector>
-#include "STVisitor.h"
 
 #define ID_T int64_t 
 
-namespace DependenciesMining {
+namespace dependenciesMining {
 
 	class SymbolTable;
 	class Structure;
 	class Definition; 
 	class Method;
+	class STVisitor;
 
 	enum class StructureType {
 		Undefined = -1,
@@ -117,6 +117,7 @@ namespace DependenciesMining {
 
 		void Print();
 		void Accept(STVisitor* visitor);
+		void Accept(STVisitor* visitor) const;
 
 		using iterator = std::unordered_map <ID_T, Symbol*>::iterator;
 		using const_iterator = std::unordered_map <ID_T, Symbol*>::const_iterator;

@@ -1,7 +1,8 @@
 #include "Utilities.h"
 
+using namespace dependenciesMining;
 
-bool isStructureOrStructurePointerType(const clang::QualType& type) {
+bool dependenciesMining::isStructureOrStructurePointerType(const clang::QualType& type) {
 	if (!type->isStructureOrClassType()) {
 		if (type->isPointerType()) {
 			if (!type->getPointeeType()->isStructureOrClassType()) {
@@ -16,7 +17,7 @@ bool isStructureOrStructurePointerType(const clang::QualType& type) {
 }
 
 
-QualType GetTemplateArgType(const TemplateArgument& arg) {
+QualType dependenciesMining::GetTemplateArgType(const TemplateArgument& arg) {
 	switch (arg.getKind()) {
 	case TemplateArgument::Null:
 		assert(0);
@@ -46,7 +47,7 @@ QualType GetTemplateArgType(const TemplateArgument& arg) {
 	}
 }
 
-void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args) {
+void dependenciesMining::AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::string* args) {
 	if (*args != "<")
 		*args += ", ";
 	RecordDecl* d = nullptr;
@@ -83,7 +84,7 @@ void AppendTemplateArgNameCallback(const TemplateArgument& templateArg, std::str
 	}
 }
 
-std::string GetInnerTemplateArgs(const RecordDecl* d) {
+std::string dependenciesMining::GetInnerTemplateArgs(const RecordDecl* d) {
 	auto temp = (ClassTemplateSpecializationDecl*)d;
 	std::string args = "<";
 	for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
@@ -93,7 +94,7 @@ std::string GetInnerTemplateArgs(const RecordDecl* d) {
 	return args;
 }
 
-std::string GetFullStructureName(const RecordDecl* d) {
+std::string dependenciesMining::GetFullStructureName(const RecordDecl* d) {
 	std::string name; 
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 		std::string args = GetInnerTemplateArgs(d);
@@ -110,7 +111,7 @@ std::string GetFullStructureName(const RecordDecl* d) {
 }
 
 
-std::string GetFullMethodName(const CXXMethodDecl* d) {
+std::string dependenciesMining::GetFullMethodName(const CXXMethodDecl* d) {
 	std::string name; 
 	std::string str = d->getType().getAsString();
 	std::size_t pos = str.find("(");
@@ -143,7 +144,7 @@ std::string GetFullMethodName(const CXXMethodDecl* d) {
 	return name;
 }
 
-std::string GetFullNamespaceName(const RecordDecl* d) {
+std::string dependenciesMining::GetFullNamespaceName(const RecordDecl* d) {
 	auto* enclosingNamespace = d->getEnclosingNamespaceContext();
 	std::string fullEnclosingNamespace = "";
 	while (enclosingNamespace->isNamespace()) {

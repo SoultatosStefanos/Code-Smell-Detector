@@ -7,11 +7,11 @@
 #define METHOD_DECL "MethodDecl"
 #define METHOD_VAR_OR_ARG "MethodVarOrArg"
 
-using namespace DependenciesMining;
+using namespace dependenciesMining;
 
-SymbolTable DependenciesMining::structuresTable;
-//SymbolTable<Structure> DependenciesMining::structuresTable;
-std::unordered_map<std::string, Ignored*> DependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()}, 
+SymbolTable dependenciesMining::structuresTable;
+//SymbolTable<Structure> dependenciesMining::structuresTable;
+std::unordered_map<std::string, Ignored*> dependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()},
 																			{"filePaths", new IgnoredFilePaths()} };
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
@@ -573,7 +573,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int DependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
+int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
 	CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
 	ClangTool Tool(OptionsParser.getCompilations(), srcs);
 	

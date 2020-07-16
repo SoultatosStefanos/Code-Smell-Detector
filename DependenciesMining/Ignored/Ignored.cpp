@@ -1,5 +1,7 @@
 #include "Ignored.h"
 
+using namespace dependenciesMining;
+
 void Ignored::Insert(const std::string& entity) {
 	auto it = std::find(entities.begin(), entities.end(), entity);
 	if (it == entities.end())
@@ -23,6 +25,8 @@ bool IgnoredNamespaces::isIgnored(const std::string& nameSpace) {
 }
 
 IgnoredFilePaths::IgnoredFilePaths(const std::string& inputFile) {
+	if (inputFile == "")
+		return;
 	std::string line;
 	std::ifstream file(inputFile);
 	if (file.is_open()) {

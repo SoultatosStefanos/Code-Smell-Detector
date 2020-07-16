@@ -18,7 +18,7 @@ using namespace clang::ast_matchers;
 using namespace llvm;
 using namespace clang::tooling;
 
-namespace DependenciesMining {
+namespace dependenciesMining {
 	extern SymbolTable structuresTable;
 	//extern SymbolTable<Structure> structuresTable;
 	extern std::unordered_map<std::string, Ignored*> ignored; 
@@ -54,5 +54,4 @@ namespace DependenciesMining {
 	};
 
 	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
-
 }
