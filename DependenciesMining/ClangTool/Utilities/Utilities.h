@@ -10,6 +10,8 @@ using namespace clang;
 using namespace clang::ast_matchers;
 using namespace llvm;
 
+#define GET_ID_FROM_POINTER(ptr) ((int64_t)ptr)
+
 namespace dependenciesMining {
 
 	template<typename T>

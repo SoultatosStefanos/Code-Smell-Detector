@@ -7,6 +7,7 @@
 #define METHOD_DECL "MethodDecl"
 #define METHOD_VAR_OR_ARG "MethodVarOrArg"
 
+
 using namespace dependenciesMining;
 
 SymbolTable dependenciesMining::structuresTable;
@@ -48,7 +49,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		else {
 			d = d->getDefinition();
-			return;
 		}
 	}
 	
@@ -79,7 +79,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
-	auto structID = d->getID(); 
+	auto structID = GET_ID_FROM_POINTER(d);	
 	assert(structID); 
 	structure.SetName(GetFullStructureName(d));
 	structure.SetID(structID);
@@ -110,7 +110,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		Structure* templateParent;
 		if (structure.IsTemplateInstatiationSpecialization()) {
 			auto* parent = d->getTemplateInstantiationPattern();
-			parentID = parent->getID();
+			parentID = GET_ID_FROM_POINTER(parent); 
 			assert(parentID); 
 			parentName = GetFullStructureName(parent);
 			templateParent = (Structure*)structuresTable.Lookup(parentID);
@@ -119,7 +119,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			parentName = d->getQualifiedNameAsString();	
 			templateParent = (Structure*)structuresTable.Lookup(parentName);
 			assert(templateParent);
-			parentID = templateParent->GetID();
+			parentID = GET_ID_FROM_POINTER(templateParent);
 		}
 		//Structure* templateParent = structuresTable.Get(parentID);
 		if (!templateParent)
@@ -139,7 +139,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
 						std::string argStructName = GetFullStructureName(d);
-						auto argStructID = d->getID(); 
+						auto argStructID = GET_ID_FROM_POINTER(d);	
 						assert(argStructID);
 						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
 						if(argStruct == nullptr)
@@ -157,7 +157,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (baseRecord == nullptr)										// otan base einai template or partial specialization Ignored
 			continue;
 		std::string baseName = GetFullStructureName(baseRecord);
-		auto baseID = baseRecord->getID();
+		auto baseID = GET_ID_FROM_POINTER(baseRecord); 
 		assert(baseID);
 		Structure* base = (Structure*)structuresTable.Lookup(baseID);
 		if (!base)
@@ -172,7 +172,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			auto parent = type->getType()->getAsCXXRecordDecl();
 			if (!parent)
 				continue;
-			auto parentID = parent->getID();
+			auto parentID = GET_ID_FROM_POINTER(parent);  //GET_ID;
 			assert(parentID);
 			std::string parentName = GetFullStructureName(type->getType()->getAsCXXRecordDecl()) ;
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
@@ -197,7 +197,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				}
 				std::string methodName = GetFullMethodName(methodDecl);
 				auto* parentClass = methodDecl->getParent();
-				auto parentClassID = parentClass->getID();
+				auto parentClassID = GET_ID_FROM_POINTER(parentClass);	
 				assert(parentClassID);
 				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
 				if (!parentStructure) continue;
@@ -208,7 +208,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();			
 				auto structureDefinition = recdecl->getDefinition(); 
 				assert(structureDefinition);
-				auto parentID = structureDefinition->getID();
+				auto parentID = GET_ID_FROM_POINTER(structureDefinition);
 				auto parentName = GetFullStructureName(structureDefinition);
 				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 				if (!parentStructure) {
@@ -227,7 +227,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto* parent = d->getParent();
 		assert(parent);
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
-		auto parentID = ((RecordDecl*)parent)->getID();
+		auto parentID = GET_ID_FROM_POINTER((RecordDecl*)parent);
 		assert(parentID);
 		if (parentName != structure.GetName()) {
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
@@ -260,15 +260,15 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (parent->isClass() || parent->isStruct()) {
 			std::string parentName = GetFullStructureName(parent);
 			std::string typeName;
-			ID_T parentID = parent->getID();
+			ID_T parentID = GET_ID_FROM_POINTER(parent);
 			ID_T typeID = 0;
 			if (d->getType()->isPointerType()) {
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-				typeID = d->getType()->getPointeeType()->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(d->getType()->getPointeeType()->getAsCXXRecordDecl());
 			}
 			else {
 				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
-				typeID = d->getType()->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(d->getType()->getAsCXXRecordDecl());
 			}
 			assert(parentID);
 			assert(typeID);
@@ -280,7 +280,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-			auto fieldID = d->getID();
+			auto fieldID = GET_ID_FROM_POINTER(d);
 			assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
@@ -294,8 +294,8 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent);
-		auto parentID = parent->getID();
-		auto methodID = d->getID();
+		auto parentID = GET_ID_FROM_POINTER(parent);
+		auto methodID = GET_ID_FROM_POINTER(d);
 		assert(parentID);
 		assert(methodID);
 
@@ -382,7 +382,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();
 						std::string argStructName = GetFullStructureName(d);
-						auto argStructID = d->getID(); 
+						auto argStructID = GET_ID_FROM_POINTER(d);
 						assert(argStructID);
 						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
 						if (argStruct == nullptr)
@@ -400,11 +400,11 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			ID_T typeID;
 			if (returnType->isPointerType()) {
 				typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
-				typeID = returnType->getPointeeType()->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(returnType->getPointeeType()->getAsCXXRecordDecl());
 			}
 			else {
 				typeName = GetFullStructureName(returnType->getAsCXXRecordDecl());
-				typeID = returnType->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(returnType->getAsCXXRecordDecl());
 			}
 			assert(typeID);
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
@@ -481,11 +481,11 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	ID_T typeID; 
 	if (type->isPointerType()) {
 		typeName = GetFullStructureName(type->getPointeeType()->getAsCXXRecordDecl());
-		typeID = type->getPointeeType()->getAsCXXRecordDecl()->getID();
+		typeID = GET_ID_FROM_POINTER(type->getPointeeType()->getAsCXXRecordDecl());
 	}
 	else {
 		typeName = GetFullStructureName(type->getAsCXXRecordDecl());
-		typeID = type->getAsCXXRecordDecl()->getID();
+		typeID = GET_ID_FROM_POINTER(type->getAsCXXRecordDecl());
 	}
 	assert(typeID); 
 	Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
@@ -525,8 +525,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			
 			auto parentClassName = GetFullStructureName(parentClass);
 			auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
-			auto parentClassID = parentClass->getID(); 
-			auto parentMethodID = ((CXXMethodDecl*)parentMethodDecl)->getID();
+			auto parentClassID = GET_ID_FROM_POINTER(parentClass);
+			auto parentMethodID = GET_ID_FROM_POINTER((CXXMethodDecl*)parentMethodDecl);
 			assert(parentClassID);
 			assert(parentMethodID);
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
@@ -542,17 +542,17 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			ID_T typeID; 
 			if (d->getType()->isPointerType()) {
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-				typeID = d->getType()->getPointeeType()->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(d->getType()->getPointeeType()->getAsCXXRecordDecl());
 			}
 			else {
 				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
-				typeID = d->getType()->getAsCXXRecordDecl()->getID();
+				typeID = GET_ID_FROM_POINTER(d->getType()->getAsCXXRecordDecl());
 			}
 			assert(typeID);
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
-			auto defID = d->getID();
+			auto defID = GET_ID_FROM_POINTER(d);
 			assert(defID);
 			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
 			def.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());

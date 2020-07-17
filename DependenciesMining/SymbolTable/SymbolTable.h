@@ -37,7 +37,7 @@ namespace dependenciesMining {
 	};
 
 
-	enum class ClassType : char {
+	enum class ClassType {
 		Undefined = -1,
 		Structure,
 		Method, 
