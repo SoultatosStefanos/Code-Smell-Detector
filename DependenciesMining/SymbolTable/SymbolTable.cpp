@@ -503,6 +503,12 @@ bool Structure::IsTemplate() const {
 	return false;
 }
 
+bool Structure::IsUndefined() const {
+	if (structureType == StructureType::Undefined)
+		return true;
+	return false;
+}
+
 bool Structure::IsNestedClass() const {
 	if (nestedParent)
 		return true;

@@ -7,6 +7,10 @@ using namespace graphGeneration;
 // GraphGenerationSTVisitor
 
 void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
+	
+	if (s->IsUndefined())
+		return;
+	
 	if (graph.GetNode(s->GetID())) {
 		if (currNode) {
 			assert(currDepType != Undefined_dep_t);
@@ -39,24 +43,30 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 
 	if (s->GetTemplateParent()) {
 		auto* templateParent = s->GetTemplateParent();
-		currDepType = ClassTemplateParent_dep_t;
-		VisitStructure(static_cast<Structure*>(templateParent));
-		nodeData.Set("templateParent", templateParent->GetID());
+		if (!templateParent->IsUndefined()) {
+			currDepType = ClassTemplateParent_dep_t;
+			VisitStructure(static_cast<Structure*>(templateParent));
+			nodeData.Set("templateParent", templateParent->GetID());
+		}
 	}
 
 	if (s->GetNestedParent()) {
 		auto* nestedParent = s->GetNestedParent();
-		currDepType = NestedClass_dep_t;
-		VisitStructure(static_cast<Structure*>(nestedParent));
-		nodeData.Set("nestedParent", nestedParent->GetID());
+		if (!nestedParent->IsUndefined()) {
+			currDepType = NestedClass_dep_t;
+			VisitStructure(static_cast<Structure*>(nestedParent));
+			nodeData.Set("nestedParent", nestedParent->GetID());
+		}
 	}
 
 	untyped::Object basesObj;
 	currDepType = Inherite_dep_t;
 	for (auto& it : s->GetBases()) {
 		auto* base = it.second;
-		VisitStructure(static_cast<Structure*>(base));
-		basesObj.Set("id", base->GetID());
+		if (!((Structure*)base)->IsUndefined()) {
+			VisitStructure(static_cast<Structure*>(base));
+			basesObj.Set("id", base->GetID());
+		}
 	}
 	nodeData.Set("bases", basesObj);
 
@@ -64,8 +74,10 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	currDepType = Friend_dep_t;
 	for (auto& it : s->GetFriends()) {
 		auto* friend_ = it.second;
-		VisitStructure(static_cast<Structure*>(friend_));
-		friendsObj.Set("id", friend_->GetID());
+		if (!((Structure*)friend_)->IsUndefined()) {
+			VisitStructure(static_cast<Structure*>(friend_));
+			friendsObj.Set("id", friend_->GetID());
+		}
 	}
 	nodeData.Set("friends", friendsObj);
 
@@ -73,8 +85,10 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	currDepType = ClassTemplateArg_dep_t;
 	for (auto& it : s->GetTemplateArguments()) {
 		auto* templArg = it.second;
-		VisitStructure(static_cast<Structure*>(templArg));
-		templArgsObj.Set("id", templArg->GetID());
+		if (!((Structure*)templArg)->IsUndefined()) {
+			VisitStructure(static_cast<Structure*>(templArg));
+			templArgsObj.Set("id", templArg->GetID());
+		}
 	}
 	nodeData.Set("templateArguments", templArgsObj);
 		
@@ -82,8 +96,10 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	currDepType = ClassField_dep_t;
 	for (auto& it : s->GetFields()) {
 		auto* field = it.second;
-		VisitDefinition(static_cast<Definition*>(field));
-		fieldsObj.Set(it.first, innerObj);
+		if (!((Definition*)field)->GetType()->IsUndefined()) {
+			VisitDefinition(static_cast<Definition*>(field));
+			fieldsObj.Set(it.first, innerObj);
+		}
 	}
 	nodeData.Set("fields", fieldsObj);
 
@@ -126,17 +142,21 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 
 	if (s->GetReturnType()) {
 		auto* returnType = s->GetReturnType();
-		currDepType = MethodReturn_dep_t;
-		VisitStructure(static_cast<Structure*>(returnType));
-		data.Set("returnType", returnType->GetID());
+		if (!returnType->IsUndefined()) {
+			currDepType = MethodReturn_dep_t;
+			VisitStructure(static_cast<Structure*>(returnType));
+			data.Set("returnType", returnType->GetID());
+		}
 	}
 	
 	untyped::Object argsObj;
 	currDepType = MethodArg_dep_t;
 	for (auto& it : s->GetArguments()) {
-		auto* args = it.second;
-		VisitDefinition(static_cast<Definition*>(args));
-		argsObj.Set(it.first, innerObj);
+		auto* arg = it.second;
+		if (!((Definition*)arg)->GetType()->IsUndefined()) {
+			VisitDefinition(static_cast<Definition*>(arg));
+			argsObj.Set(it.first, innerObj);
+		}
 	}
 	data.Set("arguments", argsObj);
 
@@ -144,8 +164,10 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	currDepType = MethodDefinition_dep_t;
 	for (auto& it : s->GetDefinitions()) {
 		auto* def = it.second;
-		VisitDefinition(static_cast<Definition*>(def));
-		defsObj.Set(it.first, innerObj);
+		if (!((Definition*)def)->GetType()->IsUndefined()) {
+			VisitDefinition(static_cast<Definition*>(def));
+			defsObj.Set(it.first, innerObj);
+		}
 	}
 	data.Set("definitions", defsObj);
 
@@ -153,8 +175,10 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	currDepType = MethodTemplateArg_dep_t;
 	for (auto& it : s->GetTemplateArguments()) {
 		auto* templArg = it.second;
-		VisitStructure(static_cast<Structure*>(templArg));
-		templArgsObj.Set("id", templArg->GetID());
+		if (!((Structure*)templArg)->IsUndefined()) {
+			VisitStructure(static_cast<Structure*>(templArg));
+			templArgsObj.Set("id", templArg->GetID());
+		}
 	}
 	data.Set("templateArguments", templArgsObj);
 
@@ -181,20 +205,22 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 		for (auto it2 : expr.GetMembers()) {
 			auto member = it2;
 			auto* memberType = it2.GetType();
-			untyped::Object memberObj;
+			if (!memberType->IsUndefined()) {
+				untyped::Object memberObj;
 
-			memberObj.Set("name", member.GetName());
-			assert(it2.GetType());
-			memberObj.Set("type", memberType->GetID());
+				memberObj.Set("name", member.GetName());
+				assert(it2.GetType());
+				memberObj.Set("type", memberType->GetID());
 
-			untyped::Object locEnd;
-			locEnd.Set("fileName", member.GetLocEnd().GetFileName());
-			locEnd.Set("line", (double)member.GetLocEnd().GetLine());
-			locEnd.Set("column", (double)member.GetLocEnd().GetColumn());
-			memberObj.Set("locEnd", locEnd);
+				untyped::Object locEnd;
+				locEnd.Set("fileName", member.GetLocEnd().GetFileName());
+				locEnd.Set("line", (double)member.GetLocEnd().GetLine());
+				locEnd.Set("column", (double)member.GetLocEnd().GetColumn());
+				memberObj.Set("locEnd", locEnd);
 
-			VisitStructure(static_cast<Structure*>(memberType));
-			memberExprObj.Set(member.GetName(), memberObj);				// not sure about the key ??
+				VisitStructure(static_cast<Structure*>(memberType));
+				memberExprObj.Set(member.GetName(), memberObj);				// not sure about the key ??
+			}
 		}
 
 		memberExprsObj.Set(it.first, memberExprObj);
@@ -211,12 +237,14 @@ void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	Edge::DependencyType oldCurrDepType = currDepType;
 	
 	Structure* typeStruct = (Structure*)s->GetType();
+	if (typeStruct->IsUndefined())
+		assert(0);
+
 	VisitStructure(typeStruct);
 	Node* node = graph.GetNode(typeStruct->GetID());
 
-
 	untyped::Object data;
-	
+
 	// Symbol 
 	data.Set("id", s->GetID());
 	data.Set("name", s->GetName());

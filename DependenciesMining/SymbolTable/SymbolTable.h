@@ -293,6 +293,7 @@ namespace dependenciesMining {
 		bool IsTemplateInstatiationSpecialization() const;
 		bool IsTemplatePartialSpecialization() const;
 		bool IsTemplate() const;
+		bool IsUndefined() const;
 		bool IsNestedClass() const;
 	};
 }
