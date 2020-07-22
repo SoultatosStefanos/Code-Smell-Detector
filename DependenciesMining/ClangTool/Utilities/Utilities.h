@@ -6,11 +6,11 @@
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include <iostream>
 
+#define ID_T std::string
+
 using namespace clang;
 using namespace clang::ast_matchers;
 using namespace llvm;
-
-#define GET_ID_FROM_POINTER(ptr) ((int64_t)ptr)
 
 namespace dependenciesMining {
 
@@ -29,7 +29,10 @@ namespace dependenciesMining {
 
 	std::string GetFullNamespaceName(const RecordDecl* d);
 
-
+	ID_T GetIDfromDecl(const RecordDecl* d);
+	ID_T GetIDfromDecl(const CXXMethodDecl* d);
+	ID_T GetIDfromDecl(const FieldDecl* d);
+	ID_T GetIDfromDecl(const VarDecl* d);
 
 	// ---------------------------- template function definition ---------------------------------
 	template<typename Callback, typename ...Types>

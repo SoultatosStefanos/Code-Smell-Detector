@@ -154,3 +154,19 @@ std::string dependenciesMining::GetFullNamespaceName(const RecordDecl* d) {
 	}
 	return fullEnclosingNamespace;
 }
+
+ID_T dependenciesMining::GetIDfromDecl(const RecordDecl* d) {
+	return GetFullStructureName(d);
+}
+
+ID_T dependenciesMining::GetIDfromDecl(const CXXMethodDecl* d) {
+	return GetFullMethodName(d);
+}
+
+ID_T dependenciesMining::GetIDfromDecl(const FieldDecl* d) {
+	return d->getQualifiedNameAsString();
+}
+
+ID_T dependenciesMining::GetIDfromDecl(const VarDecl* d) {
+	return d->getQualifiedNameAsString();
+}

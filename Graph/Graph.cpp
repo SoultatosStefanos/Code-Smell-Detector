@@ -43,7 +43,7 @@ Node::Node(const Node& node) {
 }
 
 ID_T Node::GetID() const {
-	return data.Get("id").ToNumber_i64();
+	return data.Get("id").ToString(); 
 }
 
 untyped::Object& Node::GetData() {

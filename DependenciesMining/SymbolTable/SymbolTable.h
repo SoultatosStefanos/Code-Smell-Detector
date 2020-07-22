@@ -5,7 +5,7 @@
 #include <cassert>
 #include <Vector>
 
-#define ID_T int64_t 
+#define ID_T std::string 
 
 namespace dependenciesMining {
 
@@ -71,7 +71,7 @@ namespace dependenciesMining {
 
 	class Symbol {
 	protected:
-		ID_T id = -1;
+		ID_T id = "";
 		std::string name;
 		std::string nameSpace = "";
 		SourceInfo srcInfo;
@@ -80,7 +80,7 @@ namespace dependenciesMining {
 	public:
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
-		Symbol(ID_T id, const std::string& name, const std::string& nameSpace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1) 
+		Symbol(const ID_T& id, const std::string& name, const std::string& nameSpace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1)
 			: id(id), name(name), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
 
 		virtual ID_T GetID() const;
@@ -90,7 +90,7 @@ namespace dependenciesMining {
 		virtual const SourceInfo& GetSourceInfo() const;
 		virtual std::string GetNamespace() const;
 
-		virtual void SetID(const ID_T id);
+		virtual void SetID(const ID_T& id);
 		virtual void SetName(const std::string& name);
 		virtual void SetClassType(const ClassType& type);
 		virtual void SetSourceInfo(const SourceInfo& info);
@@ -104,16 +104,16 @@ namespace dependenciesMining {
 		std::unordered_map<ID_T, Symbol*> byID;
 		std::unordered_map<std::string, std::list<Symbol*>> byName;
 	public:
-		Symbol* Install(ID_T id, const std::string& name, const ClassType& type = ClassType::Structure);		// TO FIX
-		Symbol* Install(ID_T id, const Symbol& symbol);
-		Symbol* Install(ID_T id, const Structure& symbol);
-		Symbol* Install(ID_T id, const Method& symbol);
-		Symbol* Install(ID_T id, const Definition& symbol);
-		Symbol* Install(ID_T id, Symbol* symbol);
-		Symbol* Lookup(ID_T id);
-		Symbol* Lookup(const std::string& name);
-		const Symbol* Lookup(ID_T id) const;
-		const Symbol* Lookup(const std::string& name) const;
+		Symbol* Install(const ID_T& id, const std::string& name, const ClassType& type = ClassType::Structure);		// TO FIX
+		Symbol* Install(const ID_T& id, const Symbol& symbol);
+		Symbol* Install(const ID_T& id, const Structure& symbol);
+		Symbol* Install(const ID_T& id, const Method& symbol);
+		Symbol* Install(const ID_T& id, const Definition& symbol);
+		Symbol* Install(const ID_T& id, Symbol* symbol);
+		Symbol* Lookup(const ID_T& id);
+		//Symbol* Lookup(const std::string& name);
+		const Symbol* Lookup(const ID_T& id) const;
+		//const Symbol* Lookup(const std::string& name) const;
 
 		void Print();
 		void Accept(STVisitor* visitor);
@@ -144,7 +144,7 @@ namespace dependenciesMining {
 		Parent_T* GetParent() const;
 		SymbolTable GetArguments() const;
 		void SetParent(Parent_T* structure); 
-		Symbol* InstallArguments(ID_T id, Structure* structure);
+		Symbol* InstallArguments(const ID_T& id, Structure* structure);
 	};
 
 
@@ -154,9 +154,9 @@ namespace dependenciesMining {
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
-		Definition(ID_T id, const std::string& name, const std::string& nameSpace = "", Structure* type = nullptr)
+		Definition(const ID_T& id, const std::string& name, const std::string& nameSpace = "", Structure* type = nullptr)
 			: Symbol(id, name, nameSpace, ClassType::Definition), type(type) {};
-		Definition(ID_T id, const std::string& name, const std::string& nameSpace, Structure* type, const std::string& fileName, int line, int column)
+		Definition(const ID_T& id, const std::string& name, const std::string& nameSpace, Structure* type, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Definition, fileName, line, column), type(type) {};
 
 		const Structure* GetType() const;
@@ -210,8 +210,8 @@ namespace dependenciesMining {
 		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
 	public:
 		Method() : Symbol(ClassType::Method) {};
-		Method(ID_T id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
-		Method(ID_T id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column)
+		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
+		Method(const ID_T& id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Method, fileName, line, column) {};
 
 		MethodType GetMethodType() const;
@@ -227,9 +227,9 @@ namespace dependenciesMining {
 		void SetReturnType(Structure* structure);
 		void SetTemplateParent(Method* structure);
 
-		void InstallArg(ID_T id, const Definition& definition);
-		void InstallDefinition(ID_T id, const Definition& definition);
-		void InstallTemplateSpecializationArguments(ID_T id, Structure* structure);
+		void InstallArg(const ID_T& id, const Definition& definition);
+		void InstallDefinition(const ID_T& id, const Definition& definition);
+		void InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure);
 
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
@@ -257,9 +257,9 @@ namespace dependenciesMining {
 								// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
-		Structure(ID_T id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
+		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
 			: Symbol(id, name, nameSpace, ClassType::Structure), structureType(structureType) {};
-		Structure(ID_T id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)
+		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Structure, fileName, line, column), structureType(structureType) {};
 		Structure(const Structure& s); 
 		
@@ -279,14 +279,14 @@ namespace dependenciesMining {
 		void SetTemplateParent(Structure* structure);
 		void SetNestedParent(Structure* structure);
 
-		Symbol* LookupMethod(ID_T id);
+		Symbol* LookupMethod(const ID_T& id);
 
-		Symbol* InstallMethod(ID_T id, const Method& method);
-		Symbol* InstallField(ID_T id, const Definition& definition);
-		Symbol* InstallBase(ID_T id, Structure* structure);
-		Symbol* InstallNestedClass(ID_T id, Structure* structure);
-		Symbol* InstallFriend(ID_T id, Structure* structure);
-		Symbol* InstallTemplateSpecializationArguments(ID_T id, Structure* structure);
+		Symbol* InstallMethod(const ID_T& id, const Method& method);
+		Symbol* InstallField(const ID_T& id, const Definition& definition);
+		Symbol* InstallBase(const ID_T& id, Structure* structure);
+		Symbol* InstallNestedClass(const ID_T& id, Structure* structure);
+		Symbol* InstallFriend(const ID_T& id, Structure* structure);
+		Symbol* InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure);
 
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;

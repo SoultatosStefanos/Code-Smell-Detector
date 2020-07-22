@@ -5,7 +5,7 @@
 #include <iostream>
 #include "SymbolTable.h"
 //#include "SymbolTableTempl.h"
-#include "Ignored.h";
+#include "../Ignored/Ignored.h";
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"
@@ -20,7 +20,6 @@ using namespace clang::tooling;
 
 namespace dependenciesMining {
 	extern SymbolTable structuresTable;
-	//extern SymbolTable<Structure> structuresTable;
 	extern std::unordered_map<std::string, Ignored*> ignored; 
 	
 	

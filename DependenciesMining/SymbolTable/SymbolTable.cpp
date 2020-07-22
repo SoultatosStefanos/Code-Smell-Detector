@@ -111,7 +111,7 @@ std::string Symbol::GetNamespace() const {
 	return nameSpace;
 }
 
-void Symbol::SetID(const ID_T id) {
+void Symbol::SetID(const ID_T& id) {
 	this->id = id;
 }
 
@@ -149,7 +149,7 @@ template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent)
 	this->parent = parent;
 }
 
-template<typename Parent_T> Symbol* Template<Parent_T>::InstallArguments(ID_T id, Structure* structure) {
+template<typename Parent_T> Symbol* Template<Parent_T>::InstallArguments(const ID_T& id, Structure* structure) {
 	return arguments.Install(id, structure);
 }
 
@@ -224,15 +224,15 @@ void Method::SetTemplateParent(Method* method) {
 	templateInfo.SetParent(method);
 }
 
-void Method::InstallArg(ID_T id, const Definition& definition) {
+void Method::InstallArg(const ID_T& id, const Definition& definition) {
 	arguments.Install(id, definition);
 }
 
-void Method::InstallDefinition(ID_T id, const Definition& definition) {
+void Method::InstallDefinition(const ID_T& id, const Definition& definition) {
 	definitions.Install(id, definition);
 }
 
-void Method::InstallTemplateSpecializationArguments(ID_T id, Structure* structure) {
+void Method::InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure) {
 	templateInfo.InstallArguments(id, structure);
 }
 
@@ -445,31 +445,31 @@ void Structure::SetNestedParent(Structure* structure) {
 	nestedParent = structure;
 }
 
-Symbol* Structure::LookupMethod(ID_T id) {
+Symbol* Structure::LookupMethod(const ID_T& id) {
 	return methods.Lookup(id);
 }
 
-Symbol* Structure::InstallMethod(ID_T id, const Method& method) {
+Symbol* Structure::InstallMethod(const ID_T& id, const Method& method) {
 	return methods.Install(id, method);
 }
 
-Symbol* Structure::InstallField(ID_T id, const Definition& definition) {
+Symbol* Structure::InstallField(const ID_T& id, const Definition& definition) {
 	return fields.Install(id, definition);
 }
 
-Symbol* Structure::InstallBase(ID_T id, Structure* structure) {
+Symbol* Structure::InstallBase(const ID_T& id, Structure* structure) {
 	return bases.Install(id, structure);
 }
 
-Symbol* Structure::InstallNestedClass(ID_T id, Structure* structure) {
+Symbol* Structure::InstallNestedClass(const ID_T& id, Structure* structure) {
 	return contains.Install(id, structure);
 }
 
-Symbol* Structure::InstallFriend(ID_T id, Structure* structure) {
+Symbol* Structure::InstallFriend(const ID_T& id, Structure* structure) {
 	return friends.Install(id, structure);
 }
 
-Symbol* Structure::InstallTemplateSpecializationArguments(ID_T id, Structure* structure) {
+Symbol* Structure::InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure) {
 	return templateInfo.InstallArguments(id, structure);
 }
 
@@ -511,7 +511,7 @@ bool Structure::IsNestedClass() const {
 
 
 // SymbolTable
-Symbol* SymbolTable::Install(ID_T id, const std::string& name, const ClassType& type) {
+Symbol* SymbolTable::Install(const ID_T& id, const std::string& name, const ClassType& type) {
 	auto it = byID.find(id);
 	if (it != byID.end())
 		return it->second;
@@ -537,7 +537,7 @@ Symbol* SymbolTable::Install(ID_T id, const std::string& name, const ClassType& 
 	return dummy;
 }
 
-Symbol* SymbolTable::Install(ID_T id, const Symbol& symbol) {
+Symbol* SymbolTable::Install(const ID_T& id, const Symbol& symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) {
 		if (symbol.GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
@@ -557,7 +557,7 @@ Symbol* SymbolTable::Install(ID_T id, const Symbol& symbol) {
 }
 
 
-Symbol* SymbolTable::Install(ID_T id, const Structure& symbol) {
+Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) {
 		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {	
@@ -577,7 +577,7 @@ Symbol* SymbolTable::Install(ID_T id, const Structure& symbol) {
 	return newSymbol;
 }
 
-Symbol* SymbolTable::Install(ID_T id, const Method& symbol) {
+Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) {
 			return it->second;
@@ -590,7 +590,7 @@ Symbol* SymbolTable::Install(ID_T id, const Method& symbol) {
 	return newSymbol;
 }
 
-Symbol* SymbolTable::Install(ID_T id, const Definition& symbol) {
+Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) 
 		return it->second;
@@ -604,7 +604,7 @@ Symbol* SymbolTable::Install(ID_T id, const Definition& symbol) {
 	return newSymbol;
 }
 
-Symbol* SymbolTable::Install(ID_T id, Symbol* symbol) {
+Symbol* SymbolTable::Install(const ID_T& id, Symbol* symbol) {
 	auto it = byID.find(id);
 	if (it != byID.end()) {
 		if (symbol->GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
@@ -620,7 +620,7 @@ Symbol* SymbolTable::Install(ID_T id, Symbol* symbol) {
 	return symbol;
 }
 
-Symbol* SymbolTable::Lookup(ID_T id) {
+Symbol* SymbolTable::Lookup(const ID_T& id) {
 	auto it = byID.find(id);
 	if (it != byID.end())
 		return it->second;
@@ -629,17 +629,17 @@ Symbol* SymbolTable::Lookup(ID_T id) {
 }
 
 
-Symbol* SymbolTable::Lookup(const std::string& name) {
-	auto it = byName.find(name);
-	if (it != byName.end()) {
-		//assert(it->second.size() == 1);
-		return it->second.front();			
-	}
-	else
-		return nullptr;
-}
+//Symbol* SymbolTable::Lookup(const std::string& name) {
+//	auto it = byName.find(name);
+//	if (it != byName.end()) {
+//		//assert(it->second.size() == 1);
+//		return it->second.front();			
+//	}
+//	else
+//		return nullptr;
+//}
 
-const Symbol* SymbolTable::Lookup(ID_T id) const {
+const Symbol* SymbolTable::Lookup(const ID_T& id) const {
 	auto it = byID.find(id);
 	if (it != byID.end())
 		return it->second;
@@ -648,15 +648,15 @@ const Symbol* SymbolTable::Lookup(ID_T id) const {
 }
 
 
-const Symbol* SymbolTable::Lookup(const std::string& name) const{
-	auto it = byName.find(name);
-	if (it != byName.end()) {
-		//assert(it->second.size() == 1);
-		return it->second.front();
-	}
-	else
-		return nullptr;
-}
+//const Symbol* SymbolTable::Lookup(const std::string& name) const{
+//	auto it = byName.find(name);
+//	if (it != byName.end()) {
+//		//assert(it->second.size() == 1);
+//		return it->second.front();
+//	}
+//	else
+//		return nullptr;
+//}
 
 void SymbolTable::Print() {
 	for (auto& t : byName) {
