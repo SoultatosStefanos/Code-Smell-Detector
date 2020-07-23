@@ -1,4 +1,5 @@
 #include "Graph.h"
+#include "GraphVisitor.h"
 
 using namespace graph;
 
@@ -89,4 +90,16 @@ void Graph::AddNode(Node* node) {
 
 void Graph::AddEdge(Node* from, Node* to, const Edge::DependencyType& depType, Edge::Cardinality card) {
 	from->AddEdge(to, depType, card);
+}
+
+void Graph::Accept(GraphVisitor* visitor) {
+	for (auto it : nodes) {
+		visitor->VisitNode(it);
+	}
+}
+
+void Graph::Accept(GraphVisitor* visitor) const {
+	for (auto it : nodes) {
+		visitor->VisitNode(it);
+	}
 }
