@@ -6,6 +6,9 @@ namespace memberExpr{
 
 	struct Y {
 		K k;
+		Y& operator=(const Y& y){
+			return *this;
+		}
 	};
 	 
 	struct X{

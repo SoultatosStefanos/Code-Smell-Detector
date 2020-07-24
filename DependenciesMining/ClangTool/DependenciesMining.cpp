@@ -313,10 +313,20 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		// Method's Type
 		if (d->getDeclKind() == d->CXXConstructor) {
-			method.SetMethodType(MethodType::Constructor);
+			if (d->isTrivial()) {
+				method.SetMethodType(MethodType::Constructor_Trivial);
+			}
+			else {
+				method.SetMethodType(MethodType::Constructor_UserDefined);
+			}
 		}
 		else if (d->getDeclKind() == d->CXXDestructor) {
-			method.SetMethodType(MethodType::Destructor);
+			if (d->isTrivial()) {
+				method.SetMethodType(MethodType::Destructor_Trivial);
+			}
+			else {
+				method.SetMethodType(MethodType::Destructor_UserDefined);
+			}
 		}
 		else if (d->getTemplatedKind()) {
 			if (d->getTemplatedKind() == d->TK_FunctionTemplate) {
@@ -336,6 +346,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			else {
 				std::cout << d->getTemplatedKind() << "\n\n";
 				assert(0);
+			}
+		}
+		else if (d->isOverloadedOperator()) {
+			if (d->isTrivial()) {
+				method.SetMethodType(MethodType::OverloadedOperator_Trivial);
+			}
+			else {
+				method.SetMethodType(MethodType::OverloadedOperator_UserDefined);
 			}
 		}
 		else {

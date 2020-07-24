@@ -60,13 +60,97 @@ Json::Value GraphToJsonVisitor::StructureBuilding(const untyped::Object& data) {
 
 Json::Value GraphToJsonVisitor::MethodBuilding(const untyped::Object& data) {
 	Json::Value curr;
-	// TO DO 
+	curr["id"] = data["id"].TO_ID_T();
+	curr["name"] = data["name"].ToString();
+	curr["namespace"] = data["namespace"].ToString();
+
+	Json::Value srcInfo;
+	const untyped::Object& srcInfoObj = data["srcInfo"].ToObject();
+	srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
+	srcInfo["line"] = srcInfoObj["line"].ToNumber();
+	srcInfo["column"] = srcInfoObj["column"].ToNumber();
+	curr["srcInfo"] = srcInfo;
+
+	curr["methodType"] = data["methodType"].ToString();
+	
+	if (data.In("returnType"))
+		curr["returnType"] = data["returnType"].TO_ID_T();
+
+	Json::Value args;
+	data["arguments"].ToObject().ForEach([&args, this](const untyped::Value& key, const untyped::Value& value) {
+		args[key.TO_ID_T()] = DefinitionBuilding(value.ToObject());
+		});
+	curr["arguments"] = args;
+
+	Json::Value defs;
+	data["definitions"].ToObject().ForEach([&defs, this](const untyped::Value& key, const untyped::Value& value) {
+		defs[key.TO_ID_T()] = DefinitionBuilding(value.ToObject());
+		});
+	curr["definitions"] = args;
+
+	Json::Value templArgs;
+	data["templateArguments"].ToObject().ForEach([&templArgs](const untyped::Value& key, const untyped::Value& value) {
+		templArgs[(int)key.ToNumber()] = value.ToString();
+		});
+	curr["templateArguments"] = templArgs;
+
+	Json::Value memberExprs; 
+	int index = 0;
+	auto& memberExprsObj = data["memberExprs"].ToObject();
+	memberExprsObj.ForEach([&memberExprs, &index](const untyped::Value& key, const untyped::Value& value) {
+		Json::Value memberExpr;
+		auto& memberExprObj = value.ToObject(); 
+		memberExpr["expr"] = memberExprObj["expr"].ToString();
+
+		Json::Value srcInfo;
+		const untyped::Object& srcInfoObj = memberExprObj["srcInfo"].ToObject();
+		srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
+		srcInfo["line"] = srcInfoObj["line"].ToNumber();
+		srcInfo["column"] = srcInfoObj["column"].ToNumber();
+		memberExpr["srcInfo"] = srcInfo;
+
+		Json::Value members;
+		auto& membersObj = memberExprObj["members"].ToObject();
+		membersObj.ForEach([&members](const untyped::Value& key, const untyped::Value& value) {
+			Json::Value member;
+			auto& memberObj = value.ToObject();
+			member["name"] = memberObj["name"].ToString();
+			member["type"] = memberObj["type"].TO_ID_T();
+
+			Json::Value locEnd;
+			const untyped::Object& locEndObj = memberObj["locEnd"].ToObject();
+			locEnd["fileName"] = locEndObj["fileName"].ToString();
+			locEnd["line"] = locEndObj["line"].ToNumber();
+			locEnd["column"] = locEndObj["column"].ToNumber();
+			member["locEnd"] = locEnd;
+
+			members[(int)key.ToNumber()] = member;
+
+			});
+		memberExpr["members"] = members;
+
+		memberExprs[index++] = memberExpr;
+		});
+
+	curr["memberExprs"] = memberExprs;
+
 	return curr;
 }
 
 Json::Value GraphToJsonVisitor::DefinitionBuilding(const untyped::Object& data) {
 	Json::Value curr;
-	// TO DO
+	curr["id"] = data["id"].TO_ID_T();
+	curr["name"] = data["name"].ToString();
+	curr["namespace"] = data["namespace"].ToString();
+
+	Json::Value srcInfo;
+	const untyped::Object& srcInfoObj = data["srcInfo"].ToObject();
+	srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
+	srcInfo["line"] = srcInfoObj["line"].ToNumber();
+	srcInfo["column"] = srcInfoObj["column"].ToNumber();
+	curr["srcInfo"] = srcInfo;
+
+	curr["type"] = data["type"].TO_ID_T();
 	return curr;
 }
 
@@ -82,7 +166,6 @@ void GraphToJsonVisitor::VisitNode(Node* node) {
 		json["edges"][edgesIndex] = edgeJson;
 		VisitEdge(edge); 
 		});
-
 }
 
 void GraphToJsonVisitor::VisitEdge(Edge* edge) {

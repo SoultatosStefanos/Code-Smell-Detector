@@ -194,6 +194,9 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 		auto expr = it.second;
 		untyped::Object memberExprObj;
 
+		if (!expr.GetMembers().size())
+			continue;
+
 		memberExprObj.Set("expr", expr.GetExpr());
 		untyped::Object srcInfo;
 		srcInfo.Set("fileName", expr.GetSourceInfo().GetFileName());
@@ -202,6 +205,7 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 		memberExprObj.Set("srcInfo", srcInfo);
 
 		untyped::Object membersObj;
+		double index2 = 0;
 		for (auto it2 : expr.GetMembers()) {
 			auto member = it2;
 			auto* memberType = it2.GetType();
@@ -219,7 +223,7 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 				memberObj.Set("locEnd", locEnd);
 
 				VisitStructure(static_cast<Structure*>(memberType));
-				membersObj.Set(member.GetLocEnd().toString(), memberObj);
+				membersObj.Set(index2++, memberObj);
 			}
 			memberExprObj.Set("members", membersObj);				
 		}
