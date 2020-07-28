@@ -1,6 +1,7 @@
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4146)
 #include <iostream>
+#include <fstream>
 #include "SourceLoader.h"
 #include "DependenciesMining.h"
 #include "GraphGeneration.h"
@@ -35,7 +36,11 @@ int main(int argc, const char** argv) {
 	int result = dependenciesMining::CreateClangTool(argc, argv, srcs);
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	std::string json = graphToJson::GetJson(graph);
-	std::cout << json << "\n";
+
+	std::ofstream jsonFile;
+	jsonFile.open(argv[2]);
+	jsonFile << json;
+	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 
 

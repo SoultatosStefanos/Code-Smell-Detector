@@ -13,8 +13,8 @@ Json::Value GraphToJsonVisitor::StructureBuilding(const untyped::Object& data) {
 	Json::Value srcInfo;
 	const untyped::Object& srcInfoObj = data["srcInfo"].ToObject();
 	srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
-	srcInfo["line"] = srcInfoObj["line"].ToNumber();
-	srcInfo["column"] = srcInfoObj["column"].ToNumber();
+	srcInfo["line"] = (int)srcInfoObj["line"].ToNumber();
+	srcInfo["column"] = (int)srcInfoObj["column"].ToNumber();
 	curr["srcInfo"] = srcInfo;
 
 	curr["structureType"] = data["structureType"].ToString();
@@ -67,8 +67,8 @@ Json::Value GraphToJsonVisitor::MethodBuilding(const untyped::Object& data) {
 	Json::Value srcInfo;
 	const untyped::Object& srcInfoObj = data["srcInfo"].ToObject();
 	srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
-	srcInfo["line"] = srcInfoObj["line"].ToNumber();
-	srcInfo["column"] = srcInfoObj["column"].ToNumber();
+	srcInfo["line"] = (int)srcInfoObj["line"].ToNumber();
+	srcInfo["column"] = (int)srcInfoObj["column"].ToNumber();
 	curr["srcInfo"] = srcInfo;
 
 	curr["methodType"] = data["methodType"].ToString();
@@ -105,8 +105,8 @@ Json::Value GraphToJsonVisitor::MethodBuilding(const untyped::Object& data) {
 		Json::Value srcInfo;
 		const untyped::Object& srcInfoObj = memberExprObj["srcInfo"].ToObject();
 		srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
-		srcInfo["line"] = srcInfoObj["line"].ToNumber();
-		srcInfo["column"] = srcInfoObj["column"].ToNumber();
+		srcInfo["line"] = (int)srcInfoObj["line"].ToNumber();
+		srcInfo["column"] = (int)srcInfoObj["column"].ToNumber();
 		memberExpr["srcInfo"] = srcInfo;
 
 		Json::Value members;
@@ -120,8 +120,8 @@ Json::Value GraphToJsonVisitor::MethodBuilding(const untyped::Object& data) {
 			Json::Value locEnd;
 			const untyped::Object& locEndObj = memberObj["locEnd"].ToObject();
 			locEnd["fileName"] = locEndObj["fileName"].ToString();
-			locEnd["line"] = locEndObj["line"].ToNumber();
-			locEnd["column"] = locEndObj["column"].ToNumber();
+			locEnd["line"] = (int)locEndObj["line"].ToNumber();
+			locEnd["column"] = (int)locEndObj["column"].ToNumber();
 			member["locEnd"] = locEnd;
 
 			members[(int)key.ToNumber()] = member;
@@ -146,8 +146,8 @@ Json::Value GraphToJsonVisitor::DefinitionBuilding(const untyped::Object& data) 
 	Json::Value srcInfo;
 	const untyped::Object& srcInfoObj = data["srcInfo"].ToObject();
 	srcInfo["fileName"] = srcInfoObj["fileName"].ToString();
-	srcInfo["line"] = srcInfoObj["line"].ToNumber();
-	srcInfo["column"] = srcInfoObj["column"].ToNumber();
+	srcInfo["line"] = (int)srcInfoObj["line"].ToNumber();
+	srcInfo["column"] = (int)srcInfoObj["column"].ToNumber();
 	curr["srcInfo"] = srcInfo;
 
 	curr["type"] = data["type"].TO_ID_T();

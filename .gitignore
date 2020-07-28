@@ -31,3 +31,4 @@
 *.out
 *.app
 Testfiles/.vscode/settings.json
+Main/json.txt

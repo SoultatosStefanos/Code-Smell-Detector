@@ -110,6 +110,9 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	untyped::Object methodsObj;
 	for (auto& it : s->GetMethods()) {
 		auto* method = it.second;
+		/*if (((Method*)method)->IsTrivial())						// Ignore the Trivial methods that compiler creates automatically
+			continue;
+		*/
 		VisitMethod(static_cast<Method*>(method));
 		methodsObj.Set(it.first, innerObj);
 	}
