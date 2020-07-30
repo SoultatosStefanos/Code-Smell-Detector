@@ -271,7 +271,6 @@ void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	innerObj.Clear();
 	innerObj = data;
 	data.Clear();
-	currNode->AddEdge(node, oldCurrDepType, 1);
 	currDepType = oldCurrDepType;
 }
 

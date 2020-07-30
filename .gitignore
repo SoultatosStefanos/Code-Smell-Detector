@@ -32,3 +32,4 @@
 *.app
 Testfiles/.vscode/settings.json
 Main/json.txt
+Main/graph.json
