@@ -12,7 +12,7 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 		return;
 	
 	if (graph.GetNode(s->GetID())) {
-		if (currNode) {
+		if (currNode && currNode->GetID() != s->GetID()) {			// Ignore the self dependencies 
 			assert(currDepType != Undefined_dep_t);
 			currNode->AddEdge(graph.GetNode(s->GetID()), currDepType);
 		}
@@ -110,9 +110,8 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	untyped::Object methodsObj;
 	for (auto& it : s->GetMethods()) {
 		auto* method = it.second;
-		/*if (((Method*)method)->IsTrivial())						// Ignore the Trivial methods that compiler creates automatically
+		if (((Method*)method)->IsTrivial())						// Ignore the Trivial methods that compiler creates automatically
 			continue;
-		*/
 		VisitMethod(static_cast<Method*>(method));
 		methodsObj.Set(it.first, innerObj);
 	}
