@@ -1,0 +1,17 @@
+{
+  "name": "graph_js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "gojs": "^2.1.21",
+    "npm": "^6.14.7",
+    "serve": "^11.3.2",
+    "vue": "^2.6.12"
+  }
+}
