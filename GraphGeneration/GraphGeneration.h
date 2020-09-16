@@ -1,3 +1,4 @@
+#pragma once
 #include "SymbolTable.h"
 #include "STVisitor.h"
 #include "Graph.h"

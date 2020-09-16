@@ -13,6 +13,7 @@ using namespace dependenciesMining;
 namespace graph {
 
     class Node; 
+    class GraphVisitor;
 
     class Edge {
     public:
@@ -45,6 +46,11 @@ namespace graph {
         unsigned EdgesSize() const;
         void AddEdge(Edge* edge);
         void AddEdge(Node* to, const Edge::DependencyType& depType, Edge::Cardinality card = 1);
+        template <typename Tfunc>
+        void ForEachEdge(const Tfunc& f) const {
+            for (auto& i : outEdges)
+                f(i);
+        }
     };
 
 
@@ -57,5 +63,8 @@ namespace graph {
         Node* GetNode(ID_T id) const;
         void AddNode(Node* node);
         void AddEdge(Node* from, Node* to, const Edge::DependencyType& depType, Edge::Cardinality card = 1);
+
+        void Accept(GraphVisitor* visitor);
+        void Accept(GraphVisitor* visitor) const;
     };
 }

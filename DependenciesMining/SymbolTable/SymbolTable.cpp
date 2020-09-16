@@ -169,11 +169,23 @@ MethodType Method::GetMethodType() const {
 }
 
 std::string Method::GetMethodTypeAsString() const {
-	if (methodType == MethodType::Constructor) {
-		return "Constructor";
+	if (methodType == MethodType::Constructor_UserDefined) {
+		return "Constructor_UserDefined";
 	}
-	else if (methodType == MethodType::Destructor) {
-		return "Destructor";
+	else if (methodType == MethodType::Constructor_Trivial) {
+		return "Constructor_Trivial";
+	}
+	else if (methodType == MethodType::Destructor_UserDefined) {
+		return "Destructor_UserDefined";
+	}
+	else if (methodType == MethodType::Destructor_Trivial) {
+		return "Destructor_Trivial";
+	}
+	else if (methodType == MethodType::OverloadedOperator_UserDefined) {
+		return "OverloadedOperator_UserDefined";
+	}
+	else if (methodType == MethodType::OverloadedOperator_Trivial) {
+		return "OverloadedOperator_Trivial";
 	}
 	else if (methodType == MethodType::UserMethod) {
 		return "UserMethod";
@@ -192,6 +204,8 @@ std::string Method::GetMethodTypeAsString() const {
 	}
 }
 
+
+
 Structure* Method::GetReturnType() const {
 	return returnType;
 }
@@ -208,7 +222,7 @@ SymbolTable Method::GetTemplateArguments() const {
 	return templateInfo.GetArguments();
 }
 
-std::unordered_map<std::string, Method::MemberExpr>  Method::GetMemberExpr() const {
+std::map<std::string, Method::MemberExpr>  Method::GetMemberExpr() const {
 	return memberExprs;
 }
 
@@ -262,13 +276,19 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 }
 
 bool Method::IsConstructor() const {
-	if (methodType == MethodType::Constructor)
+	if (methodType == MethodType::Constructor_UserDefined || methodType == MethodType::Constructor_Trivial)
 		return true; 
 	return false;
 }
 
 bool Method::IsDestructor() const {
-	if (methodType == MethodType::Destructor)
+	if (methodType == MethodType::Destructor_UserDefined || methodType == MethodType::Destructor_Trivial)
+		return true;
+	return false;
+}
+
+bool Method::IsOverloadedOperator() const {
+	if (methodType == MethodType::OverloadedOperator_UserDefined || methodType == MethodType::OverloadedOperator_Trivial)
 		return true;
 	return false;
 }
@@ -297,6 +317,14 @@ bool Method::IsTemplateInstatiationSpecialization() const {
 	return false;
 }
 
+bool Method::IsTrivial() const {
+	if (methodType == MethodType::Constructor_Trivial ||
+		methodType == MethodType::OverloadedOperator_Trivial ||
+		methodType == MethodType::Destructor_Trivial) {
+		return true;
+	}
+	return false;
+}
 
 // Member
 std::string Method::Member::GetName() const {

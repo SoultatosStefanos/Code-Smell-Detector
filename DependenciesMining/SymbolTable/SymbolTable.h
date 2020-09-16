@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <cassert>
 #include <Vector>
 
@@ -28,9 +29,13 @@ namespace dependenciesMining {
 
 	enum class MethodType {
 		Undefined = -1,
-		Constructor,
-		Destructor,
+		Constructor_Trivial,
+		OverloadedOperator_Trivial,
+		Destructor_Trivial,
+		Constructor_UserDefined,
+		Destructor_UserDefined,
 		UserMethod,
+		OverloadedOperator_UserDefined,
 		TemplateDefinition,
 		TemplateFullSpecialization,
 		TemplateInstatiationSpecialization
@@ -81,7 +86,7 @@ namespace dependenciesMining {
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
 		Symbol(const ID_T& id, const std::string& name, const std::string& nameSpace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1)
-			: id(id), name(name), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
+			: id(id), name(name), nameSpace(nameSpace), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
 
 		virtual ID_T GetID() const;
 		virtual std::string GetName() const;
@@ -207,7 +212,7 @@ namespace dependenciesMining {
 		Template<Method> templateInfo;								// Template Parent is *not* used
 		SymbolTable arguments;
 		SymbolTable definitions;
-		std::unordered_map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
+		std::map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
@@ -221,7 +226,7 @@ namespace dependenciesMining {
 		SymbolTable GetArguments() const;
 		SymbolTable GetDefinitions() const;
 		SymbolTable GetTemplateArguments() const;
-		std::unordered_map<std::string, MemberExpr> GetMemberExpr() const;
+		std::map<std::string, MemberExpr> GetMemberExpr() const;
 
 		void SetMethodType(const MethodType& type);
 		void SetReturnType(Structure* structure);
@@ -237,9 +242,11 @@ namespace dependenciesMining {
 		bool IsConstructor () const;
 		bool IsDestructor() const;
 		bool IsUserMethod() const;
+		bool IsOverloadedOperator() const;
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
 		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTrivial() const; 
 	};
 
 

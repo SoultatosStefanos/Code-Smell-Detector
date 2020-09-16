@@ -12,7 +12,7 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 		return;
 	
 	if (graph.GetNode(s->GetID())) {
-		if (currNode) {
+		if (currNode && currNode->GetID() != s->GetID()) {			// Ignore the self dependencies 
 			assert(currDepType != Undefined_dep_t);
 			currNode->AddEdge(graph.GetNode(s->GetID()), currDepType);
 		}
@@ -34,6 +34,7 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	srcInfo.Set("line", (double)s->GetSourceInfo().GetLine());
 	srcInfo.Set("column", (double)s->GetSourceInfo().GetColumn());
 	nodeData.Set("srcInfo", srcInfo);
+
 	nodeData.Set("classType", s->GetClassTypeAsString());
 
 	graph.AddNode(currNode);
@@ -61,33 +62,36 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 
 	untyped::Object basesObj;
 	currDepType = Inherite_dep_t;
+	double index = 0;
 	for (auto& it : s->GetBases()) {
 		auto* base = it.second;
 		if (!((Structure*)base)->IsUndefined()) {
 			VisitStructure(static_cast<Structure*>(base));
-			basesObj.Set("id", base->GetID());
+			basesObj.Set(index++, base->GetID());
 		}
 	}
 	nodeData.Set("bases", basesObj);
 
 	untyped::Object friendsObj;
+	index = 0;
 	currDepType = Friend_dep_t;
 	for (auto& it : s->GetFriends()) {
 		auto* friend_ = it.second;
 		if (!((Structure*)friend_)->IsUndefined()) {
 			VisitStructure(static_cast<Structure*>(friend_));
-			friendsObj.Set("id", friend_->GetID());
+			friendsObj.Set(index++, friend_->GetID());
 		}
 	}
 	nodeData.Set("friends", friendsObj);
 
 	untyped::Object templArgsObj;
+	index = 0;
 	currDepType = ClassTemplateArg_dep_t;
 	for (auto& it : s->GetTemplateArguments()) {
 		auto* templArg = it.second;
 		if (!((Structure*)templArg)->IsUndefined()) {
 			VisitStructure(static_cast<Structure*>(templArg));
-			templArgsObj.Set("id", templArg->GetID());
+			templArgsObj.Set(index++, templArg->GetID());
 		}
 	}
 	nodeData.Set("templateArguments", templArgsObj);
@@ -106,6 +110,8 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	untyped::Object methodsObj;
 	for (auto& it : s->GetMethods()) {
 		auto* method = it.second;
+		if (((Method*)method)->IsTrivial())						// Ignore the Trivial methods that compiler creates automatically
+			continue;
 		VisitMethod(static_cast<Method*>(method));
 		methodsObj.Set(it.first, innerObj);
 	}
@@ -172,12 +178,13 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	data.Set("definitions", defsObj);
 
 	untyped::Object templArgsObj;
+	double index = 0;
 	currDepType = MethodTemplateArg_dep_t;
 	for (auto& it : s->GetTemplateArguments()) {
 		auto* templArg = it.second;
 		if (!((Structure*)templArg)->IsUndefined()) {
 			VisitStructure(static_cast<Structure*>(templArg));
-			templArgsObj.Set("id", templArg->GetID());
+			templArgsObj.Set(index++, templArg->GetID());
 		}
 	}
 	data.Set("templateArguments", templArgsObj);
@@ -189,6 +196,9 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 		auto expr = it.second;
 		untyped::Object memberExprObj;
 
+		if (!expr.GetMembers().size())
+			continue;
+
 		memberExprObj.Set("expr", expr.GetExpr());
 		untyped::Object srcInfo;
 		srcInfo.Set("fileName", expr.GetSourceInfo().GetFileName());
@@ -196,12 +206,8 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 		srcInfo.Set("column", (double)expr.GetSourceInfo().GetColumn());
 		memberExprObj.Set("srcInfo", srcInfo);
 
-		untyped::Object locEnd;
-		locEnd.Set("fileName", expr.GetLocEnd().GetFileName());
-		locEnd.Set("line", (double)expr.GetLocEnd().GetLine());
-		locEnd.Set("column", (double)expr.GetLocEnd().GetColumn());
-		memberExprObj.Set("locEnd", locEnd);
-
+		untyped::Object membersObj;
+		double index2 = 0;
 		for (auto it2 : expr.GetMembers()) {
 			auto member = it2;
 			auto* memberType = it2.GetType();
@@ -219,8 +225,9 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 				memberObj.Set("locEnd", locEnd);
 
 				VisitStructure(static_cast<Structure*>(memberType));
-				memberExprObj.Set(member.GetName(), memberObj);				// not sure about the key ??
+				membersObj.Set(index2++, memberObj);
 			}
+			memberExprObj.Set("members", membersObj);				
 		}
 
 		memberExprsObj.Set(it.first, memberExprObj);
@@ -263,7 +270,6 @@ void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	innerObj.Clear();
 	innerObj = data;
 	data.Clear();
-	currNode->AddEdge(node, oldCurrDepType, 1);
 	currDepType = oldCurrDepType;
 }
 
