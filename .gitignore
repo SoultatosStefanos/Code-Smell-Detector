@@ -31,3 +31,6 @@
 *.out
 *.app
 Testfiles/.vscode/settings.json
+GraphVisualizer/node_modules
+GraphVisualizer/package-lock.json
+GraphVisualizer/package.json

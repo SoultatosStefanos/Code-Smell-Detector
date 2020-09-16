@@ -1,0 +1,93 @@
+body{
+    font-family: tahoma;
+    color: #282828;
+}
+
+h2 {
+    text-align: center;
+    color: rgb(63, 62, 62);
+    background-color: rgb(220 220 220);
+    padding: 1vh; 
+    margin: 0;
+    border-bottom:  0.2vw solid  rgb(138, 137, 137, .3); 
+}
+
+#diagramDiv {
+    display: inline-block;
+    position: absolute;
+    width: 73%; 
+    height: 96%;  
+    margin: 1vw;
+    background-color:rgb(215, 220, 223); /* #DAE4E4; */
+}
+
+#config {
+    display: inline-block;
+    vertical-align: top; 
+    position: absolute;
+    right: 0; 
+    width: 24%;
+    height: 96%;  
+    margin: 1vw;
+    background-color: rgb(235, 235, 235); 
+    border-style: solid; 
+    border-radius: 0.2vw;
+    border-width: 0.2vw;
+    border-color: rgb(138, 137, 137, .3);
+} 
+
+.disabled {
+    color:grey;
+}
+
+
+.slider {
+  display: inline-block;
+  -webkit-appearance: none;
+  height: 5px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 7px;
+  background: rgb(97, 118, 216);
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 10px;
+  height: 7px;
+  background:  rgb(97, 118, 216);
+  cursor: pointer;
+}
+
+.group {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.group .name {
+    text-align: center;
+    color: rgb(63, 62, 62);
+    background-color: rgb(220 220 220);
+    padding: .5vh; 
+    margin: .2vh;
+    border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
+    border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+}
+
+.group .data{
+    padding: 1vh; 
+}

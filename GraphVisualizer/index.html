@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <script src="./node_modules/gojs/release/go-debug.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="diagramDiv"></div>
+
+    <div id="config">
+        <h2>{{ title }}</h2>
+        <div class="group" v-for="group in groups">
+            <div class="name" :id="group.id">{{group.description}}</div>
+            <div v-for="data in group.data" class="data">
+
+                <div v-if="data.type == 'slider'">
+                    {{data.description}}:
+                    <input type="range" v-model="data.value" :min="data.min" :max="data.max" :id="data.id"
+                        class="slider">
+                    {{data.value}}
+                    <!-- <div v-if="conditionCheck(data.condition)">
+                    </div> -->
+                </div>
+
+                <div v-else-if="data.type == 'checkbox'">
+                    <div v-if="data.value == true">
+                        {{data.description}}: <input type="checkbox" :id="data.id" checked>
+                    </div>
+                    <div v-else>
+                        {{data.description}}: <input type="checkbox" :id="data.id">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <script type="module" src="./Graph/graphVisualization.js"></script>
+    <script type="module" src="./Config/config.js"></script>
+
+</body>
+
+</html>
