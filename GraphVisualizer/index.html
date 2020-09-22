@@ -15,28 +15,23 @@
     <div id="config">
         <h2>{{ title }}</h2>
         <div class="group" v-for="group in groups">
-            <div class="name" :id="group.id">{{group.description}}</div>
-            <div v-for="data in group.data" class="data">
+            <div class="groupName" :id="group.id">{{group.description}}</div>
+            <div v-for="data in group.data" class="groupData">
 
-                <div v-if="data.type == 'slider'">
+                <div v-if="data.type == 'slider'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
                     {{data.description}}:
-                    <input type="range" v-model="data.value" :min="data.min" :max="data.max" :id="data.id"
-                        class="slider">
+                    <input type="range" v-model="data.value" :min="data.min" :max="data.max" :id="data.id" 
+                        class="slider" :disabled="evalCondition(data.conditions.disabled)">
                     {{data.value}}
-                    <!-- <div v-if="conditionCheck(data.condition)">
-                    </div> -->
                 </div>
 
-                <div v-else-if="data.type == 'checkbox'">
-                    <div v-if="data.value == true">
-                        {{data.description}}: <input type="checkbox" :id="data.id" checked>
-                    </div>
-                    <div v-else>
-                        {{data.description}}: <input type="checkbox" :id="data.id">
-                    </div>
+                <div v-else-if="data.type == 'checkbox'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                    {{data.description}}: <input type="checkbox" v-model="data.value" :id="data.id"
+                        :checked="data.value" :disabled="evalCondition(data.conditions.disabled)">
                 </div>
             </div>
         </div>
+    </div>
     </div>
     </div>
 

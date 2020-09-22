@@ -36,7 +36,7 @@ h2 {
     border-color: rgb(138, 137, 137, .3);
 } 
 
-.disabled {
+.disabledElem {
     color:grey;
 }
 
@@ -78,7 +78,7 @@ h2 {
     margin-right: auto;
 }
 
-.group .name {
+.group .groupName {
     text-align: center;
     color: rgb(63, 62, 62);
     background-color: rgb(220 220 220);
@@ -88,6 +88,6 @@ h2 {
     border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
 }
 
-.group .data{
+.group .groupData{
     padding: 1vh; 
 }

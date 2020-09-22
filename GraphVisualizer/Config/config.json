@@ -1,50 +1,38 @@
 {
-    "title" : "Configurations",
-    "groups": [
-        {
+    "title": "Configurations",
+    "groups": {
+        "general": {
             "id": "general",
             "description": "General",
-            "data": [
-                {
-                    "id" : "edges",
+            "data": {
+                "edges": {
+                    "id": "edges",
                     "description": "Show all Edges",
                     "type": "checkbox",
-                    "value": true, 
-                    "condition": {} 
-                }, 
-                {
-                    "id" : "weights",
+                    "value": true,
+                    "conditions": {}
+                },
+                "weights": {
+                    "id": "weights",
                     "description": "Filter via Weights",
                     "type": "slider",
-                    "value": 10,
+                    "value": 5,
                     "min": 1,
-                    "max": 10, 
-                    "condition": {
-                        "condition" : "this.categories[0].data[0].value == this.categories[0].data[0].max",
-                        "bindTo": "Cycles", 
-                        "result": "disabled", 
-                        "resultValue": false
-                    } 
+                    "max": 10,
+                    "conditions": {
+                        "disabled": "this.groups.general.data.edges.value === true"
+                    }
                 },
-                {
-                    "id" : "cycles",
+                "cycles": {
+                    "id": "cycles",
                     "description": "Show Cycles",
                     "type": "checkbox",
-                    "value": false, 
-                    "condition": {
-                        "type": "equality", 
-                        "lvalue": "categories[0].data[0].value", 
-                        "rvalue": "categories[0].data[0].max", 
-                        "condition" : "categories[0].data[0].value == categories[0].data[0].max",
-                        "result": "disabled", 
-                        "resultValue": true
-                    } 
+                    "value": false,
+                    "conditions": {
+                        "disabled": "this.groups.general.data.edges.value === true"
+                    }
                 }
-            ]
-        }, 
-        {
-            "name": "Group 2", 
-            "data": []
-        }        
-    ]
+            }
+        }
+    }
 }
