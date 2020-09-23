@@ -1,35 +1,76 @@
 {
     "title": "Configurations",
     "groups": {
+        "edges": {
+            "id": "edges",
+            "description": "Edges",
+            "data": {
+                "allEdges": {
+                    "id": "allEdges",
+                    "description": "Show all Edges",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {},
+                    "onChange": {
+                        "event": "allEdges"
+                    }
+                },
+                "weightFilter": {
+                    "id": "weightFilter",
+                    "description": "Filter via Weights",
+                    "type": "slider",
+                    "value": 1,
+                    "min": 1,
+                    "max": 100,
+                    "conditions": {
+                        "disabled": "this.groups.edges.data.allEdges.value === true"
+                    },
+                    "onChange": {
+                        "event": "weightFilter"
+                    }
+                },
+                "showWeights": {
+                    "id": "showWeights",
+                    "description": "Show Weights",
+                    "type": "checkbox",
+                    "value": true,
+                    "conditions": {},
+                    "onChange": {
+                        "event": "showWeights"
+                    }
+                }
+            }
+        },
+        "grouping" : {
+            "id": "grouping",
+            "description": "Grouping",
+            "data" : {
+                "namespace" : {
+                    "id": "namespace",
+                    "description": "By Namespace",
+                    "type": "checkbox",
+                    "value": true,
+                    "conditions": {}, 
+                    "onChange": {
+                        "event": "namespace"
+                    }
+                }
+            }
+        },
         "general": {
             "id": "general",
             "description": "General",
             "data": {
-                "edges": {
-                    "id": "edges",
-                    "description": "Show all Edges",
-                    "type": "checkbox",
-                    "value": true,
-                    "conditions": {}
-                },
-                "weights": {
-                    "id": "weights",
-                    "description": "Filter via Weights",
-                    "type": "slider",
-                    "value": 5,
-                    "min": 1,
-                    "max": 10,
-                    "conditions": {
-                        "disabled": "this.groups.general.data.edges.value === true"
-                    }
-                },
                 "cycles": {
                     "id": "cycles",
                     "description": "Show Cycles",
                     "type": "checkbox",
                     "value": false,
                     "conditions": {
-                        "disabled": "this.groups.general.data.edges.value === true"
+                        "disabled": "this.groups.edges.data.allEdges.value === false"
+                    },
+                    "onChange": {
+                        "event": "cycles"
                     }
                 }
             }

@@ -1,3 +1,5 @@
+import {obs} from "../Observer/observer.js"
+
 (async () => {
     const json = await fetch("/Config/config.json").then(response => response.json());
     
@@ -10,8 +12,11 @@
         methods: {
             evalCondition(condition) {
                 return eval(condition);
+            }, 
+            onChange(event, data) {
+                obs.fire(event, data);
             }
-        }
+        }, 
     });
 })();
 
