@@ -1,8 +1,8 @@
 import { diagram } from "./graphVisualization.js"
 import { obs } from "../Observer/observer.js"
 
-function showAllEdges(data) {
-  if (data === true) {
+function showAllEdges(value) {
+  if (value) {
     diagram.model.commit(function (m) {
       m.linkDataArray.forEach((linkData) => {
         m.set(linkData, "visibleLink", true);
@@ -11,10 +11,10 @@ function showAllEdges(data) {
   }
 };
 
-function weightFilter(data) {
+function weightFilter(value) {
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
-      if (linkData.data.weight < data) {
+      if (linkData.data.weight < value) {
         m.set(linkData, "visibleLink", false);
       }
       else {
@@ -24,39 +24,59 @@ function weightFilter(data) {
   }, "weightFilter");
 }
 
-function showWeights(data) {
+
+function showWeights(value) {
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
-      m.set(linkData, "visibleWeight", data);
+      m.set(linkData, "visibleWeight", value);
     });
   }, "showWeights");
 
 };
 
-function namespaceGrouping(data) {
+
+function namespaceGrouping(value) {
   diagram.model.commit(function (m) {
     m.nodeDataArray.forEach((nodeData) => {
-      // TO FIX
-      if (data) {
-        // console.log("Namespace Grouping");
-        if (!nodeData.isGroup)
-          m.set(nodeData, "group", nodeData.namespace);
-        else
+      if (value) {
+        if (!nodeData.isGroup) 
+          m.set(nodeData, "group", nodeData.data.namespace);
+        else if(nodeData.type === "namespace")
           m.set(nodeData, "visible", true)
       }
       else {
-        // console.log("No Namespace Grouping");
         if (!nodeData.isGroup)
           m.set(nodeData, "group", undefined);
-        else
-          m.set(nodeData, "visible", data)
+        else if(nodeData.type === "namespace")
+          m.set(nodeData, "visible", false)
       }
     });
   });
 }
 
-function cyclesTracer(data) {
-  if (data === true) {
+
+function fileNameGrouping(value) {
+  diagram.model.commit(function (m) {
+    m.nodeDataArray.forEach((nodeData) => {
+      if (value) {
+        if (!nodeData.isGroup) 
+          m.set(nodeData, "group", nodeData.data.fileName);
+        else if(nodeData.type === "fileName")
+          m.set(nodeData, "visible", true)
+      }
+      else {
+        if (!nodeData.isGroup)
+          m.set(nodeData, "group", undefined);
+        else if(nodeData.type === "fileName")
+          m.set(nodeData, "visible", false)
+      }
+    });
+  });
+}
+
+
+function cyclesTracer(value) {
+  if (value) {
     console.log("lets trace cycles");
     m.set(linkData, "thick", 0.2);
   } else {
@@ -70,5 +90,6 @@ obs.install("weightFilter", weightFilter);
 obs.install("showWeights", showWeights);
 
 obs.install("namespace", namespaceGrouping);
+obs.install("fileName", fileNameGrouping);
 
 obs.install("cycles", cyclesTracer); 

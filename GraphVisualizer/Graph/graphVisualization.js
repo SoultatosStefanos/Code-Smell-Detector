@@ -40,11 +40,12 @@ export const diagram =
         new go.Binding("visible", "visible"),
       ),
       $(go.Placeholder,
-        { padding: 5 })
+        { padding: 7 })
     ),
     $(go.TextBlock,         // group title
-      { alignment: go.Spot.Default, margin: 10, font: "Bold 12pt sans-serif" },
-      new go.Binding("text", "name"))
+      { alignment: go.Spot.Default, margin: 10, font: "Bold 12pt sans-serif", visible: true },
+      new go.Binding("text", "name")),
+    new go.Binding("visible", "visible")
   );
 
   diagram.linkTemplate =
@@ -67,15 +68,20 @@ export const diagram =
   const edges = data.edges;
 
   const namespacesGroups = [];
+  const fileNameGroups = [];
   const nodeDataArray = Object.keys(nodes).map(id => {
-    const { id: key, name, namespace } = nodes[id];
+    const { id: key, name, namespace, srcInfo } = nodes[id];
     if (!namespacesGroups.some((group) => { return group.key === namespace })) {
-      namespacesGroups.push({ key: namespace, name: namespace, isGroup: true, type: "namespace"});
+      namespacesGroups.push({ key: namespace, name: namespace, isGroup: true, type: "namespace", visible: false });
     }
-    return { key, name, data: { namespace }, group: namespace };
+    if (!fileNameGroups.some((group) => { return group.key === srcInfo.fileName })) {
+      fileNameGroups.push({ key: srcInfo.fileName, name: srcInfo.fileName, isGroup: true, type: "fileName", visible: false });
+    }
+    return { key, name, data: { namespace, fileName: srcInfo.fileName } };
   });
 
   nodeDataArray.splice(0, 0, ...namespacesGroups);
+  nodeDataArray.splice(0, 0, ...fileNameGroups);
 
   const linkDataArray = edges.map(({ from, to, dependencies }) => {
     let weight = Object.values(dependencies).reduce((counter, curr) => counter + curr, 0);

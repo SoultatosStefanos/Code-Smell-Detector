@@ -9,7 +9,7 @@
                     "id": "allEdges",
                     "description": "Show all Edges",
                     "type": "checkbox",
-                    "value": false,
+                    "value": true,
                     "conditions": {},
                     "onChange": {
                         "event": "allEdges"
@@ -49,10 +49,24 @@
                     "id": "namespace",
                     "description": "By Namespace",
                     "type": "checkbox",
-                    "value": true,
-                    "conditions": {}, 
+                    "value": false,
+                    "conditions": {
+                        "disabled": "this.groups.grouping.data.fileName.value === true"
+                    }, 
                     "onChange": {
                         "event": "namespace"
+                    }
+                }, 
+                "fileName" : {
+                    "id": "fileName",
+                    "description": "By File",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "disabled": "this.groups.grouping.data.namespace.value === true"
+                    }, 
+                    "onChange": {
+                        "event": "fileName"
                     }
                 }
             }
