@@ -15,6 +15,9 @@ import {obs} from "../Observer/observer.js"
             }, 
             onChange(event, data) {
                 obs.fire(event, data);
+            }, 
+            onChangeSelect(event, data) {
+                obs.fire(event+data);
             }
         }, 
     });

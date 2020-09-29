@@ -18,18 +18,32 @@
         <h2>{{ title }}</h2>
         <div class="group" v-for="group in groups">
             <div class="groupName" :id="group.id">{{group.description}}</div>
-            <div v-for="data in group.data" class="groupData">
+            <div class="groupContent">
+                <div v-for="data in group.data" class="groupData">
 
-                <div v-if="data.type == 'slider'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
-                    {{data.description}}:
-                    <input type="range" v-model="data.value" :min="data.min" :max="data.max" :id="data.id" 
-                        class="slider" :disabled="evalCondition(data.conditions.disabled)" @change="onChange(data.onChange.event, data.value)">
-                    {{data.value}}
-                </div>
+                    <div v-if="data.type == 'slider'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                        {{data.description}}:
+                        <input type="range" v-model="data.value" :min="data.min" :max="data.max" :id="data.id"
+                            class="slider" :disabled="evalCondition(data.conditions.disabled)"
+                            @change="onChange(data.onChange.event, data.value)">
+                        {{data.value}}
+                    </div>
 
-                <div v-else-if="data.type == 'checkbox'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
-                    {{data.description}}: <input type="checkbox" v-model="data.value" :id="data.id"
-                        :checked="data.value" :disabled="evalCondition(data.conditions.disabled)" @change="onChange(data.onChange.event, data.value)">
+                    <div v-else-if="data.type == 'checkbox'"
+                        :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                        {{data.description}}: <input type="checkbox" v-model="data.value" :id="data.id"
+                            :checked="data.value" :disabled="evalCondition(data.conditions.disabled)"
+                            @change="onChange(data.onChange.event, data.value)">
+                    </div>
+
+                    <div v-else-if="data.type == 'select'"
+                        :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                        {{data.description}}:
+                        <select id="data.id" v-model="data.value"
+                            @change="onChangeSelect(data.onChange.event, data.value)">
+                            <option v-for="option in data.options" :value="option.value">{{option.description}}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
         </div>

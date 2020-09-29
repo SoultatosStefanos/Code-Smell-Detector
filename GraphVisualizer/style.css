@@ -83,9 +83,14 @@ h2 {
     color: rgb(63, 62, 62);
     background-color: rgb(220 220 220);
     padding: .5vh; 
-    margin: .2vh;
+    margin: .1vh;
     border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
     border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+}
+
+.group .groupContent {
+  padding-top: 1.5vh;
+  padding-bottom: 1.5vh;
 }
 
 .group .groupData{

@@ -41,32 +41,35 @@
                 }
             }
         },
-        "grouping" : {
+        "grouping": {
             "id": "grouping",
             "description": "Grouping",
-            "data" : {
-                "namespace" : {
-                    "id": "namespace",
-                    "description": "By Namespace",
-                    "type": "checkbox",
-                    "value": false,
-                    "conditions": {
-                        "disabled": "this.groups.grouping.data.fileName.value === true"
-                    }, 
+            "data": {
+                "groupingBy": {
+                    "id": "groupingBy",
+                    "description": "Grouping By",
+                    "type": "select",
+                    "value": "none",
+                    "options": {
+                        "none": {
+                            "id": "none",
+                            "description": "---",
+                            "value": "none"
+                        },
+                        "namespace": {
+                            "id": "namespace",
+                            "description": "Namespace",
+                            "value": "namespace"
+                        },
+                        "fileName": {
+                            "id": "fileName",
+                            "description": "File",
+                            "value": "fileName"
+                        }
+                    },
+                    "conditions": {},
                     "onChange": {
-                        "event": "namespace"
-                    }
-                }, 
-                "fileName" : {
-                    "id": "fileName",
-                    "description": "By File",
-                    "type": "checkbox",
-                    "value": false,
-                    "conditions": {
-                        "disabled": "this.groups.grouping.data.namespace.value === true"
-                    }, 
-                    "onChange": {
-                        "event": "fileName"
+                        "event": "groupingBy"
                     }
                 }
             }

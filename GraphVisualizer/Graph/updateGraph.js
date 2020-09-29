@@ -35,41 +35,40 @@ function showWeights(value) {
 };
 
 
-function namespaceGrouping(value) {
+function groupingByNamespace() {
   diagram.model.commit(function (m) {
     m.nodeDataArray.forEach((nodeData) => {
-      if (value) {
-        if (!nodeData.isGroup) 
-          m.set(nodeData, "group", nodeData.data.namespace);
-        else if(nodeData.type === "namespace")
-          m.set(nodeData, "visible", true)
-      }
-      else {
-        if (!nodeData.isGroup)
-          m.set(nodeData, "group", undefined);
-        else if(nodeData.type === "namespace")
-          m.set(nodeData, "visible", false)
-      }
+      if (!nodeData.isGroup)
+        m.set(nodeData, "group", nodeData.data.namespace);
+      else if (nodeData.type === "namespace")
+        m.set(nodeData, "visible", true);
+        else
+        m.set(nodeData, "visible", false)
     });
   });
 }
 
 
-function fileNameGrouping(value) {
+function groupingByFileName() {
   diagram.model.commit(function (m) {
     m.nodeDataArray.forEach((nodeData) => {
-      if (value) {
-        if (!nodeData.isGroup) 
-          m.set(nodeData, "group", nodeData.data.fileName);
-        else if(nodeData.type === "fileName")
-          m.set(nodeData, "visible", true)
-      }
-      else {
-        if (!nodeData.isGroup)
-          m.set(nodeData, "group", undefined);
-        else if(nodeData.type === "fileName")
-          m.set(nodeData, "visible", false)
-      }
+      if (!nodeData.isGroup)
+        m.set(nodeData, "group", nodeData.data.fileName);
+      else if (nodeData.type === "fileName")
+        m.set(nodeData, "visible", true)
+        else
+        m.set(nodeData, "visible", false)
+    });
+  });
+}
+
+function groupingByNone() {
+  diagram.model.commit(function (m) {
+    m.nodeDataArray.forEach((nodeData) => {
+      if (!nodeData.isGroup)
+        m.set(nodeData, "group", undefined);
+      else
+        m.set(nodeData, "visible", false)
     });
   });
 }
@@ -89,7 +88,8 @@ obs.install("allEdges", showAllEdges);
 obs.install("weightFilter", weightFilter);
 obs.install("showWeights", showWeights);
 
-obs.install("namespace", namespaceGrouping);
-obs.install("fileName", fileNameGrouping);
+obs.install("groupingBynamespace", groupingByNamespace);
+obs.install("groupingByfileName", groupingByFileName);
+obs.install("groupingBynone", groupingByNone);
 
 obs.install("cycles", cyclesTracer); 
