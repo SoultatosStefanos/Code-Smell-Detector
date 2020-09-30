@@ -1,5 +1,3 @@
-
-
 const $ = go.GraphObject.make;
 export const diagram =
   $(go.Diagram, "diagramDiv",
@@ -14,6 +12,32 @@ export const diagram =
     }
   );
 
+function makeButton(text, action) {
+  return $("ContextMenuButton",
+    $(go.TextBlock, "default",
+      {
+        margin: 3,
+        stroke: "rgb(63, 62, 62)",
+        font: "12px sans-serif"
+      }, text),
+    { click: action });
+}
+
+const nodeContextMenu =
+  $("ContextMenu",
+    makeButton("Properties",
+      function (e, obj) {  // OBJ is this Button
+        var contextmenu = obj.part;  // the Button is in the context menu Adornment
+        var part = contextmenu.adornedPart;  // the adornedPart is the Part that the context menu adorns
+        // now can do something with PART, or with its data, or with the Adornment (the context menu)
+        alert(nodeProperties(part.data));
+
+      }))
+
+
+
+
+// Node
 diagram.nodeTemplate =
   $(go.Node, "Auto",
     { locationSpot: go.Spot.Center, background: "lightblue", visible: true },
@@ -34,15 +58,33 @@ diagram.nodeTemplate =
         font: "bold 16px sans-serif"
       },
       new go.Binding("text", "name")),
-
     {
       selectionChanged: function (part) {
         var shape = part.elt(0);
         shape.fill = part.isSelected ? "lightyellow" : "lightblue";
-      }
+      },
+      toolTip:
+        $("ToolTip",
+          $(go.TextBlock, {
+            margin: 3,
+            stroke: "gray",
+            font: "12px sans-serif"
+          },
+            new go.Binding("text", "", nodeProperties))
+        ),
+      contextMenu: nodeContextMenu
     }
   );
 
+function nodeProperties(d) {
+  return "Methods: " + (d.data.methods ? Object.keys(d.data.methods).length : "-") +
+    "\nFields: " + (d.data.fields ? Object.keys(d.data.fields).length : "-") +
+    "\nBases: " + (d.data.bases ? Object.keys(d.data.bases).length : "-") +
+    "\nFriends: " + (d.data.friends ? Object.keys(d.data.friends).length : "-");
+}
+
+
+// Group
 diagram.groupTemplate = $(go.Group, "Vertical",
   $(go.Panel, "Auto",
     $(go.Shape, "RoundedRectangle",  // surrounds the Placeholder
@@ -68,6 +110,8 @@ diagram.groupTemplate = $(go.Group, "Vertical",
   new go.Binding("visible", "visible")
 );
 
+
+// Link
 diagram.linkTemplate =
   $(go.Link,
     { toShortLength: 6, toEndSegmentLength: 20, curve: go.Link.Bezier },
@@ -104,35 +148,3 @@ diagram.linkTemplate =
     )
   );
 
-
-(async () => {
-  // Create graph from json
-  const data = await fetch("Graph/graph.json").then(response => response.json());
-  const nodes = data.nodes;
-  const edges = data.edges;
-
-  const namespacesGroups = [];
-  const fileNameGroups = [];
-  const nodeDataArray = Object.keys(nodes).map(id => {
-    const { id: key, name, namespace, srcInfo } = nodes[id];
-
-    if (!namespacesGroups.some((group) => { return group.key === namespace })) {
-      namespacesGroups.push({ key: namespace, name: namespace, isGroup: true, type: "namespace", fill: "rgba(213, 213, 144, 0.33)", visible: false });
-    }
-    if (!fileNameGroups.some((group) => { return group.key === srcInfo.fileName })) {
-      fileNameGroups.push({ key: srcInfo.fileName, name: srcInfo.fileName, isGroup: true, type: "fileName", visible: false });
-    }
-
-    return { key, name, data: { namespace, fileName: srcInfo.fileName } };
-  });
-
-  nodeDataArray.splice(0, 0, ...namespacesGroups);
-  nodeDataArray.splice(0, 0, ...fileNameGroups);
-
-  const linkDataArray = edges.map(({ from, to, dependencies }) => {
-    let weight = Object.values(dependencies).reduce((counter, curr) => counter + curr, 0);
-    return { from, to, weight, data: { dependencies, weight } };
-  });
-
-  diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
-})();

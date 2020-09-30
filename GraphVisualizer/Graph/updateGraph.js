@@ -1,4 +1,4 @@
-import { diagram } from "./graphVisualization.js"
+import { diagram } from "./graphAppearance.js"
 import { obs } from "../Observer/observer.js"
 
 function showAllEdges(value) {
@@ -44,7 +44,7 @@ function groupingByNamespace() {
         m.set(nodeData, "visible", true);
         else
         m.set(nodeData, "visible", false)
-    });
+    }, "groupingByNamespace");
   });
 }
 
@@ -58,7 +58,7 @@ function groupingByFileName() {
         m.set(nodeData, "visible", true)
         else
         m.set(nodeData, "visible", false)
-    });
+    }, "groupingByFileName");
   });
 }
 
@@ -69,7 +69,7 @@ function groupingByNone() {
         m.set(nodeData, "group", undefined);
       else
         m.set(nodeData, "visible", false)
-    });
+    }, "groupingByNone");
   });
 }
 
