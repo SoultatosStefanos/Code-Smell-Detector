@@ -39,6 +39,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
+	if (d->isAnonymousStructOrUnion()) {
+		return;
+	}
+
 	// gia ta declerations
 	if (!(d->isCompleteDefinition())) {
 		if (!d->hasDefinition()){									// for templateDefinition Declarations only
@@ -251,6 +255,9 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
+		if (parent->isAnonymousStructOrUnion()) {
+			return;
+		}
 
 		if (parent->isClass() || parent->isStruct()) {
 			std::string parentName = GetFullStructureName(parent);
@@ -305,6 +312,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
+		}
+		if (parent->isAnonymousStructOrUnion()) {
+			return; 
 		}
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);

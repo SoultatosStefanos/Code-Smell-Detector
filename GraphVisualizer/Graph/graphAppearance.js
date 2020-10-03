@@ -6,7 +6,9 @@ export const diagram =
       initialAutoScale: go.Diagram.Uniform,  // an initial automatic zoom-to-fit
       contentAlignment: go.Spot.Center,
       layout:
-        $(go.ForceDirectedLayout,
+         $(go.ForceDirectedLayout,
+        // $(go.GridLayout)
+        // $(go.CircularLayout)
           { defaultSpringLength: 30, defaultElectricalCharge: 100 }),
       "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
     }

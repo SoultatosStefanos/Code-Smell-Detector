@@ -2,7 +2,7 @@ import { diagram } from "./graphAppearance.js"
 
 (async () => {
   // Create graph from json
-  const data = await fetch("Graph/graph.json").then(response => response.json());
+  const data = await fetch("./Graph/graph.json").then(response => response.json());
   const nodes = data.nodes;
   const edges = data.edges;
 
