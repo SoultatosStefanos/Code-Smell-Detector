@@ -10,7 +10,7 @@ export const diagram =
         // $(go.GridLayout)
         // $(go.CircularLayout)
           { defaultSpringLength: 30, defaultElectricalCharge: 100 }),
-      "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
+      // "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
     }
   );
 
@@ -35,8 +35,6 @@ const nodeContextMenu =
         alert(nodeProperties(part.data));
 
       }))
-
-
 
 
 // Node

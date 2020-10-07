@@ -10,7 +10,10 @@ Subject.prototype = {
         delete this.observers[event];
     },
     fire: function(event, ...data) {
-        this.observers[event](...data);
+        if(this.observers[event] !== undefined)
+            this.observers[event](...data);
+        else 
+        console.log('None event handler is defined for "' + event  + '" event.');
     }
 }
 

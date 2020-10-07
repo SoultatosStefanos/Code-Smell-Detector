@@ -7,6 +7,7 @@
     <script src="./node_modules/gojs/release/go-debug.js"></script>
     <link rel="stylesheet" href="./style.css">
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript" src="./jLouvain/src/jLouvain.js"></script>
 
     <link rel="icon" href="favicon.png" type="image" sizes="16x16">
     <title>Architecture Mining</title>
@@ -20,6 +21,9 @@
         <div class="group" v-for="group in groups">
             <div class="groupName" :id="group.id">{{group.description}}</div>
             <div class="groupContent">
+                <div v-if="group.type == 'form'"> 
+
+                </div>
                 <div v-for="data in group.data" class="groupData">
 
                     <div v-if="data.type == 'slider'" :class="{disabledElem: evalCondition(data.conditions.disabled)}">
@@ -38,12 +42,24 @@
                     </div>
 
                     <div v-else-if="data.type == 'select'"
-                        :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                        :class="{disabledElem: evalCondition(data.conditions.disabled)}" style="display: inline-block;">
                         {{data.description}}:
                         <select id="data.id" v-model="data.value"
                             @change="onChangeSelect(data.onChange.event, data.value)">
                             <option v-for="option in data.options" :value="option.value">{{option.description}}</option>
                         </select>
+                    </div>
+
+                    <div v-else-if="data.type == 'number'"
+                        :class="{disabledElem: evalCondition(data.conditions.disabled)}" style="display: inline-block;">
+                        {{data.description}}:
+                        <input type="number" v-model="data.value" :id="data.id" :min="data.min" :max="data.max"
+                            :step="data.step" style="width: 3vw" :disabled="evalCondition(data.conditions.disabled)">
+                    </div>
+
+                    <div v-else-if="data.type == 'applyButton'"
+                        :class="{disabledElem: evalCondition(data.conditions.disabled)}">
+                        <button @click="onClick(data.onClick.event, group.data, data.onGroupData)">{{data.description}}</button>
                     </div>
                 </div>
             </div>

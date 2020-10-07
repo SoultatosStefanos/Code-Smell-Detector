@@ -1,9 +1,9 @@
 {
     "title": "Configurations",
     "groups": {
-        "edges": {
-            "id": "edges",
-            "description": "Edges",
+        "filtering": {
+            "id": "filtering",
+            "description": "Filtering",
             "data": {
                 "allEdges": {
                     "id": "allEdges",
@@ -23,7 +23,7 @@
                     "min": 1,
                     "max": 100,
                     "conditions": {
-                        "disabled": "this.groups.edges.data.allEdges.value === true"
+                        "disabled": "this.groups.filtering.data.allEdges.value === true"
                     },
                     "onChange": {
                         "event": "weightFilter"
@@ -65,6 +65,11 @@
                             "id": "fileName",
                             "description": "File",
                             "value": "fileName"
+                        },
+                        "louvain": {
+                            "id": "louvain",
+                            "description": "Louvain",
+                            "value": "louvain"
                         }
                     },
                     "conditions": {},
@@ -84,11 +89,69 @@
                     "type": "checkbox",
                     "value": false,
                     "conditions": {
-                        "disabled": "this.groups.edges.data.allEdges.value === false"
+                        "disabled": "this.groups.filtering.data.allEdges.value === false"
                     },
                     "onChange": {
                         "event": "cycles"
                     }
+                }
+            }
+        },
+        "dependenciesConfig": {
+            "id": "dependenciesConfig",
+            "description": "Dependencies' Configurations",
+            "data": {
+                "Inherite": {
+                    "id": "Inherite",
+                    "description": "Inheritence",
+                    "type": "select",
+                    "value": "default",
+                    "options": {
+                        "none": {
+                            "id": "default",
+                            "description": "Default",
+                            "value": "default"
+                        },
+                        "weighted": {
+                            "id": "weighted",
+                            "description": "Apply Weight",
+                            "value": "weighted"
+                        },
+                        "singleWeight": {
+                            "id": "singleWeight",
+                            "description": "Computed as Single Dependency",
+                            "value": "singleWeight"
+                        }
+                    },
+                    "conditions": {},
+                    "onChange": {}
+                },
+                "InheriteWeight": {
+                    "id": "InheriteWeight",
+                    "description": "Weight",
+                    "type": "number",
+                    "value": 1,
+                    "min": 0,
+                    "max": 2,
+                    "step": 0.05,
+                    "conditions": {
+                        "disabled": "this.groups.dependenciesConfig.data.Inherite.value !== \"weighted\""
+                    },
+                    "onChange": {}
+                },
+                "apply": {
+                    "id": "apply",
+                    "description": "Apply",
+                    "type": "applyButton",
+                    "conditions": {}, 
+                    "onClick": {
+                        "event" : "dependenciesConfig"
+                    },
+                    "onGroupData": [
+                        "Inherite", 
+                        "InheriteWeight"
+                    ]
+                   
                 }
             }
         }
