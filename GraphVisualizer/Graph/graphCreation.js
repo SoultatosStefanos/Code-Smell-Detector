@@ -11,7 +11,6 @@ import { totalWeight, louvainCommunities } from "./utilities.js"
   const groupsHolder = [];
   groupsHolder.namespace = [];
   groupsHolder.fileName = [];
-  groupsHolder.louvain = [];
   groupsHolder.createGroup = function (type, key, fill = 'rgba(128,128,128,0.33)', visible = false) {
     if (!this[type].some((group) => { return group.key === key })) {
       this[type].push({ key, name: key, isGroup: true, type, fill, visible });

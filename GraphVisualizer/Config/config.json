@@ -22,8 +22,9 @@
                     "value": 1,
                     "min": 1,
                     "max": 100,
+                    "step": 0.5,
                     "conditions": {
-                        "disabled": "this.groups.filtering.data.allEdges.value === true"
+                        "disabled": "$currGroup.allEdges.value === true"
                     },
                     "onChange": {
                         "event": "weightFilter"
@@ -79,79 +80,569 @@
                 }
             }
         },
-        "general": {
-            "id": "general",
-            "description": "General",
-            "data": {
-                "cycles": {
-                    "id": "cycles",
-                    "description": "Show Cycles",
-                    "type": "checkbox",
-                    "value": false,
-                    "conditions": {
-                        "disabled": "this.groups.filtering.data.allEdges.value === false"
-                    },
-                    "onChange": {
-                        "event": "cycles"
-                    }
-                }
-            }
-        },
         "dependenciesConfig": {
             "id": "dependenciesConfig",
             "description": "Dependencies' Configurations",
+            "type": "group",
             "data": {
+                "ClassField": {
+                    "id": "ClassField",
+                    "description": "Class Fields",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "ClassFieldCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "ClassFieldCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "ClassFieldWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "ClassTemplateParent": {
+                    "id": "ClassTemplateParent",
+                    "description": "Class Template Parent",
+                    "type": "subgroup",
+                    "data": {
+                        "custom": {
+                            "id": "ClassTemplateParentCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "ClassTemplateParentWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "ClassTemplateArg": {
+                    "id": "ClassTemplateArg",
+                    "description": "Class Template Arguments",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "ClassTemplateArgCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "ClassTemplateArgCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "ClassTemplateArgWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
                 "Inherite": {
                     "id": "Inherite",
                     "description": "Inheritence",
-                    "type": "select",
-                    "value": "default",
-                    "options": {
-                        "none": {
-                            "id": "default",
-                            "description": "Default",
-                            "value": "default"
+                    "type": "subgroup",
+                    "data": {
+                        "custom": {
+                            "id": "InheriteCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
                         },
-                        "weighted": {
-                            "id": "weighted",
-                            "description": "Apply Weight",
-                            "value": "weighted"
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
                         },
-                        "singleWeight": {
-                            "id": "singleWeight",
-                            "description": "Computed as Single Dependency",
-                            "value": "singleWeight"
+                        "weight": {
+                            "id": "InheriteWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
                         }
                     },
-                    "conditions": {},
-                    "onChange": {}
+                    "conditions": {}
                 },
-                "InheriteWeight": {
-                    "id": "InheriteWeight",
-                    "description": "Weight",
-                    "type": "number",
-                    "value": 1,
-                    "min": 0,
-                    "max": 2,
-                    "step": 0.05,
-                    "conditions": {
-                        "disabled": "this.groups.dependenciesConfig.data.Inherite.value !== \"weighted\""
+                "MethodArg": {
+                    "id": "MethodArg",
+                    "description": "Methods' Arguments",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "MethodArgCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "MethodArgCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "MethodArgWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
                     },
-                    "onChange": {}
+                    "conditions": {}
                 },
+                "MethodDefinition": {
+                    "id": "MethodDefinition",
+                    "description": "Methods' Fields",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "MethodDefinitionCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "MethodDefinitionCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "MethodDefinitionWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "MethodReturn": {
+                    "id": "MethodReturn",
+                    "description": "'Methods' Return Type",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "MethodReturnCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "MethodReturnCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "MethodReturnWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "MethodTemplateArg": {
+                    "id": "MethodTemplateArg",
+                    "description": "'Methods' Template Argument",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "MethodTemplateArgCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "MethodTemplateArgCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "MethodTemplateArgWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "MemberExpr": {
+                    "id": "MemberExpr",
+                    "description": "'Methods' Member Expresions",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "MemberExprCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "MemberExprCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "MemberExprWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "$currGroup.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+
+
+                "Friend": {
+                    "id": "Friend",
+                    "description": "Friends",
+                    "type": "subgroup",
+                    "data": {
+                        "countOnce": {
+                            "id": "FriendCountOnce",
+                            "description": "Count Once",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "custom": {
+                            "id": "FriendCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "this.groups.dependenciesConfig.data.Friend.data.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "FriendWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "this.groups.dependenciesConfig.data.Friend.data.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+                "NestedClass": {
+                    "id": "NestedClass",
+                    "description": "Nested Class Parent",
+                    "type": "subgroup",
+                    "data": {
+                        "custom": {
+                            "id": "NestedClassCustom",
+                            "description": "Custom",
+                            "type": "checkbox",
+                            "value": false,
+                            "conditions": {},
+                            "onChange": {}
+                        },
+                        "defaultWeight": {
+                            "id": "defaultWeight",
+                            "description": "Uses default weight 1",
+                            "type": "span",
+                            "conditions": {
+                                "displayed": "this.groups.dependenciesConfig.data.NestedClass.data.custom.value === false"
+                            }
+                        },
+                        "weight": {
+                            "id": "NestedClassWeight",
+                            "description": "Weight",
+                            "type": "number",
+                            "value": 1,
+                            "min": 0,
+                            "max": 100,
+                            "step": 0.05,
+                            "conditions": {
+                                "displayed": "this.groups.dependenciesConfig.data.NestedClass.data.custom.value === true"
+                            },
+                            "onChange": {}
+                        }
+                    },
+                    "conditions": {}
+                },
+
                 "apply": {
                     "id": "apply",
                     "description": "Apply",
                     "type": "applyButton",
-                    "conditions": {}, 
+                    "conditions": {},
                     "onClick": {
-                        "event" : "dependenciesConfig"
+                        "event": "dependenciesConfig"
                     },
                     "onGroupData": [
-                        "Inherite", 
-                        "InheriteWeight"
+                        {
+                            "ClassField": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "ClassTemplateParent": [
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "ClassTemplateArg": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "Inherite": [
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "NestedClass": [
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "Friend": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "MethodArg": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "MethodDefinition": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "MethodReturn": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "MethodTemplateArg": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        },
+                        {
+                            "MemberExpr": [
+                                "countOnce",
+                                "custom",
+                                "weight"
+                            ]
+                        }
                     ]
-                   
                 }
             }
         }

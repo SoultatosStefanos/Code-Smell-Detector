@@ -1,0 +1,87 @@
+.group {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    color: rgb(63, 62, 62);
+}
+
+.group .groupName {
+    text-align: center;
+    background-color: rgb(220 220 220);
+    padding: .5vh; 
+    margin: .1vh;
+    border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
+    border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+}
+
+.group .groupData {
+  /* padding-top: 1.5vh; 
+  padding-bottom: 1.5vh; */
+}
+
+.group .groupElem {
+    padding: 1vh; 
+}
+
+/* Subgroup */
+.subgroup {
+  width: 100%;
+  margin-top: -1vh;
+  margin-bottom: -1vh;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.subgroup .groupName {
+  text-align: center;
+  border-radius: 2px;
+  background-color: rgb(235, 235, 235); 
+  padding: .5vh; 
+  border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
+  border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+}
+
+.subgroup .groupData {
+  padding-top: 0vh;
+  padding-bottom: 0vh;
+}
+
+.subgroup .groupElem {
+    padding: 1vh; 
+}
+
+/* Cpllapsible */
+.collapsible {
+    cursor: pointer;
+    padding-top: 1.5vh; 
+    padding-bottom: 1.5vh;
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 15px;
+  }
+  
+  .active, .collapsible:hover {
+    background-color: rgb(193, 193, 193);
+  }
+  
+  .collapsible:after {
+    content: '\f0d7';
+    font-family: "Font Awesome 5 Free";
+    font-style: normal;
+    text-decoration: inherit;
+    color: rgb(63, 62, 62);
+    font-weight: bold;
+    float: right;
+  }
+  
+  .active:after {
+    content: '\f0d8';
+  }
+  
+  .content {
+    padding: 0 18px;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+  }

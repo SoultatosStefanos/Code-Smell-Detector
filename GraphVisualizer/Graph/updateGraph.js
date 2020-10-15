@@ -13,9 +13,10 @@ function showAllEdges(value) {
 };
 
 function weightFilter(value) {
+  console.log("weightFilter"); 
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
-      if (linkData.data.weight < value) {
+      if (linkData.weight < value) {
         m.set(linkData, "visibleLink", false);
       }
       else {
