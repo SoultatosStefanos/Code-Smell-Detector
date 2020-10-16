@@ -1,7 +1,13 @@
-export function totalWeight(dependencies, data) {
+export function totalWeight(dependencies, inData) {
     let dependenciesKeys = Object.keys(dependencies);
     let total = 0;
     dependenciesKeys.forEach((depKind) => {
+        let data; 
+        if(inData !== undefined && depKind.includes("Method"))
+            data = inData["Methods"];
+        else 
+            data = inData;
+            
         if (data === undefined || data[depKind] === undefined)
             total += dependencies[depKind];
         else if (data[depKind].custom === false) {

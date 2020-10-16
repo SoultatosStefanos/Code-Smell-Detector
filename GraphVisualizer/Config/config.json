@@ -249,233 +249,6 @@
                     },
                     "conditions": {}
                 },
-                "MethodArg": {
-                    "id": "MethodArg",
-                    "description": "Methods' Arguments",
-                    "type": "subgroup",
-                    "data": {
-                        "countOnce": {
-                            "id": "MethodArgCountOnce",
-                            "description": "Count Once",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "custom": {
-                            "id": "MethodArgCustom",
-                            "description": "Custom",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "defaultWeight": {
-                            "id": "defaultWeight",
-                            "description": "Uses default weight 1",
-                            "type": "span",
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === false"
-                            }
-                        },
-                        "weight": {
-                            "id": "MethodArgWeight",
-                            "description": "Weight",
-                            "type": "number",
-                            "value": 1,
-                            "min": 0,
-                            "max": 100,
-                            "step": 0.05,
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === true"
-                            },
-                            "onChange": {}
-                        }
-                    },
-                    "conditions": {}
-                },
-                "MethodDefinition": {
-                    "id": "MethodDefinition",
-                    "description": "Methods' Fields",
-                    "type": "subgroup",
-                    "data": {
-                        "countOnce": {
-                            "id": "MethodDefinitionCountOnce",
-                            "description": "Count Once",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "custom": {
-                            "id": "MethodDefinitionCustom",
-                            "description": "Custom",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "defaultWeight": {
-                            "id": "defaultWeight",
-                            "description": "Uses default weight 1",
-                            "type": "span",
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === false"
-                            }
-                        },
-                        "weight": {
-                            "id": "MethodDefinitionWeight",
-                            "description": "Weight",
-                            "type": "number",
-                            "value": 1,
-                            "min": 0,
-                            "max": 100,
-                            "step": 0.05,
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === true"
-                            },
-                            "onChange": {}
-                        }
-                    },
-                    "conditions": {}
-                },
-                "MethodReturn": {
-                    "id": "MethodReturn",
-                    "description": "'Methods' Return Type",
-                    "type": "subgroup",
-                    "data": {
-                        "countOnce": {
-                            "id": "MethodReturnCountOnce",
-                            "description": "Count Once",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "custom": {
-                            "id": "MethodReturnCustom",
-                            "description": "Custom",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "defaultWeight": {
-                            "id": "defaultWeight",
-                            "description": "Uses default weight 1",
-                            "type": "span",
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === false"
-                            }
-                        },
-                        "weight": {
-                            "id": "MethodReturnWeight",
-                            "description": "Weight",
-                            "type": "number",
-                            "value": 1,
-                            "min": 0,
-                            "max": 100,
-                            "step": 0.05,
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === true"
-                            },
-                            "onChange": {}
-                        }
-                    },
-                    "conditions": {}
-                },
-                "MethodTemplateArg": {
-                    "id": "MethodTemplateArg",
-                    "description": "'Methods' Template Argument",
-                    "type": "subgroup",
-                    "data": {
-                        "countOnce": {
-                            "id": "MethodTemplateArgCountOnce",
-                            "description": "Count Once",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "custom": {
-                            "id": "MethodTemplateArgCustom",
-                            "description": "Custom",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "defaultWeight": {
-                            "id": "defaultWeight",
-                            "description": "Uses default weight 1",
-                            "type": "span",
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === false"
-                            }
-                        },
-                        "weight": {
-                            "id": "MethodTemplateArgWeight",
-                            "description": "Weight",
-                            "type": "number",
-                            "value": 1,
-                            "min": 0,
-                            "max": 100,
-                            "step": 0.05,
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === true"
-                            },
-                            "onChange": {}
-                        }
-                    },
-                    "conditions": {}
-                },
-                "MemberExpr": {
-                    "id": "MemberExpr",
-                    "description": "'Methods' Member Expresions",
-                    "type": "subgroup",
-                    "data": {
-                        "countOnce": {
-                            "id": "MemberExprCountOnce",
-                            "description": "Count Once",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "custom": {
-                            "id": "MemberExprCustom",
-                            "description": "Custom",
-                            "type": "checkbox",
-                            "value": false,
-                            "conditions": {},
-                            "onChange": {}
-                        },
-                        "defaultWeight": {
-                            "id": "defaultWeight",
-                            "description": "Uses default weight 1",
-                            "type": "span",
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === false"
-                            }
-                        },
-                        "weight": {
-                            "id": "MemberExprWeight",
-                            "description": "Weight",
-                            "type": "number",
-                            "value": 1,
-                            "min": 0,
-                            "max": 100,
-                            "step": 0.05,
-                            "conditions": {
-                                "displayed": "$currGroup.custom.value === true"
-                            },
-                            "onChange": {}
-                        }
-                    },
-                    "conditions": {}
-                },
-
-
                 "Friend": {
                     "id": "Friend",
                     "description": "Friends",
@@ -558,7 +331,239 @@
                     },
                     "conditions": {}
                 },
-
+                "Methods": {
+                    "id": "method",
+                    "description": "Methods",
+                    "type": "subgroup",
+                    "data": {
+                        "MethodArg": {
+                            "id": "MethodArg",
+                            "description": "Arguments",
+                            "type": "subgroup",
+                            "data": {
+                                "countOnce": {
+                                    "id": "MethodArgCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "custom": {
+                                    "id": "MethodArgCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MethodArgWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
+                                    },
+                                    "onChange": {}
+                                }
+                            },
+                            "conditions": {}
+                        },
+                        "MethodDefinition": {
+                            "id": "MethodDefinition",
+                            "description": "Fields",
+                            "type": "subgroup",
+                            "data": {
+                                "countOnce": {
+                                    "id": "MethodDefinitionCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "custom": {
+                                    "id": "MethodDefinitionCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MethodDefinitionWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
+                                    },
+                                    "onChange": {}
+                                }
+                            },
+                            "conditions": {}
+                        },
+                        "MethodReturn": {
+                            "id": "MethodReturn",
+                            "description": "Return Type",
+                            "type": "subgroup",
+                            "data": {
+                                "countOnce": {
+                                    "id": "MethodReturnCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "custom": {
+                                    "id": "MethodReturnCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MethodReturnWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
+                                    },
+                                    "onChange": {}
+                                }
+                            },
+                            "conditions": {}
+                        },
+                        "MethodTemplateArg": {
+                            "id": "MethodTemplateArg",
+                            "description": "Template Argument",
+                            "type": "subgroup",
+                            "data": {
+                                "countOnce": {
+                                    "id": "MethodTemplateArgCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "custom": {
+                                    "id": "MethodTemplateArgCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MethodTemplateArgWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
+                                    },
+                                    "onChange": {}
+                                }
+                            },
+                            "conditions": {}
+                        },
+                        "MemberExpr": {
+                            "id": "MemberExpr",
+                            "description": "Member Expresions",
+                            "type": "subgroup",
+                            "data": {
+                                "countOnce": {
+                                    "id": "MemberExprCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "custom": {
+                                    "id": "MemberExprCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
+                                },
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MemberExprWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
+                                    },
+                                    "onChange": {}
+                                }
+                            },
+                            "conditions": {}
+                        }
+                     },
+                    "conditions": {}
+                },
                 "apply": {
                     "id": "apply",
                     "description": "Apply",
@@ -608,38 +613,42 @@
                             ]
                         },
                         {
-                            "MethodArg": [
-                                "countOnce",
-                                "custom",
-                                "weight"
-                            ]
-                        },
-                        {
-                            "MethodDefinition": [
-                                "countOnce",
-                                "custom",
-                                "weight"
-                            ]
-                        },
-                        {
-                            "MethodReturn": [
-                                "countOnce",
-                                "custom",
-                                "weight"
-                            ]
-                        },
-                        {
-                            "MethodTemplateArg": [
-                                "countOnce",
-                                "custom",
-                                "weight"
-                            ]
-                        },
-                        {
-                            "MemberExpr": [
-                                "countOnce",
-                                "custom",
-                                "weight"
+                            "Methods": [
+                                {
+                                    "MethodArg": [
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
+                                    ]
+                                },
+                                {
+                                    "MethodDefinition": [
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
+                                    ]
+                                },
+                                {
+                                    "MethodReturn": [
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
+                                    ]
+                                },
+                                {
+                                    "MethodTemplateArg": [
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
+                                    ]
+                                },
+                                {
+                                    "MemberExpr": [
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
+                                    ]
+                                }
                             ]
                         }
                     ]

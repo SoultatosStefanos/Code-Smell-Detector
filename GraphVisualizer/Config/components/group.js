@@ -80,6 +80,7 @@ export default Vue.component('group', {
             applyOnGroupData.forEach(element => {
                 dataCreation(element, data, groupData);
             });
+            console.log(data);
             this.confighandler.fire(event, data)
         },
         Collapsible(e) {
@@ -89,7 +90,7 @@ export default Vue.component('group', {
             if (content.style.maxHeight) {
                 content.style.maxHeight = null;
             } else {
-                content.style.maxHeight = 3*content.scrollHeight + "px";
+                content.style.maxHeight = 4*content.scrollHeight + "px";
             }
 
         }

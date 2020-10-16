@@ -9,7 +9,6 @@
     text-align: center;
     background-color: rgb(220 220 220);
     padding: .5vh; 
-    margin: .1vh;
     border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
     border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
 }
@@ -66,21 +65,20 @@
   }
   
   .collapsible:after {
-    content: '\f0d7';
+    content: '\f107';
     font-family: "Font Awesome 5 Free";
     font-style: normal;
     text-decoration: inherit;
-    color: rgb(63, 62, 62);
+    color: rgba(63, 62, 62, 0.5);
     font-weight: bold;
     float: right;
   }
   
   .active:after {
-    content: '\f0d8';
+    content: '\f106';
   }
   
   .content {
-    padding: 0 18px;
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease-out;
