@@ -3,7 +3,7 @@
     "groups": {
         "filtering": {
             "id": "filtering",
-            "description": "Filtering",
+            "description": "Filtering Edges",
             "data": {
                 "allEdges": {
                     "id": "allEdges",
@@ -44,7 +44,7 @@
         },
         "grouping": {
             "id": "grouping",
-            "description": "Grouping",
+            "description": "Grouping Nodes",
             "data": {
                 "groupingBy": {
                     "id": "groupingBy",
@@ -82,7 +82,7 @@
         },
         "dependenciesConfig": {
             "id": "dependenciesConfig",
-            "description": "Dependencies' Configurations",
+            "description": "Dependency Types",
             "type": "group",
             "data": {
                 "ClassField": {
@@ -214,7 +214,7 @@
                 },
                 "Inherite": {
                     "id": "Inherite",
-                    "description": "Inheritence",
+                    "description": "Class Bases",
                     "type": "subgroup",
                     "data": {
                         "custom": {
@@ -251,7 +251,7 @@
                 },
                 "Friend": {
                     "id": "Friend",
-                    "description": "Friends",
+                    "description": "Class Friends",
                     "type": "subgroup",
                     "data": {
                         "countOnce": {
@@ -296,7 +296,7 @@
                 },
                 "NestedClass": {
                     "id": "NestedClass",
-                    "description": "Nested Class Parent",
+                    "description": "Outer Class",
                     "type": "subgroup",
                     "data": {
                         "custom": {
@@ -333,7 +333,7 @@
                 },
                 "Methods": {
                     "id": "method",
-                    "description": "Methods",
+                    "description": "Class Methods",
                     "type": "subgroup",
                     "data": {
                         "MethodArg": {
@@ -383,7 +383,7 @@
                         },
                         "MethodDefinition": {
                             "id": "MethodDefinition",
-                            "description": "Fields",
+                            "description": "Local Definitions",
                             "type": "subgroup",
                             "data": {
                                 "countOnce": {
@@ -473,7 +473,7 @@
                         },
                         "MethodTemplateArg": {
                             "id": "MethodTemplateArg",
-                            "description": "Template Argument",
+                            "description": "Template Arguments",
                             "type": "subgroup",
                             "data": {
                                 "countOnce": {
@@ -518,7 +518,7 @@
                         },
                         "MemberExpr": {
                             "id": "MemberExpr",
-                            "description": "Member Expresions",
+                            "description": "Member Access",
                             "type": "subgroup",
                             "data": {
                                 "countOnce": {

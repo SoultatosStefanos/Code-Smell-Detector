@@ -18,6 +18,7 @@ import { totalWeight, louvainCommunities } from "./utilities.js"
   }
 
   const nodeDataArray = Object.keys(nodes).map(id => {
+
     const { id: key, name, namespace, srcInfo, methods, fields, bases, friends } = nodes[id];
 
     groupsHolder.createGroup('namespace', namespace, 'rgba(238, 255, 170, 0.33)');

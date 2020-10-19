@@ -3,7 +3,7 @@ export function totalWeight(dependencies, inData) {
     let total = 0;
     dependenciesKeys.forEach((depKind) => {
         let data; 
-        if(inData !== undefined && depKind.includes("Method"))
+        if(inData !== undefined && (depKind.includes("Method") || depKind.includes("Member")))
             data = inData["Methods"];
         else 
             data = inData;
