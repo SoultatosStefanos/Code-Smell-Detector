@@ -42,7 +42,7 @@ import { totalWeight } from "./utilities.js"
 
   const linkDataArray = edges.map(({ from, to, dependencies }) => {
     let weight = totalWeight(dependencies);
-    return { from, to, weight, data: { dependencies} };
+    return { from, to, weight, data: { dependencies } };
   });
 
   diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);

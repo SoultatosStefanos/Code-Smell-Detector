@@ -39,6 +39,78 @@
                     "onChange": {
                         "event": "showWeights"
                     }
+                }, 
+                "highlightEdges": {
+                    "id": "highlightEdges",
+                    "description": "Highlight",
+                    "type": "select",
+                    "value": "None",
+                    "options": {
+                        "None": {
+                            "id": "None",
+                            "description": "---",
+                            "value": "None"
+                        },
+                        "ClassField": {
+                            "id": "ClassField",
+                            "description": "Class Fields",
+                            "value": "ClassField"
+                        },
+                        "ClassTemplateParent": {
+                            "id": "ClassTemplateParent",
+                            "description": "Class Template Parents",
+                            "value": "ClassTemplateParent"
+                        },
+                        "ClassTemplateArg": {
+                            "id": "ClassTemplateArg",
+                            "description": "Class Template Arguments",
+                            "value": "ClassTemplateArg"
+                        },
+                        "Inherite": {
+                            "id": "Inherite",
+                            "description": "Class Bases",
+                            "value": "Inherite"
+                        },
+                        "Friend": {
+                            "id": "Friend",
+                            "description": "Class Friends",
+                            "value": "Friend"
+                        },
+                        "NestedClass": {
+                            "id": "NestedClass",
+                            "description": "Outer Classes",
+                            "value": "NestedClass"
+                        },
+                        "MethodArg": {
+                            "id": "MethodArg",
+                            "description": "Method Arguments",
+                            "value": "MethodArg"
+                        },
+                        "MethodDefinition": {
+                            "id": "MethodDefinition",
+                            "description": "Method Local Definitions",
+                            "value": "MethodDefinition"
+                        },
+                        "MethodReturn": {
+                            "id": "MethodReturn",
+                            "description": "Method Return Types",
+                            "value": "MethodReturn"
+                        },
+                        "MethodTemplateArg": {
+                            "id": "MethodTemplateArg",
+                            "description": "Method Template Arguments",
+                            "value": "MethodTemplateArg"
+                        },
+                        "MemberExpr": {
+                            "id": "MemberExpr",
+                            "description": "Method Member Access",
+                            "value": "MemberExpr"
+                        }
+                    },
+                    "conditions": {},
+                    "onChange": {
+                        "event": "highlight"
+                    }
                 }
             }
         },

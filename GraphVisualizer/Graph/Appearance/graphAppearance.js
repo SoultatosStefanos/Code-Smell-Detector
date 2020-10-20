@@ -94,13 +94,17 @@ diagram.linkTemplate =
         strokeWidth: 0.9,
         stroke: "#555555"
       },
-      new go.Binding("strokeWidth", "thick")),
+      new go.Binding("strokeWidth", "thick"),
+      new go.Binding("stroke", "color")),
     $(go.Shape,                                           // arrowhead
       {
         toArrow: "standard",
         stroke: "#555555",
+        fill: "#555555",
         scale: 0.9
-      }),
+      },
+      new go.Binding("stroke", "color"),
+      new go.Binding("fill", "color")),
 
     $(go.Panel, "Auto",
       $(go.Shape,  // the label background, which becomes transparent around the edges
@@ -117,7 +121,8 @@ diagram.linkTemplate =
           visible: true
         },
         new go.Binding("text", "weight"),
-        new go.Binding("visible", "visibleWeight"))
+        new go.Binding("visible", "visibleWeight"),
+        new go.Binding("stroke", "color"))
     ),
     {
       toolTip:
