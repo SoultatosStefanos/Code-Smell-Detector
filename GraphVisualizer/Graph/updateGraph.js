@@ -1,6 +1,7 @@
-import { diagram } from "./graphAppearance.js"
+import { diagram } from "./Appearance/graphAppearance.js"
 import { obs } from "../Observer/observer.js"
-import { totalWeight, louvainCommunities } from "./utilities.js"
+import { totalWeight } from "./utilities.js"
+import louvainCommunities from "./clusteringAlgorithms/louvain.js"
 
 function showAllEdges(value) {
   if (value) {
@@ -55,7 +56,7 @@ function groupingByFileName() {
   diagram.model.commit(function (m) {
     m.nodeDataArray.forEach((nodeData) => {
       if (!nodeData.isGroup)
-        m.set(nodeData, "group", nodeData.data.fileName);
+        m.set(nodeData, "group", nodeData.data.srcInfo.fileName);
       else if (nodeData.type === "fileName")
         m.set(nodeData, "visible", true)
       else

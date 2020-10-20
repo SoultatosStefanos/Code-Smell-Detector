@@ -1,3 +1,5 @@
+import contextMenu from "./contextMenu.js"
+
 const $ = go.GraphObject.make;
 export const diagram =
   $(go.Diagram, "diagramDiv",
@@ -6,38 +8,16 @@ export const diagram =
       initialAutoScale: go.Diagram.Uniform,  // an initial automatic zoom-to-fit
       contentAlignment: go.Spot.Center,
       layout:
-         $(go.ForceDirectedLayout,
-        // $(go.GridLayout)
-        // $(go.CircularLayout)
+        $(go.ForceDirectedLayout,
+          // $(go.GridLayout)
+          // $(go.CircularLayout)
           { defaultSpringLength: 30, defaultElectricalCharge: 100 }),
       // "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
     }
   );
 
-function makeButton(text, action) {
-  return $("ContextMenuButton",
-    $(go.TextBlock, "default",
-      {
-        margin: 3,
-        stroke: "rgb(63, 62, 62)",
-        font: "12px sans-serif"
-      }, text),
-    { click: action });
-}
 
-const nodeContextMenu =
-  $("ContextMenu",
-    makeButton("Properties",
-      function (e, obj) {  // OBJ is this Button
-        var contextmenu = obj.part;  // the Button is in the context menu Adornment
-        var part = contextmenu.adornedPart;  // the adornedPart is the Part that the context menu adorns
-        // now can do something with PART, or with its data, or with the Adornment (the context menu)
-        alert(nodeProperties(part.data));
-
-      }))
-
-
-// Node
+  // Node
 diagram.nodeTemplate =
   $(go.Node, "Auto",
     { locationSpot: go.Spot.Center, background: "lightblue", visible: true },
@@ -70,18 +50,11 @@ diagram.nodeTemplate =
             stroke: "gray",
             font: "12px sans-serif"
           },
-            new go.Binding("text", "", nodeProperties))
+            new go.Binding("text", "", contextMenu.nodeProperties))
         ),
-      contextMenu: nodeContextMenu
+      contextMenu: contextMenu.nodeContextMenu
     }
   );
-
-function nodeProperties(d) {
-  return "Methods: " + (d.data.methods ? Object.keys(d.data.methods).length : "-") +
-    "\nFields: " + (d.data.fields ? Object.keys(d.data.fields).length : "-") +
-    "\nBases: " + (d.data.bases ? Object.keys(d.data.bases).length : "-") +
-    "\nFriends: " + (d.data.friends ? Object.keys(d.data.friends).length : "-");
-}
 
 
 // Group
@@ -118,7 +91,7 @@ diagram.linkTemplate =
     new go.Binding("visible", "visibleLink"),
     $(go.Shape,                                           // link
       {
-        strokeWidth: 0.6,
+        strokeWidth: 0.9,
         stroke: "#555555"
       },
       new go.Binding("strokeWidth", "thick")),
@@ -145,6 +118,17 @@ diagram.linkTemplate =
         },
         new go.Binding("text", "weight"),
         new go.Binding("visible", "visibleWeight"))
-    )
+    ),
+    {
+      toolTip:
+        $("ToolTip",
+          $(go.TextBlock, {
+            margin: 3,
+            stroke: "gray",
+            font: "12px sans-serif"
+          },
+            new go.Binding("text", "", contextMenu.linkProperties))
+        )
+    }
   );
 

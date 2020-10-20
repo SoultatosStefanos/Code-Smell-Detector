@@ -1,5 +1,5 @@
-import { diagram } from "./graphAppearance.js"
-import { totalWeight, louvainCommunities } from "./utilities.js"
+import { diagram } from "./Appearance/graphAppearance.js"
+import { totalWeight } from "./utilities.js"
 
 (async () => {
   // Create graph from json
@@ -19,12 +19,22 @@ import { totalWeight, louvainCommunities } from "./utilities.js"
 
   const nodeDataArray = Object.keys(nodes).map(id => {
 
-    const { id: key, name, namespace, srcInfo, methods, fields, bases, friends } = nodes[id];
+    const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments} = nodes[id];
 
     groupsHolder.createGroup('namespace', namespace, 'rgba(238, 255, 170, 0.33)');
     groupsHolder.createGroup('fileName', srcInfo.fileName, 'rgba(105,	196,	47, 0.33)');
 
-    return { key, name, data: { namespace, fileName: srcInfo.fileName, methods, fields, bases, friends } };
+    return { key, name, data: { 
+                                namespace,
+                                structureType,
+                                srcInfo, 
+                                fields, 
+                                bases, 
+                                friends,
+                                methods, 
+                                nestedParent,
+                                templateArguments
+                               } };
   });
 
   nodeDataArray.splice(0, 0, ...groupsHolder.namespace);

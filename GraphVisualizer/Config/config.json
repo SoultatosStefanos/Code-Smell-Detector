@@ -428,7 +428,7 @@
                         },
                         "MethodReturn": {
                             "id": "MethodReturn",
-                            "description": "Return Type",
+                            "description": "Return Types",
                             "type": "subgroup",
                             "data": {
                                 "countOnce": {
