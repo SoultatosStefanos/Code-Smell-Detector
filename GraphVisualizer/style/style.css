@@ -3,45 +3,45 @@
 @import url(group.css);
 
 body{
-    font-family: sans-serif;
-    color: #282828;
+  font-family: sans-serif;
+  color: #282828;
 }
 
 #diagramDiv {
-    display: inline-block;
-    position: absolute;
-    width: 73%; 
-    height: 95vh;   
-    margin: 1vw;
-    background-color:rgb(215, 220, 223); /* #DAE4E4; */
-    border-style: solid; 
-    border-radius: 0.2vw;
-    border-width: 0.2vw;
-    border-color: rgb(138, 137, 137, .3);
+  display: inline-block;
+  position: absolute;
+  width: 73%; 
+  height: 95vh;   
+  margin: 1vw;
+  background-color:rgb(215, 220, 223);
+  border-style: solid; 
+  border-radius: 0.2vw;
+  border-width: 0.2vw;
+  border-color: rgb(138, 137, 137, .3);
 }
 
 #config {
-    display: inline-block;
-    vertical-align: top; 
-    position: absolute;
-    right: 0; 
-    width: 24%;
-    height: 95vh; 
-    margin: 1vw;
-    background-color: rgb(235, 235, 235); 
-    border-style: solid; 
-    border-radius: 0.2vw;
-    border-width: 0.2vw;
-    border-color: rgb(138, 137, 137, .3);
+  display: inline-block;
+  vertical-align: top; 
+  position: absolute;
+  right: 0; 
+  width: 24%;
+  height: 95vh; 
+  margin: 1vw;
+  background-color: rgb(235, 235, 235); 
+  border-style: solid; 
+  border-radius: 0.2vw;
+  border-width: 0.2vw;
+  border-color: rgba(24, 85, 164, 0.6);
 } 
 
 #configTitle {
   text-align: center;
-  color: rgb(63, 62, 62);
-  background-color: rgb(220 220 220);
+  color: rgb(234, 238, 255);
+  background-color: rgb(24, 85, 164);
   padding: 1vh; 
   margin: 0;
-  border-bottom:  0.2vw solid  rgb(138, 137, 137, .3); 
+  border-bottom:  0.2vw solid rgba(24, 85, 164, 0.6);
 }
 
 #configData {
@@ -50,5 +50,5 @@ body{
 }
 
 .disabledElem {
-    color:grey;
+  color:grey;
 }

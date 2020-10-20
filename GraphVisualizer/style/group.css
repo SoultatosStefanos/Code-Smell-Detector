@@ -1,16 +1,15 @@
 .group {
-    width: 100%;
-    margin-left: auto;
-    margin-right: auto;
-    color: rgb(63, 62, 62);
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  color: rgb(3, 10, 19);
 }
 
 .group .groupName {
-    text-align: center;
-    background-color: rgb(220 220 220);
-    padding: .5vh; 
-    border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
-    border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+  text-align: left;
+  background-color: rgb(220 220 220);
+  font-size: 15.5px;
+  font-weight: bold;
 }
 
 .group .groupData {
@@ -19,7 +18,8 @@
 }
 
 .group .groupElem {
-    padding: 1vh; 
+  padding: 1vh; 
+  border-left:  0.07vw solid  rgba(24, 85, 164, 0.25); 
 }
 
 /* Subgroup */
@@ -32,13 +32,7 @@
 }
 
 .subgroup .groupName {
-  text-align: center;
-  /* border-radius: 2px; */
-  background-color: rgb(235, 235, 235); 
-  padding: .5vh; 
-  border-bottom:  0.15vw solid  rgb(138, 137, 137, .3); 
-  border:  0.15vw solid  rgb(138, 137, 137, .3); 
-  border-top:  0.15vw solid  rgb(138, 137, 137, .3); 
+  background-color: rgb(235, 235, 235);
 }
 
 .subgroup .groupData {
@@ -46,43 +40,44 @@
   padding-bottom: 0vh;
 }
 
-.subgroup .groupElem {
-    padding: 1vh; 
-}
+.subgroup .groupElem {}
+
 
 /* Cpllapsible */
 .collapsible {
-    cursor: pointer;
-    padding-top: 1.5vh; 
-    padding-bottom: 1.5vh;
-    width: 100%;
-    border: none;
-    outline: none;
-    font-size: 15px;
-  }
+  cursor: pointer;
+  padding-top: 1.5vh; 
+  padding-bottom: 1.5vh;
+  width: 100%;
+  border: none;
+  outline: none;
+}
   
-  .active, .collapsible:hover {
-    background-color: rgb(193, 193, 193);
-  }
+.active, .collapsible:hover {
+  background-color: rgb(193, 193, 193);
+}
   
-  .collapsible:after {
-    content: '\f107';
-    font-family: "Font Awesome 5 Free";
-    font-style: normal;
-    text-decoration: inherit;
-    color: rgba(63, 62, 62, 0.5);
-    font-weight: bold;
-    float: right;
-  }
+.collapsible:after {
+  content: '\f105';
+  font-family: "Font Awesome 5 Free";
+  font-style: normal;
+  text-decoration: inherit;
+  color: rgba(24, 85, 164, 0.6);
+   padding-left: 0.5vh;
+   padding-right: 0.5vh;
+   padding-top: 0.2vh; 
+   font-weight: bold;
+   float: left;
+}
   
-  .active:after {
-    content: '\f106';
-  }
+.active:after {
+  content: '\f107';
+}
   
-  .content {
-    padding-left: 1.5vh;
-    padding-right: 1.5vh;
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.3s ease-out;
-  }
+.content {
+  padding-left: 1.5vh;
+  padding-right: 1.5vh;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+}
