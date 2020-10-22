@@ -92,19 +92,20 @@ diagram.linkTemplate =
     $(go.Shape,                                           // link
       {
         strokeWidth: 0.9,
-        stroke: "#555555"
+        stroke: "#555555", 
+        name: "LINK"
       },
       new go.Binding("strokeWidth", "thick"),
-      new go.Binding("stroke", "color")),
+      new go.Binding("stroke", "color").makeTwoWay()),
     $(go.Shape,                                           // arrowhead
       {
         toArrow: "standard",
         stroke: "#555555",
         fill: "#555555",
-        scale: 0.9
+        scale: 0.9, 
       },
-      new go.Binding("stroke", "color"),
-      new go.Binding("fill", "color")),
+      new go.Binding("stroke", "color").makeTwoWay(),
+      new go.Binding("fill", "color").makeTwoWay()),
 
     $(go.Panel, "Auto",
       $(go.Shape,  // the label background, which becomes transparent around the edges

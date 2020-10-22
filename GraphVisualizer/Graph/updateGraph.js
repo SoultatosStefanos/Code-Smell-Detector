@@ -45,7 +45,7 @@ function highlight(depKind) {
       } else {
         m.linkDataArray.forEach((linkData) => {
           if (linkData.data.dependencies[depKind] !== undefined) 
-            m.set(linkData, 'color', 'red');
+            m.set(linkData, 'color', 'OrangeRed');
            else 
             m.set(linkData, 'color', '#555555');
         });
