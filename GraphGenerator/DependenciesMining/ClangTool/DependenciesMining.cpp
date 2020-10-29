@@ -450,12 +450,41 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
 	auto* decl = memberExpr->getMemberDecl();
-	auto type = decl->getType();
+	//auto type = decl->getType();
+	auto type = memberExpr->getType();
 	auto* base = memberExpr->getBase();
-	bool isMethod = false;
 
-	if (base->getStmtClass() == memberExpr->CXXThisExprClass) { // ignore class' fields
-		return true;
+	if (base) {
+		std::cout << base->getStmtClassName() << ": " << base->getStmtClass();
+		base = base->IgnoreUnlessSpelledInSource();
+
+		if (base->getStmtClass() == memberExpr->DeclRefExprClass) {
+			auto baseType = base->getType();
+			auto baseRange = base->getSourceRange();
+			auto baseScLocationBegin = MethodDeclsCallback::sm->getPresumedLoc(baseRange.getBegin());
+			auto baseScLocationEnd = MethodDeclsCallback::sm->getPresumedLoc(baseRange.getEnd());
+			SourceInfo baseLocBegin(baseScLocationBegin.getFilename(), baseScLocationBegin.getLine(), baseScLocationBegin.getColumn());
+			SourceInfo baseLocEnd(baseScLocationEnd.getFilename(), baseScLocationEnd.getLine(), baseScLocationEnd.getColumn());
+			std::string exprString = "__LOCAL DEF__"; 
+			Method::MemberExpr methodMemberExpr(exprString, baseLocEnd, baseLocBegin.GetFileName(), baseLocBegin.GetLine(), baseLocBegin.GetColumn());
+			
+			std::string typeName;
+			ID_T typeID;
+			if (baseType->isPointerType()) {
+				typeName = GetFullStructureName(baseType->getPointeeType()->getAsCXXRecordDecl());
+				typeID = GetIDfromDecl(baseType->getPointeeType()->getAsCXXRecordDecl());
+			}
+			else {
+				typeName = GetFullStructureName(baseType->getAsCXXRecordDecl());
+				typeID = GetIDfromDecl(baseType->getAsCXXRecordDecl());
+			}
+			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
+			if (!typeStructure)
+				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
+
+			Method::Member member("__LOCAL DEF__", typeStructure, baseLocEnd);
+			MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, baseLocBegin.toString());
+		}
 	}
 		
 	auto range = memberExpr->getSourceRange();
@@ -464,6 +493,7 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	SourceInfo locBegin(srcLocationBegin.getFilename(), srcLocationBegin.getLine(), srcLocationBegin.getColumn());
 	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
 	std::string exprString;
+
 	if (decl->getKind() == decl->CXXMethod) {
 		auto end = sm->getCharacterData(range.getEnd());
 		int openCount = 0, closeCount = 0;
@@ -488,7 +518,6 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 		if (decl->getKind() == decl->CXXMethod) {
 			CXXMethodDecl* methodDecl = (CXXMethodDecl*)decl;
 			type = methodDecl->getReturnType();
-			isMethod = true;
 			if (!isStructureOrStructurePointerType(type)) {
 				MethodDeclsCallback::currentMethod->UpdateMemberExpr(methodMemberExpr, locBegin.toString());	// to get the full expr if I have fields with not a class type
 				return true;

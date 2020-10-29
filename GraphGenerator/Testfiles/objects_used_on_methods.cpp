@@ -34,7 +34,9 @@ namespace memberExpr{
 		C* pc; 
 	};
 
-	B f(B b) { return b;}
+	B f(B b) { 
+		return b;
+	}
 
 	template<typename T>struct A {
 		B b;
@@ -49,6 +51,9 @@ namespace memberExpr{
 		}
 
 		B method(){
+			B* pb = &b; 
+			pb->pc->x;
+			
 			C* pc = b2->pc; 
 			C c = b.c;
 			T bb; 
