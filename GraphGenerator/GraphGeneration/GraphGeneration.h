@@ -13,7 +13,9 @@
 #define MethodReturn_dep_t "MethodReturn"
 #define MethodArg_dep_t "MethodArg"
 #define MethodDefinition_dep_t "MethodDefinition"
-#define MemberExpr_dep_t "MemberExpr"
+#define MemberExpr_Value_dep_t "MemberExprValue"
+#define MemberExpr_ClassField_dep_t "MemberExprClassField"
+#define MemberExpr_MethodDefinition_dep_t "MemberExprMethodDefinition"
 #define MethodTemplateArg_dep_t "MethodTemplateArgs"
 
 using namespace graph;

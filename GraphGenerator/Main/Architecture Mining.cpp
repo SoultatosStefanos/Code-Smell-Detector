@@ -12,7 +12,7 @@ int main(int argc, const char** argv) {
 	sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();
-	//srcLoader.PrintSourceFiles();
+	srcLoader.PrintSourceFiles();
 	
 	//std::vector<std::string> srcs;
 	//srcs.push_back(path + "\\classes_simple.cpp");			
@@ -21,9 +21,9 @@ int main(int argc, const char** argv) {
 	srcs.push_back(path + "\\member_classes.cpp");			
 	srcs.push_back(path + "\\methods_args_vars.cpp");		
 	srcs.push_back(path + "\\methods.cpp");					
-	srcs.push_back(path + "\\namespaces.cpp");			
-	srcs.push_back(path + "\\objects_used_on_methods.cpp");	
-	srcs.push_back(path + "\\template_methods.cpp");		
+	srcs.push_back(path + "\\namespaces.cpp");	*/		
+	//srcs.push_back(path + "\\objects_used_on_methods.cpp");	
+	/*srcs.push_back(path + "\\template_methods.cpp");		
 	srcs.push_back(path + "\\template_types.cpp");			
 	srcs.push_back(path + "\\templates.cpp");				
 	

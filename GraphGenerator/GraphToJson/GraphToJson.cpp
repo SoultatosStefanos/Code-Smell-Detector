@@ -116,6 +116,7 @@ Json::Value GraphToJsonVisitor::MethodBuilding(const untyped::Object& data) {
 			auto& memberObj = value.ToObject();
 			member["name"] = memberObj["name"].ToString();
 			member["type"] = memberObj["type"].TO_ID_T();
+			member["memberType"] = memberObj["memberType"].ToString();
 
 			Json::Value locEnd;
 			const untyped::Object& locEndObj = memberObj["locEnd"].ToObject();

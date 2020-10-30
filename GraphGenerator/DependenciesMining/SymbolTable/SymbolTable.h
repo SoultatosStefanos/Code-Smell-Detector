@@ -168,21 +168,28 @@ namespace dependenciesMining {
 		void SetType(Structure* structure);
 	};
 
+	#define Value_mem_t "Value"
+	#define ClassField_mem_t "ClassField"
+	#define MethodDefinition_mem_t "MethodDefinition"
 
 	class Method : public Symbol {
 	public:
 		class Member {
+		public:
+		using MemberType = std::string; 
 		private:
 			std::string name;
 			SourceInfo locEnd;
 			Structure* type;
+			MemberType memType = Value_mem_t;
 
 		public:
 			Member() = default;
-			Member(const std::string& name, Structure* type, SourceInfo locEnd) : name(name), type(type), locEnd(locEnd) {};
+			Member(const std::string& name, Structure* type, SourceInfo locEnd, MemberType memType = Value_mem_t) : name(name), type(type), locEnd(locEnd), memType(memType) {};
 			std::string GetName() const;
 			SourceInfo GetLocEnd() const;
 			Structure* GetType() const;
+			MemberType GetMemberType() const;
 
 			void SetName(const std::string& name);
 			void SetLocEnd(const SourceInfo& locEnd);

@@ -455,7 +455,6 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	auto* base = memberExpr->getBase();
 
 	if (base) {
-		std::cout << base->getStmtClassName() << ": " << base->getStmtClass();
 		base = base->IgnoreUnlessSpelledInSource();
 
 		if (base->getStmtClass() == memberExpr->DeclRefExprClass) {
@@ -482,7 +481,7 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-			Method::Member member("__LOCAL DEF__", typeStructure, baseLocEnd);
+			Method::Member member("__LOCAL DEF__", typeStructure, baseLocEnd, MethodDefinition_mem_t);
 			MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, baseLocBegin.toString());
 		}
 	}
@@ -543,8 +542,14 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 	if (!typeStructure)
 		typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
-	
-	Method::Member member(decl->getNameAsString(), typeStructure, locEnd);
+
+	Method::Member::MemberType memType;
+	if (base->getStmtClass() == memberExpr->CXXThisExprClass)
+		memType = ClassField_mem_t;
+	else
+		memType = Value_mem_t;
+	Method::Member member(decl->getNameAsString(), typeStructure, locEnd, memType);
+
 	MethodDeclsCallback::currentMethod->InsertMemberExpr(methodMemberExpr, member, locBegin.toString());
 
 	return true;

@@ -250,6 +250,7 @@ Structure* Method::Member::GetType() const {
 	return type;
 }
 
+
 void Method::Member::SetName(const std::string& name) {
 	this->name = name; 
 }

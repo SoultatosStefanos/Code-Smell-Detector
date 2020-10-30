@@ -339,6 +339,10 @@ Structure* Method::Member::GetType() const {
 	return type;
 }
 
+Method::Member::MemberType Method::Member::GetMemberType() const {
+	return memType;
+}
+
 void Method::Member::SetName(const std::string& name) {
 	this->name = name; 
 }

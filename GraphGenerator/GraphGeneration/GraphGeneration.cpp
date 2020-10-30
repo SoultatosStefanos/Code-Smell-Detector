@@ -191,7 +191,8 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 
 	// memberexpr
 	untyped::Object memberExprsObj; 
-	currDepType = MemberExpr_dep_t;
+	//currDepType = MemberExpr_dep_t;
+	currDepType = MemberExpr_Value_dep_t;
 	for (auto it : s->GetMemberExpr()) {
 		auto expr = it.second;
 		untyped::Object memberExprObj;
@@ -217,12 +218,19 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 				memberObj.Set("name", member.GetName());
 				assert(it2.GetType());
 				memberObj.Set("type", memberType->GetID());
+				memberObj.Set("memberType", member.GetMemberType());
 
 				untyped::Object locEnd;
 				locEnd.Set("fileName", member.GetLocEnd().GetFileName());
 				locEnd.Set("line", (double)member.GetLocEnd().GetLine());
 				locEnd.Set("column", (double)member.GetLocEnd().GetColumn());
 				memberObj.Set("locEnd", locEnd);
+				if (member.GetMemberType() == Value_mem_t)
+					currDepType = MemberExpr_Value_dep_t;
+				else if (member.GetMemberType() == ClassField_mem_t)
+					currDepType = MemberExpr_ClassField_dep_t;
+				else 
+					currDepType = MemberExpr_MethodDefinition_dep_t;
 
 				VisitStructure(static_cast<Structure*>(memberType));
 				membersObj.Set(index2++, memberObj);
@@ -239,6 +247,7 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	data.Clear();
 	currDepType = oldCurrDepType;
 }
+
 
 void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	Edge::DependencyType oldCurrDepType = currDepType;
