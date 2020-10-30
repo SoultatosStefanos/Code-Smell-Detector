@@ -42,12 +42,50 @@ function highlight(depKind) {
     diagram.model.commit(function (m) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'color', '#555555'); });
-      } else {
+      } else if (depKind.includes('MemberExpr')) {              // sto highlighting den ksexwrisw ta memberExpr types
         m.linkDataArray.forEach((linkData) => {
-          if (linkData.data.dependencies[depKind] !== undefined) 
+          if (linkData.data.dependencies['MemberExprValue'] !== undefined ||
+            linkData.data.dependencies['MemberExprClassField'] !== undefined ||
+            linkData.data.dependencies['MemberExprMethodDefinition'] !== undefined)
             m.set(linkData, 'color', 'OrangeRed');
-           else 
+          else
             m.set(linkData, 'color', '#555555');
+        });
+      }
+      else {
+        m.linkDataArray.forEach((linkData) => {
+          if (linkData.data.dependencies[depKind] !== undefined)
+            m.set(linkData, 'color', 'OrangeRed');
+          else
+            m.set(linkData, 'color', '#555555');
+        });
+      }
+    }, 'highlight');
+  }
+}
+
+function viewOnly(depKind) {
+  return function () {
+    diagram.model.commit(function (m) {
+      if (depKind === 'None') {
+        m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', true); });
+      }
+      else if (depKind.includes('MemberExpr')) {     // sto viewOnly den ksexwrisw ta memberExpr types
+        m.linkDataArray.forEach((linkData) => {
+          if (linkData.data.dependencies['MemberExprValue'] !== undefined ||
+            linkData.data.dependencies['MemberExprClassField'] !== undefined ||
+            linkData.data.dependencies['MemberExprMethodDefinition'] !== undefined)
+            m.set(linkData, 'visibleLink', true);
+          else
+            m.set(linkData, 'visibleLink', false);
+        });
+      }
+      else {
+        m.linkDataArray.forEach((linkData) => {
+          if (linkData.data.dependencies[depKind] !== undefined)
+            m.set(linkData, 'visibleLink', true);
+          else
+            m.set(linkData, 'visibleLink', false);
         });
       }
     }, 'highlight');
@@ -94,15 +132,32 @@ function groupingByLouvain() {
 
     const communities = louvainCommunities(m.nodeDataArray, m.linkDataArray);
 
+    const communitiesFiles = {};
+    Object.values(communities).forEach((commynityKey) => {
+      communitiesFiles[commynityKey] = {};
+    });
+
     const groupsArray = [];
     m.nodeDataArray.forEach(nodeData => {
       const key = communities[nodeData.key];
+      if (!nodeData.isGroup) {
+        if (communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] === undefined)
+          communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] = 1;
+        else
+          communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] += 1;
+      }
       if (!nodeData.isGroup && !groupsArray.some((group) => { return group.key === key })) {
         groupsArray.push({ key, name: key, isGroup: true, type: 'louvain', visible: true });
-        // m.addNodeData({ key, name: key, isGroup: true, type: 'louvain', visible: true });
       }
       m.set(nodeData, 'group', key);
     });
+
+    groupsArray.forEach((group) => {
+      const groupFiles = communitiesFiles[group.key];
+      const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
+      group.name = name;
+    });
+
     groupsArray.splice(0, 0, ...m.nodeDataArray);
     m.mergeNodeDataArray(groupsArray);
   });
@@ -144,6 +199,19 @@ obs.install('highlightMethodDefinition', highlight('MethodDefinition'));
 obs.install('highlightMethodReturn', highlight('MethodReturn'));
 obs.install('highlightMethodTemplateArg', highlight('MethodTemplateArg'));
 obs.install('highlightMemberExpr', highlight('MemberExpr'));
+obs.install('viewOnlyNone', viewOnly('None'));
+obs.install('viewOnlyClassField', viewOnly('ClassField'));
+obs.install('viewOnlyClassTemplateParent', viewOnly('ClassTemplateParent'));
+obs.install('viewOnlyClassTemplateArg', viewOnly('ClassTemplateArg'));
+obs.install('viewOnlyInherite', viewOnly('Inherite'));
+obs.install('viewOnlyFriend', viewOnly('Friend'));
+obs.install('viewOnlyNestedClass', viewOnly('NestedClass'));
+obs.install('viewOnlyMethodArg', viewOnly('MethodArg'));
+obs.install('viewOnlyMethodDefinition', viewOnly('MethodDefinition'));
+obs.install('viewOnlyMethodReturn', viewOnly('MethodReturn'));
+obs.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
+obs.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
+
 
 obs.install('groupingBynamespace', groupingByNamespace);
 obs.install('groupingByfileName', groupingByFileName);

@@ -17,7 +17,7 @@ body{
   border-style: solid; 
   border-radius: 0.2vw;
   border-width: 0.2vw;
-  border-color: rgb(138, 137, 137, .3);
+  border-color: rgba(24, 85, 164, 0.6);
 }
 
 #config {

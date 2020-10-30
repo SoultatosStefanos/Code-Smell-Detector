@@ -1,5 +1,5 @@
 import { diagram } from "./Appearance/graphAppearance.js"
-import { totalWeight } from "./utilities.js"
+import { totalWeight, cleanDoubleDotsFromFilePath, CommonPath } from "./utilities.js"
 
 (async () => {
   // Create graph from json
@@ -11,18 +11,26 @@ import { totalWeight } from "./utilities.js"
   const groupsHolder = [];
   groupsHolder.namespace = [];
   groupsHolder.fileName = [];
-  groupsHolder.createGroup = function (type, key, fill = 'rgba(128,128,128,0.33)', visible = false) {
+  groupsHolder.createGroup = function (type, key, name = key, fill = 'rgba(128,128,128,0.33)', visible = false) {
     if (!this[type].some((group) => { return group.key === key })) {
-      this[type].push({ key, name: key, isGroup: true, type, fill, visible });
+      this[type].push({ key, name, isGroup: true, type, fill, visible });
     }
   }
+  
+  let commonPath = ""; 
+  Object.keys(nodes).map(id => {
+    commonPath = CommonPath(nodes[id].srcInfo.fileName);
+  });
 
   const nodeDataArray = Object.keys(nodes).map(id => {
 
     const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments} = nodes[id];
 
+    srcInfo.fileName = cleanDoubleDotsFromFilePath(srcInfo.fileName);
+    srcInfo.cleanFileName = srcInfo.fileName.substring(commonPath.length, srcInfo.fileName.length);
+
     groupsHolder.createGroup('namespace', namespace, 'rgba(238, 255, 170, 0.33)');
-    groupsHolder.createGroup('fileName', srcInfo.fileName, 'rgba(105,	196,	47, 0.33)');
+    groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(105,	196,	47, 0.33)');
 
     return { key, name, data: { 
                                 namespace,
@@ -36,6 +44,7 @@ import { totalWeight } from "./utilities.js"
                                 templateArguments
                                } };
   });
+
 
   nodeDataArray.splice(0, 0, ...groupsHolder.namespace);
   nodeDataArray.splice(0, 0, ...groupsHolder.fileName);
