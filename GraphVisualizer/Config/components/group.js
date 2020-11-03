@@ -80,7 +80,6 @@ export default Vue.component('group', {
             applyOnGroupData.forEach(element => {
                 dataCreation(element, data, groupData);
             });
-            console.log(data);
             this.confighandler.fire(event, data)
         },
         Collapsible(e) {

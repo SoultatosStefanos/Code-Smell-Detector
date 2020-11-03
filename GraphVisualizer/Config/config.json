@@ -665,140 +665,42 @@
                             "description": "Member Access",
                             "type": "subgroup",
                             "data": {
-                                "MemberExprValue": {
-                                    "id": "MemberExprValue",
-                                    "description": "Accessed Values",
-                                    "type": "subgroup",
-                                    "data": {
-                                        "countOnce": {
-                                            "id": "MemberExprCountOnce",
-                                            "description": "Count Once",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "custom": {
-                                            "id": "MemberExprCustom",
-                                            "description": "Custom",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "defaultWeight": {
-                                            "id": "defaultWeight",
-                                            "description": "Uses default weight 1",
-                                            "type": "span",
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === false"
-                                            }
-                                        },
-                                        "weight": {
-                                            "id": "MemberExprWeight",
-                                            "description": "Weight",
-                                            "type": "number",
-                                            "value": 1,
-                                            "min": 0,
-                                            "max": 100,
-                                            "step": 0.05,
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === true"
-                                            },
-                                            "onChange": {}
-                                        }
-                                    },
-                                    "conditions": {}
+                                "countOnce": {
+                                    "id": "MemberExprCountOnce",
+                                    "description": "Count Once",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
                                 },
-                                "MemberExprClassField": {
-                                    "id": "MemberExprClassField",
-                                    "description": "Class Fields",
-                                    "type": "subgroup",
-                                    "data": {
-                                        "countOnce": {
-                                            "id": "MemberExprCountOnceClassField",
-                                            "description": "Count Once",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "custom": {
-                                            "id": "MemberExprCustomClassField",
-                                            "description": "Custom",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "defaultWeight": {
-                                            "id": "defaultWeightClassField",
-                                            "description": "Uses default weight 1",
-                                            "type": "span",
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === false"
-                                            }
-                                        },
-                                        "weight": {
-                                            "id": "MemberExprWeightClassField",
-                                            "description": "Weight",
-                                            "type": "number",
-                                            "value": 1,
-                                            "min": 0,
-                                            "max": 100,
-                                            "step": 0.05,
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === true"
-                                            },
-                                            "onChange": {}
-                                        }
-                                    },
-                                    "conditions": {}
+                                "custom": {
+                                    "id": "MemberExprCustom",
+                                    "description": "Custom",
+                                    "type": "checkbox",
+                                    "value": false,
+                                    "conditions": {},
+                                    "onChange": {}
                                 },
-                                "MemberExprMethodDefinition": {
-                                    "id": "MemberExprMethodDefinition",
-                                    "description": "Local Definitions",
-                                    "type": "subgroup",
-                                    "data": {
-                                        "countOnce": {
-                                            "id": "MemberExprCountOnceMethodDefinition",
-                                            "description": "Count Once",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "custom": {
-                                            "id": "MemberExprCustomMethodDefinition",
-                                            "description": "Custom",
-                                            "type": "checkbox",
-                                            "value": false,
-                                            "conditions": {},
-                                            "onChange": {}
-                                        },
-                                        "defaultWeight": {
-                                            "id": "defaultWeightMethodDefinition",
-                                            "description": "Uses default weight 1",
-                                            "type": "span",
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === false"
-                                            }
-                                        },
-                                        "weight": {
-                                            "id": "MemberExprWeightMethodDefinition",
-                                            "description": "Weight",
-                                            "type": "number",
-                                            "value": 1,
-                                            "min": 0,
-                                            "max": 100,
-                                            "step": 0.05,
-                                            "conditions": {
-                                                "displayed": "$currGroup.custom.value === true"
-                                            },
-                                            "onChange": {}
-                                        }
+                                "defaultWeight": {
+                                    "id": "defaultWeight",
+                                    "description": "Uses default weight 1",
+                                    "type": "span",
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === false"
+                                    }
+                                },
+                                "weight": {
+                                    "id": "MemberExprWeight",
+                                    "description": "Weight",
+                                    "type": "number",
+                                    "value": 1,
+                                    "min": 0,
+                                    "max": 100,
+                                    "step": 0.05,
+                                    "conditions": {
+                                        "displayed": "$currGroup.custom.value === true"
                                     },
-                                    "conditions": {}
+                                    "onChange": {}
                                 }
                             },
                             "conditions": {}
@@ -886,27 +788,9 @@
                                 },
                                 {
                                     "MemberExpr": [
-                                        {
-                                            "MemberExprValue": [
-                                                "countOnce",
-                                                "custom",
-                                                "weight"
-                                            ]
-                                        },
-                                        {
-                                            "MemberExprClassField": [
-                                                "countOnce",
-                                                "custom",
-                                                "weight"
-                                            ]
-                                        },
-                                        {
-                                            "MemberExprMethodDefinition": [
-                                                "countOnce",
-                                                "custom",
-                                                "weight"
-                                            ]
-                                        }
+                                        "countOnce",
+                                        "custom",
+                                        "weight"
                                     ]
                                 }
                             ]

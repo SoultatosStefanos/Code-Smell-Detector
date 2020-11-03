@@ -1,6 +1,6 @@
 import { diagram } from "./Appearance/graphAppearance.js"
 import { obs } from "../Observer/observer.js"
-import { totalWeight } from "./utilities.js"
+import totalWeight from "./utilities/totalWeight.js"
 import louvainCommunities from "./clusteringAlgorithms/louvain.js"
 
 function showAllEdges(value) {
@@ -42,16 +42,7 @@ function highlight(depKind) {
     diagram.model.commit(function (m) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'color', '#555555'); });
-      } else if (depKind.includes('MemberExpr')) {              // sto highlighting den ksexwrisw ta memberExpr types
-        m.linkDataArray.forEach((linkData) => {
-          if (linkData.data.dependencies['MemberExprValue'] !== undefined ||
-            linkData.data.dependencies['MemberExprClassField'] !== undefined ||
-            linkData.data.dependencies['MemberExprMethodDefinition'] !== undefined)
-            m.set(linkData, 'color', 'OrangeRed');
-          else
-            m.set(linkData, 'color', '#555555');
-        });
-      }
+      } 
       else {
         m.linkDataArray.forEach((linkData) => {
           if (linkData.data.dependencies[depKind] !== undefined)
@@ -69,16 +60,6 @@ function viewOnly(depKind) {
     diagram.model.commit(function (m) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', true); });
-      }
-      else if (depKind.includes('MemberExpr')) {     // sto viewOnly den ksexwrisw ta memberExpr types
-        m.linkDataArray.forEach((linkData) => {
-          if (linkData.data.dependencies['MemberExprValue'] !== undefined ||
-            linkData.data.dependencies['MemberExprClassField'] !== undefined ||
-            linkData.data.dependencies['MemberExprMethodDefinition'] !== undefined)
-            m.set(linkData, 'visibleLink', true);
-          else
-            m.set(linkData, 'visibleLink', false);
-        });
       }
       else {
         m.linkDataArray.forEach((linkData) => {

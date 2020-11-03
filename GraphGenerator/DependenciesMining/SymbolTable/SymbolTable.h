@@ -71,8 +71,8 @@ namespace dependenciesMining {
 		bool  operator<=(SourceInfo const& loc) const;
 		bool  operator>(SourceInfo const& loc) const;
 		bool  operator>=(SourceInfo const& loc) const;
+		bool  operator==(SourceInfo const& loc) const;		
 	};
-
 
 	class Symbol {
 	protected:
@@ -170,6 +170,7 @@ namespace dependenciesMining {
 
 	#define Value_mem_t "Value"
 	#define ClassField_mem_t "ClassField"
+	#define ClassMethod_mem_t "ClassMethod"
 	#define MethodDefinition_mem_t "MethodDefinition"
 
 	class Method : public Symbol {

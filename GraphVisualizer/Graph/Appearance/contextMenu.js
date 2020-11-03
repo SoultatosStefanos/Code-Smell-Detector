@@ -65,10 +65,7 @@ function linkProperties(d) {
     "MethodDefinition": "Method Local Definitions",
     "MethodReturn": "Method Return Types",
     "MethodTemplateArg": "Method Template Arguments",
-    // "MemberExpr": "Method Member Access",
-    "MemberExprValue": "Method Member Access",
-    "MemberExprClassField": "Method Class Fields Access",
-    "MemberExprMethodDefinition": "Method Local Definitions Access",
+    "MemberExpr": "Method Member Access"
   };
   Object.keys(d.data.dependencies).forEach(depKind => { data += description[depKind] + ": " + d.data.dependencies[depKind] + "\n" });
   return data.slice(0, -1);

@@ -73,6 +73,14 @@ bool  SourceInfo::operator>=(SourceInfo const& loc) const {
 	return false;
 }
 
+bool SourceInfo::operator==(SourceInfo const& loc) const {
+	assert(fileName == loc.fileName);
+	if (line == loc.line && column == loc.column)
+		return true;
+	else
+		return false;
+}
+
 
 // Symbol 
 ID_T Symbol::GetID() const {
@@ -251,15 +259,17 @@ void Method::InstallTemplateSpecializationArguments(const ID_T& id, Structure* s
 }
 
 void Method::InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin) {
-	if (memberExprs.find(locBegin) == memberExprs.end()) {
-		memberExprs[locBegin] = memberExpr;
-	}
-	else {
-		if (memberExpr.GetLocEnd() > memberExprs[locBegin].GetLocEnd()) {
-			memberExprs[locBegin].SetExpr(memberExpr.GetExpr());
-			memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
+	//if (memberExpr.GetExpr() != "__$Ignore__") {
+		if (memberExprs.find(locBegin) == memberExprs.end()) {
+			memberExprs[locBegin] = memberExpr;
 		}
-	}
+		else {
+			if (memberExpr.GetLocEnd() > memberExprs[locBegin].GetLocEnd()) {
+				memberExprs[locBegin].SetExpr(memberExpr.GetExpr());
+				memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
+			}
+		}
+	//}
 	memberExprs[locBegin].InsertMember(member);
 }
 

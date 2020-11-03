@@ -1,5 +1,6 @@
 import { diagram } from "./Appearance/graphAppearance.js"
-import { totalWeight, cleanDoubleDotsFromFilePath, CommonPath } from "./utilities.js"
+import totalWeight from "./utilities/totalWeight.js"
+import srcpathManager from "./utilities/srcpathMangment.js"
 
 (async () => {
   // Create graph from json
@@ -19,17 +20,17 @@ import { totalWeight, cleanDoubleDotsFromFilePath, CommonPath } from "./utilitie
   
   let commonPath = ""; 
   Object.keys(nodes).map(id => {
-    commonPath = CommonPath(nodes[id].srcInfo.fileName);
+    commonPath = srcpathManager.commonPathDetection(nodes[id].srcInfo.fileName);
   });
 
   const nodeDataArray = Object.keys(nodes).map(id => {
 
     const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments} = nodes[id];
 
-    srcInfo.fileName = cleanDoubleDotsFromFilePath(srcInfo.fileName);
+    srcInfo.fileName = srcpathManager.cleanDoubleDots(srcInfo.fileName);
     srcInfo.cleanFileName = srcInfo.fileName.substring(commonPath.length, srcInfo.fileName.length);
 
-    groupsHolder.createGroup('namespace', namespace, 'rgba(238, 255, 170, 0.33)');
+    groupsHolder.createGroup('namespace', namespace, namespace, 'rgba(238, 255, 170, 0.33)');
     groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(105,	196,	47, 0.33)');
 
     return { key, name, data: { 

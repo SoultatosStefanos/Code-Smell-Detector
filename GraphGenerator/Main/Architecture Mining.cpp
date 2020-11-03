@@ -12,7 +12,6 @@ int main(int argc, const char** argv) {
 	sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();
-	srcLoader.PrintSourceFiles();
 	
 	//std::vector<std::string> srcs;
 	//srcs.push_back(path + "\\classes_simple.cpp");			
@@ -39,8 +38,6 @@ int main(int argc, const char** argv) {
 	std::ofstream jsonFile;
 	jsonFile.open(argv[2]);
 	jsonFile << json;
-	jsonFile.close();
+ 	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-
-
 }
