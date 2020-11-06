@@ -215,12 +215,40 @@
                             "id": "louvain",
                             "description": "Louvain",
                             "value": "louvain"
+                        },
+                        "louvain2": {
+                            "id": "louvain2",
+                            "description": "Louvain_2",
+                            "value": "louvain2"
+                        },
+                        "infomap": {
+                            "id": "infomap",
+                            "description": "Info Map",
+                            "value": "infomap"
+                        },
+                        "layeredLabelPropagation": {
+                            "id": "layeredLabelPropagation",
+                            "description": "Layered Label Propagation",
+                            "value": "layeredLabelPropagation"
                         }
                     },
                     "conditions": {},
                     "onChange": {
                         "event": "groupingBy"
                     }
+                },
+                "gamma": {
+                    "id": "layeredLabelPropagationGamma",
+                    "description": "γ",
+                    "type": "number",
+                    "value": 0,
+                    "min": 0,
+                    "max": 100,
+                    "step": 0.001,
+                    "conditions": {
+                        "displayed": "$currGroup.groupingBy.value === \"layeredLabelPropagation\""
+                    },
+                    "onChange": {}
                 }
             }
         },

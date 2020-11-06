@@ -1,7 +1,6 @@
-import { diagram } from "./Appearance/graphAppearance.js"
-import { obs } from "../Observer/observer.js"
-import totalWeight from "./utilities/totalWeight.js"
-import louvainCommunities from "./clusteringAlgorithms/louvain.js"
+import { diagram } from "../Appearance/graphAppearance.js"
+import { obs } from "../../Observer/observer.js"
+import totalWeight from "../utilities/totalWeight.js"
 
 function showAllEdges(value) {
   if (value) {
@@ -27,7 +26,6 @@ function weightFilter(value) {
   }, 'weightFilter');
 }
 
-
 function showWeights(value) {
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
@@ -42,9 +40,9 @@ function highlight(depKind) {
     diagram.model.commit(function (m) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'color', '#555555'); });
-      } 
+      }
       else {
-        m.linkDataArray.forEach((linkData) => {
+        m.linkDataArray.forEach((linkData) => { 
           if (linkData.data.dependencies[depKind] !== undefined)
             m.set(linkData, 'color', 'OrangeRed');
           else
@@ -73,97 +71,13 @@ function viewOnly(depKind) {
   }
 }
 
-
-function groupingByNamespace() {
-  diagram.model.commit(function (m) {
-    m.nodeDataArray.forEach((nodeData) => {
-      if (!nodeData.isGroup)
-        m.set(nodeData, 'group', nodeData.data.namespace);
-      else if (nodeData.type === 'namespace')
-        m.set(nodeData, 'visible', true);
-      else
-        m.set(nodeData, 'visible', false)
-    }, 'groupingByNamespace');
-  });
-}
-
-
-function groupingByFileName() {
-  diagram.model.commit(function (m) {
-    m.nodeDataArray.forEach((nodeData) => {
-      if (!nodeData.isGroup)
-        m.set(nodeData, 'group', nodeData.data.srcInfo.fileName);
-      else if (nodeData.type === 'fileName')
-        m.set(nodeData, 'visible', true)
-      else
-        m.set(nodeData, 'visible', false)
-    }, 'groupingByFileName');
-  });
-}
-
-function groupingByLouvain() {
-  diagram.model.commit(function (m) {
-    // remove the old Louvain groups and make invisible the other groups
-    m.nodeDataArray.forEach(nodeData => {
-      if (nodeData.isGroup && nodeData.type === 'louvain')
-        m.removeNodeData(nodeData);
-      else if (nodeData.isGroup)
-        m.set(nodeData, 'visible', false)
-    });
-
-    const communities = louvainCommunities(m.nodeDataArray, m.linkDataArray);
-
-    const communitiesFiles = {};
-    Object.values(communities).forEach((commynityKey) => {
-      communitiesFiles[commynityKey] = {};
-    });
-
-    const groupsArray = [];
-    m.nodeDataArray.forEach(nodeData => {
-      const key = communities[nodeData.key];
-      if (!nodeData.isGroup) {
-        if (communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] === undefined)
-          communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] = 1;
-        else
-          communitiesFiles[key][nodeData.data.srcInfo.cleanFileName] += 1;
-      }
-      if (!nodeData.isGroup && !groupsArray.some((group) => { return group.key === key })) {
-        groupsArray.push({ key, name: key, isGroup: true, type: 'louvain', visible: true });
-      }
-      m.set(nodeData, 'group', key);
-    });
-
-    groupsArray.forEach((group) => {
-      const groupFiles = communitiesFiles[group.key];
-      const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
-      group.name = name;
-    });
-
-    groupsArray.splice(0, 0, ...m.nodeDataArray);
-    m.mergeNodeDataArray(groupsArray);
-  });
-}
-
-
-function groupingByNone() {
-  diagram.model.commit(function (m) {
-    m.nodeDataArray.forEach((nodeData) => {
-      if (!nodeData.isGroup)
-        m.set(nodeData, 'group', undefined);
-      else
-        m.set(nodeData, 'visible', false)
-    }, 'groupingByNone');
-  });
-}
-
 function dependenciesConfig(data) {
   diagram.model.commit(function (m) {
-    m.linkDataArray.forEach((linkData) => {
-      m.set(linkData, 'weight', totalWeight(linkData.data.dependencies, data));
-    });
+      m.linkDataArray.forEach((linkData) => {
+          m.set(linkData, 'weight', totalWeight(linkData.data.dependencies, data));
+      });
   }, 'dependenciesConfig');
 }
-
 
 obs.install('allEdges', showAllEdges);
 obs.install('weightFilter', weightFilter);
@@ -193,10 +107,5 @@ obs.install('viewOnlyMethodReturn', viewOnly('MethodReturn'));
 obs.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
 obs.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
 
-
-obs.install('groupingBynamespace', groupingByNamespace);
-obs.install('groupingByfileName', groupingByFileName);
-obs.install('groupingBylouvain', groupingByLouvain);
-obs.install('groupingBynone', groupingByNone);
 
 obs.install('dependenciesConfig', dependenciesConfig); 
