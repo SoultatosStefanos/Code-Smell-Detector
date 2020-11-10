@@ -19,7 +19,12 @@ export const diagram =
 // Node
 diagram.nodeTemplate =
   $(go.Node, "Auto",
-    { locationSpot: go.Spot.Center, background: "lightblue", visible: true },
+    {
+      locationSpot: go.Spot.Center, 
+      background: "lightblue", 
+      visible: true,
+      layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized
+    },
     new go.Binding("location", "loc", go.Point.parse),
     new go.Binding("visible", "visible"),
     $(go.Shape,
@@ -59,7 +64,7 @@ diagram.nodeTemplate =
 
 
 // Group
-diagram.groupTemplate = $(go.Group, "Vertical",
+diagram.groupTemplate = $(go.Group, "Vertical", { layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized },
   $(go.Panel, "Auto",
     $(go.Shape, "RoundedRectangle",  // surrounds the Placeholder
       {
@@ -86,11 +91,12 @@ diagram.groupTemplate = $(go.Group, "Vertical",
     layout:
       $(PackedLayout,
         {
-          sortMode: PackedLayout.Area,
           packShape: PackedLayout.Rectangular,
           // packMode: PackedLayout.ExpandToFit,
           spacing: 15,
-          aspectRatio : 2
+          aspectRatio: 2,
+          isInitial: false,
+          isOngoing: false
         })
   }
 );
