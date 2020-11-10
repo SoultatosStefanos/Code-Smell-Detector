@@ -31,7 +31,7 @@ import srcpathManager from "./utilities/srcpathMangment.js"
     srcInfo.cleanFileName = srcInfo.fileName.substring(commonPath.length, srcInfo.fileName.length);
 
     groupsHolder.createGroup('namespace', namespace, namespace, 'rgba(238, 255, 170, 0.33)');
-    groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(105,	196,	47, 0.33)');
+    groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(173, 216, 230, 0.4)');
 
     return { key, name, data: { 
                                 namespace,

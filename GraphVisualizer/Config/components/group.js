@@ -32,7 +32,7 @@ export default Vue.component('group', {
                     </div>
 
                     <div v-else-if="data.type == 'number'">
-                        <number :data="data" :disabled="evalCondition(data.conditions.disabled)" :onChange="onChangeSelect"/>
+                        <number :data="data" :disabled="evalCondition(data.conditions.disabled)" :onChange="onChange"/>
                     </div>
 
                     <div v-else-if="data.type == 'applyButton'">

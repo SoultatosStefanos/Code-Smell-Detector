@@ -42,9 +42,9 @@ function highlight(depKind) {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'color', '#555555'); });
       }
       else {
-        m.linkDataArray.forEach((linkData) => { 
+        m.linkDataArray.forEach((linkData) => {
           if (linkData.data.dependencies[depKind] !== undefined)
-            m.set(linkData, 'color', 'OrangeRed');
+            m.set(linkData, 'color', 'rgb(71, 128, 236)');
           else
             m.set(linkData, 'color', '#555555');
         });
@@ -58,6 +58,9 @@ function viewOnly(depKind) {
     diagram.model.commit(function (m) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', true); });
+      }
+      else if (depKind === 'None') {
+        m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', false); });
       }
       else {
         m.linkDataArray.forEach((linkData) => {
@@ -73,9 +76,9 @@ function viewOnly(depKind) {
 
 function dependenciesConfig(data) {
   diagram.model.commit(function (m) {
-      m.linkDataArray.forEach((linkData) => {
-          m.set(linkData, 'weight', totalWeight(linkData.data.dependencies, data));
-      });
+    m.linkDataArray.forEach((linkData) => {
+      m.set(linkData, 'weight', totalWeight(linkData.data.dependencies, data));
+    });
   }, 'dependenciesConfig');
 }
 
@@ -106,6 +109,7 @@ obs.install('viewOnlyMethodDefinition', viewOnly('MethodDefinition'));
 obs.install('viewOnlyMethodReturn', viewOnly('MethodReturn'));
 obs.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
 obs.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
+obs.install('viewOnlyNodes', viewOnly('Nodes'));
 
 
-obs.install('dependenciesConfig', dependenciesConfig); 
+obs.install('dependenciesConfig', dependenciesConfig);

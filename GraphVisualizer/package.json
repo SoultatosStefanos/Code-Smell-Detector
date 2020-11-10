@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mapequation/infomap": "^1.2.0",
     "gojs": "^2.1.21",
     "graphology-communities-louvain": "^1.2.0",
     "npm": "^6.14.7",

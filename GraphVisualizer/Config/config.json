@@ -21,7 +21,7 @@
                     "type": "slider",
                     "value": 1,
                     "min": 1,
-                    "max": 100,
+                    "max": 1000,
                     "step": 0.5,
                     "conditions": {
                         "disabled": "$currGroup.allEdges.value === true"
@@ -177,11 +177,28 @@
                             "id": "MemberExpr",
                             "description": "Method Member Access",
                             "value": "MemberExpr"
+                        },
+                        "Nodes": {
+                            "id": "Nodes",
+                            "description": "Graph Nodes",
+                            "value": "Nodes"
                         }
                     },
                     "conditions": {},
                     "onChange": {
                         "event": "viewOnly"
+                    }
+                },
+                "groupEdges": {
+                    "id": "groypEdges",
+                    "description": "Show group Edges",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "disabled": "this.groups.grouping.data.groupingBy.value === \"none\""
+                    },
+                    "onChange": {
+                        "event": "groupEdges"
                     }
                 }
             }
@@ -248,7 +265,21 @@
                     "conditions": {
                         "displayed": "$currGroup.groupingBy.value === \"layeredLabelPropagation\""
                     },
-                    "onChange": {}
+                    "onChange": {
+                        "event": "layeredLabelPropagationGamma"
+                    }
+                },
+                "multiLevels": {
+                    "id": "multiLevels",
+                    "description": "Multi Levels",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "displayed": "$currGroup.groupingBy.value === \"infomap\""
+                    },
+                    "onChange": {
+                        "event": "infomapMultiLevels"
+                    }
                 }
             }
         },
