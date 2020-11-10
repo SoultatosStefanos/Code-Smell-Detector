@@ -27,8 +27,8 @@ const nodeContextMenu =
       let part = obj.part.adornedPart;
       let links = part.findLinksConnected();
       while (links.next()) {
-        if (links.value.findObject("LINK").stroke !== 'deepPink')
-          links.value.findObject("LINK").stroke = 'deepPink';
+        if (links.value.findObject("LINK").stroke !== '#ff2e9e')
+          links.value.findObject("LINK").stroke = '#ff2e9e';
         else
           links.value.findObject("LINK").stroke = '#555555';
       }

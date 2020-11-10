@@ -1,4 +1,5 @@
 import contextMenu from "./contextMenu.js"
+import { PackedLayout } from "../../node_modules/gojs/extensionsJSM/PackedLayout.js"
 
 const $ = go.GraphObject.make;
 export const diagram =
@@ -9,15 +10,13 @@ export const diagram =
       contentAlignment: go.Spot.Center,
       layout:
         $(go.ForceDirectedLayout,
-          // $(go.GridLayout)
-          // $(go.CircularLayout)
           { defaultSpringLength: 30, defaultElectricalCharge: 100 }),
       // "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
     }
   );
 
 
-  // Node
+// Node
 diagram.nodeTemplate =
   $(go.Node, "Auto",
     { locationSpot: go.Spot.Center, background: "lightblue", visible: true },
@@ -26,8 +25,10 @@ diagram.nodeTemplate =
     $(go.Shape,
       "RoundedRectangle",
       {
-        fill: "lightblue",
-        stroke: "gray",
+        // fill: "lightblue",
+        // stroke: "gray",
+        fill: "rgb(188, 229, 183)",
+        stroke: "rgb(56, 160, 85)",
         strokeWidth: 2
       }),
     $(go.TextBlock,
@@ -41,7 +42,7 @@ diagram.nodeTemplate =
     {
       selectionChanged: function (part) {
         var shape = part.elt(0);
-        shape.fill = part.isSelected ? "lightyellow" : "lightblue";
+        shape.stroke = part.isSelected ? "rgb(244, 128, 116)" : "rgb(56, 160, 85)";
       },
       toolTip:
         $("ToolTip",
@@ -80,7 +81,18 @@ diagram.groupTemplate = $(go.Group, "Vertical",
       visible: true
     },
     new go.Binding("text", "name")),
-  new go.Binding("visible", "visible")
+  new go.Binding("visible", "visible"),
+  {
+    layout:
+      $(PackedLayout,
+        {
+          sortMode: PackedLayout.Area,
+          packShape: PackedLayout.Rectangular,
+          // packMode: PackedLayout.ExpandToFit,
+          spacing: 15,
+          aspectRatio : 2
+        })
+  }
 );
 
 
@@ -91,8 +103,8 @@ diagram.linkTemplate =
     new go.Binding("visible", "visibleLink"),
     $(go.Shape,                                           // link
       {
-        strokeWidth: 0.9,
-        stroke: "#555555", 
+        strokeWidth: 1,
+        stroke: "#555555",
         name: "LINK"
       },
       new go.Binding("strokeWidth", "thick"),
@@ -102,7 +114,7 @@ diagram.linkTemplate =
         toArrow: "standard",
         stroke: "#555555",
         fill: "#555555",
-        scale: 0.9, 
+        scale: 0.9,
       },
       new go.Binding("stroke", "color").makeTwoWay(),
       new go.Binding("fill", "color").makeTwoWay()),

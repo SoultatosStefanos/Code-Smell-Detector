@@ -5,19 +5,17 @@
 body{
   font-family: sans-serif;
   color: #282828;
+  background-color:rgb(221, 225, 227);
+  margin: 0;
 }
 
 #diagramDiv {
   display: inline-block;
   position: absolute;
-  width: 73%; 
-  height: 95vh;   
-  margin: 1vw;
-  background-color:rgb(215, 220, 223);
-  border-style: solid; 
-  border-radius: 0.2vw;
-  border-width: 0.2vw;
-  border-color: rgba(24, 85, 164, 0.6);
+  width: 75.5vw; 
+  height: 99.5vh;   
+  margin: 0.2vw;
+  background-color:rgb(221, 225, 227);
 }
 
 #config {
@@ -25,14 +23,15 @@ body{
   vertical-align: top; 
   position: absolute;
   right: 0; 
-  width: 24%;
-  height: 95vh; 
-  margin: 1vw;
+  width: 24vw;
+  height: 99vh;   
+  margin: 0.1vw;
   background-color: rgb(235, 235, 235); 
   border-style: solid; 
-  border-radius: 0.2vw;
-  border-width: 0.2vw;
-  border-color: rgba(24, 85, 164, 0.6);
+  border-radius: 0.15vw;
+  border-width: 0.15vw;
+  border-color: rgba(24, 85, 164, .3);
+  box-shadow: 0 0 1vw rgba(34, 36, 38,.2);
 } 
 
 #configTitle {
@@ -45,7 +44,7 @@ body{
 }
 
 #configData {
-  height: 88vh; 
+  height: 92.3vh; 
   overflow: auto;
 }
 
