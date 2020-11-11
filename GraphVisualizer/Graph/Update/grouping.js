@@ -31,12 +31,24 @@ function groupEdges(value) {
                 let toGroup = nodesGroups[linkData.to];
                 if (groupEdges[nodesGroups[linkData.from]] === undefined) {
                     groupEdges[fromGroup] = {};
-                    groupEdges[fromGroup][toGroup] = linkData.weight;
+                    groupEdges[fromGroup][toGroup] = {};
+                    groupEdges[fromGroup][toGroup].dependencies = { ...linkData.data.dependencies };
+                    groupEdges[fromGroup][toGroup].weight = linkData.weight;
                 } else {
-                    if (groupEdges[fromGroup][toGroup] === undefined)
-                        groupEdges[fromGroup][toGroup] = linkData.weight;
-                    else
-                        groupEdges[fromGroup][toGroup] += linkData.weight;
+                    if (groupEdges[fromGroup][toGroup] === undefined) {
+                        groupEdges[fromGroup][toGroup] = {};
+                        groupEdges[fromGroup][toGroup].dependencies = { ...linkData.data.dependencies };
+                        groupEdges[fromGroup][toGroup].weight = linkData.weight;
+                    } else{
+                        groupEdges[fromGroup][toGroup].weight += linkData.weight;
+                        Object.keys(linkData.data.dependencies).forEach((dep) => {
+                            if(groupEdges[fromGroup][toGroup].dependencies[dep] === undefined){
+                                groupEdges[fromGroup][toGroup].dependencies[dep] = linkData.data.dependencies[dep];
+                            }else{
+                                groupEdges[fromGroup][toGroup].dependencies[dep] += linkData.data.dependencies[dep];
+                            }
+                        });
+                    }
                 }
             });
 
@@ -44,7 +56,7 @@ function groupEdges(value) {
             let count = 0;
             Object.keys(groupEdges).forEach((from) => {
                 Object.keys(groupEdges[from]).forEach((to) => {
-                    groupEdgesArray.push({ from, to, weight: groupEdges[from][to], type: 'groupEdge', data: { dependencies: {} } });
+                    groupEdgesArray.push({ from, to, weight: groupEdges[from][to].weight, type: 'groupEdge', data: { dependencies: groupEdges[from][to].dependencies } });
                 });
             });
 
