@@ -3,11 +3,9 @@ import { obs } from "../../Observer/observer.js"
 import louvainCommunities from "../clusteringAlgorithms/louvain.js"
 import jLayeredLabelPropagation from "../ClusteringAlgorithms/layeredLabelPropagation.js"
 import jLouvain from "../clusteringAlgorithms/jlouvain.js"
-
-var groupEdges_flag = false;
+import config from "./configValues.js"
 
 function groupEdges(value) {
-    groupEdges_flag = value;
     diagram.model.commit(function (m) {
         if (value) {
             for (let i = 0; i < m.linkDataArray.length; ++i) {
@@ -39,12 +37,12 @@ function groupEdges(value) {
                         groupEdges[fromGroup][toGroup] = {};
                         groupEdges[fromGroup][toGroup].dependencies = { ...linkData.data.dependencies };
                         groupEdges[fromGroup][toGroup].weight = linkData.weight;
-                    } else{
+                    } else {
                         groupEdges[fromGroup][toGroup].weight += linkData.weight;
                         Object.keys(linkData.data.dependencies).forEach((dep) => {
-                            if(groupEdges[fromGroup][toGroup].dependencies[dep] === undefined){
+                            if (groupEdges[fromGroup][toGroup].dependencies[dep] === undefined) {
                                 groupEdges[fromGroup][toGroup].dependencies[dep] = linkData.data.dependencies[dep];
-                            }else{
+                            } else {
                                 groupEdges[fromGroup][toGroup].dependencies[dep] += linkData.data.dependencies[dep];
                             }
                         });
@@ -56,7 +54,14 @@ function groupEdges(value) {
             let count = 0;
             Object.keys(groupEdges).forEach((from) => {
                 Object.keys(groupEdges[from]).forEach((to) => {
-                    groupEdgesArray.push({ from, to, weight: groupEdges[from][to].weight, type: 'groupEdge', data: { dependencies: groupEdges[from][to].dependencies } });
+                    groupEdgesArray.push({
+                        from,
+                        to,
+                        weight: groupEdges[from][to].weight,
+                        type: 'groupEdge',
+                        data: { dependencies: groupEdges[from][to].dependencies },
+                        visibleWeight: config.showWeightsFlag
+                    });
                 });
             });
 
@@ -73,9 +78,11 @@ function groupEdges(value) {
                 }
                 else
                     m.set(linkData, 'visibleLink', true);
-            };
+            }
         }
+        config.recover.groupEdges(value);
     });
+
 }
 
 function groupingByNone() {
@@ -86,10 +93,9 @@ function groupingByNone() {
             else
                 m.set(nodeData, 'visible', false)
         }, 'groupingByNone');
+        config.recover.groupingByNone();
     });
-    const old_groupEdges_flag = groupEdges_flag;
-    groupEdges(false);
-    groupEdges_flag = old_groupEdges_flag;
+    
 }
 
 function groupingByNamespace() {
@@ -103,7 +109,7 @@ function groupingByNamespace() {
                 m.set(nodeData, 'visible', false)
         }, 'groupingByNamespace');
     });
-    groupEdges(groupEdges_flag);
+    config.recover.groupingBy();
 }
 
 function groupingByFileName() {
@@ -117,7 +123,7 @@ function groupingByFileName() {
                 m.set(nodeData, 'visible', false)
         }, 'groupingByFileName');
     });
-    groupEdges(groupEdges_flag);
+    config.recover.groupingBy();
 }
 
 function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)') {
@@ -151,7 +157,7 @@ function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)
 
     groupsArray.splice(0, 0, ...m.nodeDataArray);
     m.mergeNodeDataArray(groupsArray);
-    groupEdges(groupEdges_flag);
+    config.recover.groupingBy();
 }
 
 function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238, 255, 170, 0.33)') {
@@ -201,7 +207,7 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
 
     groupsArray.splice(0, 0, ...m.nodeDataArray);
     m.mergeNodeDataArray(groupsArray);
-    groupEdges(groupEdges_flag);
+    config.recover.groupingBy();
 }
 
 function groupingByLouvain() {
@@ -234,8 +240,8 @@ function groupingByLouvain2() {
         }
 
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
-        const edges = m.linkDataArray.map(({ from, to, weight }) => {
-            if (weight !== 0) {
+        const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
+            if (weight !== 0 && type === 'nodeEdge') {
                 // remove the edges that has weight 0
                 return { source: from, target: to, value: weight };
             }
@@ -268,8 +274,9 @@ function groupingByInfomap(mode = '-d --two-level --silent') {
             network += index + ' \"' + nodeName + '\"\n';
         });
         network += '*Edges ' + m.linkDataArray.length + '\n';
-        m.linkDataArray.forEach(({ from, to, weight }) => {
-            network += nodes.indexOf(from) + ' ' + nodes.indexOf(to) + ' ' + weight + '\n';
+        m.linkDataArray.forEach(({ from, to, weight, type }) => {
+            if (weight !== 0 && type === 'nodeEdge')
+                network += nodes.indexOf(from) + ' ' + nodes.indexOf(to) + ' ' + weight + '\n';
         });
 
         const Infomap = window.infomap.default;
@@ -320,11 +327,9 @@ function groupingByLayeredLabelPropagation(gamma = 0) {
         };
 
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
-        const edges = m.linkDataArray.map(({ from, to, weight }) => {
-            if (weight !== 0) {
-                // remove the edges that has weight 0
+        const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
+            if (weight !== 0 && type === 'nodeEdge')
                 return { source: from, target: to, value: weight };
-            }
         }).filter(key => key !== undefined);
 
         let communities = jLayeredLabelPropagation(nodes, edges, gamma);
@@ -347,3 +352,7 @@ obs.install('groupingByinfomap', groupingByInfomap);
 obs.install('infomapMultiLevels', infomapMultiLevels);
 obs.install('groupingBylayeredLabelPropagation', groupingByLayeredLabelPropagation);
 obs.install('layeredLabelPropagationGamma', layeredLabelPropagationGamma);
+
+export default {
+    groupEdges
+}

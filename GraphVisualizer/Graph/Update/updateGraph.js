@@ -1,29 +1,32 @@
 import { diagram } from "../Appearance/graphAppearance.js"
 import { obs } from "../../Observer/observer.js"
 import totalWeight from "../utilities/totalWeight.js"
+import config from "./configValues.js"
 
-function showAllEdges(value) {
-  if (value) {
-    diagram.model.commit(function (m) {
-      m.linkDataArray.forEach((linkData) => {
-        m.set(linkData, 'visibleLink', true);
-      });
-    });
-  }
-};
-
-function weightFilter(value) {
-  console.log('weightFilter');
+function filterWeights(value = config.weightFilterValue) {
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
-      if (linkData.weight < value) {
+      if (linkData.weight < value)
         m.set(linkData, 'visibleLink', false);
-      }
-      else {
-        m.set(linkData, 'visibleLink', true);
-      }
     });
-  }, 'weightFilter');
+  });
+}
+
+function weightFilter(value) {
+  diagram.model.commit(function (m) {
+    let type;
+    if (config.groupEdgesFlag)
+      type = 'groupEdge'
+    else
+      type = 'nodeEdge'
+    m.linkDataArray.forEach((linkData) => {
+      if (linkData.type === type)
+        m.set(linkData, 'visibleLink', true);
+    });
+    filterWeights(value);
+
+    config.recover.weightFilter(value);
+  });
 }
 
 function showWeights(value) {
@@ -32,7 +35,7 @@ function showWeights(value) {
       m.set(linkData, 'visibleWeight', value);
     });
   }, 'showWeights');
-
+  config.recover.showWeights(value);
 };
 
 function highlight(depKind) {
@@ -59,7 +62,7 @@ function viewOnly(depKind) {
       if (depKind === 'None') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', true); });
       }
-      else if (depKind === 'None') {
+      else if (depKind === 'Nodes') {
         m.linkDataArray.forEach((linkData) => { m.set(linkData, 'visibleLink', false); });
       }
       else {
@@ -70,7 +73,9 @@ function viewOnly(depKind) {
             m.set(linkData, 'visibleLink', false);
         });
       }
-    }, 'highlight');
+    }, 'viewOnly');
+
+    config.recover.viewOnly(depKind);
   }
 }
 
@@ -82,7 +87,6 @@ function dependenciesConfig(data) {
   }, 'dependenciesConfig');
 }
 
-obs.install('allEdges', showAllEdges);
 obs.install('weightFilter', weightFilter);
 obs.install('showWeights', showWeights);
 obs.install('highlightNone', highlight('None'));
@@ -111,5 +115,12 @@ obs.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
 obs.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
 obs.install('viewOnlyNodes', viewOnly('Nodes'));
 
-
 obs.install('dependenciesConfig', dependenciesConfig);
+
+export default {
+  weightFilter,
+  showWeights,
+  highlight,
+  viewOnly, 
+  filterWeights
+}

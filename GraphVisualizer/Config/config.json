@@ -5,16 +5,6 @@
             "id": "filtering",
             "description": "Filtering Edges",
             "data": {
-                "allEdges": {
-                    "id": "allEdges",
-                    "description": "Show all Edges",
-                    "type": "checkbox",
-                    "value": true,
-                    "conditions": {},
-                    "onChange": {
-                        "event": "allEdges"
-                    }
-                },
                 "weightFilter": {
                     "id": "weightFilter",
                     "description": "Filter via Weights",
@@ -23,9 +13,7 @@
                     "min": 1,
                     "max": 1000,
                     "step": 0.5,
-                    "conditions": {
-                        "disabled": "$currGroup.allEdges.value === true"
-                    },
+                    "conditions": {},
                     "onChange": {
                         "event": "weightFilter"
                     }
@@ -184,7 +172,9 @@
                             "value": "Nodes"
                         }
                     },
-                    "conditions": {},
+                    "conditions": {
+                        "disabled": "$currGroup.groupEdges.value === true"
+                    },
                     "onChange": {
                         "event": "viewOnly"
                     }

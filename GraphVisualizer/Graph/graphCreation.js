@@ -52,7 +52,7 @@ import srcpathManager from "./utilities/srcpathMangment.js"
 
   const linkDataArray = edges.map(({ from, to, dependencies }) => {
     let weight = totalWeight(dependencies);
-    return { from, to, weight, data: { dependencies } };
+    return { from, to, weight, type: 'nodeEdge', data: { dependencies } };
   });
 
   diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
