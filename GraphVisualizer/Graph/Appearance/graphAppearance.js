@@ -1,5 +1,5 @@
-import contextMenu from "./contextMenu.js"
 import { PackedLayout } from "../../node_modules/gojs/extensionsJSM/PackedLayout.js"
+import contextMenu from "./contextMenu.js"
 
 const $ = go.GraphObject.make;
 export const diagram =
@@ -95,8 +95,6 @@ diagram.groupTemplate = $(go.Group, "Vertical", { layoutConditions: go.Part.Layo
           // packMode: PackedLayout.ExpandToFit,
           spacing: 15,
           aspectRatio: 2,
-          isInitial: false,
-          isOngoing: false
         })
   }
 );
