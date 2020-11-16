@@ -169,11 +169,7 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
         return commKey;
     };
 
-    // const communitiesFiles = {};
-    // Object.values(communities).forEach((key) => {
-    //     communitiesFiles[communityKey(key)] = {};
-    // });
-
+    const communitiesFiles = {};
     const groupsArray = [];
     m.nodeDataArray.forEach(nodeData => {
         if (!nodeData.isGroup) {
@@ -181,12 +177,14 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
             let parentCommKey = undefined;
             for (let i = 0; i < path.length - 1; ++i) {        // ignore the last group since contains just the node
                 const commKey = communityKey(path, i);
-                // if (!nodeData.isGroup) {
-                //     if (communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] === undefined)
-                //         communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] = 1;
-                //     else
-                //         communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] += 1;
-                // }
+                if (!nodeData.isGroup) {
+                    if (communitiesFiles[commKey] === undefined)
+                        communitiesFiles[commKey] = {};
+                    if (communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] === undefined)
+                        communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] = 1;
+                    else
+                        communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] += 1;
+                }
 
                 if (!groupsArray.some((group) => { return group.key === commKey })) {
                     groupsArray.push({ key: commKey, name: commKey, isGroup: true, type, visible: true, group: parentCommKey, fill });
@@ -199,11 +197,13 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
         }
     });
 
-    // groupsArray.forEach((group) => {
-    //     const groupFiles = communitiesFiles[group.key];
-    //     const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
-    //     group.name = name;
-    // });
+    console.log(communitiesFiles);
+
+    groupsArray.forEach((group) => {
+        const groupFiles = communitiesFiles[group.key];
+        const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
+        group.name = name;
+    });
 
     groupsArray.splice(0, 0, ...m.nodeDataArray);
     m.mergeNodeDataArray(groupsArray);

@@ -17,33 +17,35 @@ import srcpathManager from "./utilities/srcpathMangment.js"
       this[type].push({ key, name, isGroup: true, type, fill, visible });
     }
   }
-  
-  let commonPath = ""; 
+
+  let commonPath = "";
   Object.keys(nodes).map(id => {
+    nodes[id].srcInfo.fileName = srcpathManager.cleanDoubleDots(nodes[id].srcInfo.fileName);
     commonPath = srcpathManager.commonPathDetection(nodes[id].srcInfo.fileName);
   });
 
   const nodeDataArray = Object.keys(nodes).map(id => {
 
-    const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments} = nodes[id];
+    const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments } = nodes[id];
 
-    srcInfo.fileName = srcpathManager.cleanDoubleDots(srcInfo.fileName);
     srcInfo.cleanFileName = srcInfo.fileName.substring(commonPath.length, srcInfo.fileName.length);
 
     groupsHolder.createGroup('namespace', namespace, namespace, 'rgba(238, 255, 170, 0.33)');
     groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(173, 216, 230, 0.4)');
 
-    return { key, name, data: { 
-                                namespace,
-                                structureType,
-                                srcInfo, 
-                                fields, 
-                                bases, 
-                                friends,
-                                methods, 
-                                nestedParent,
-                                templateArguments
-                               } };
+    return {
+      key, name, data: {
+        namespace,
+        structureType,
+        srcInfo,
+        fields,
+        bases,
+        friends,
+        methods,
+        nestedParent,
+        templateArguments
+      }
+    };
   });
 
 
