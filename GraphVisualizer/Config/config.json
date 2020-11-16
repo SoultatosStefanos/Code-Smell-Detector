@@ -259,8 +259,8 @@
                         "event": "layeredLabelPropagationGamma"
                     }
                 },
-                "multiLevels": {
-                    "id": "multiLevels",
+                "infomapMultiLevels": {
+                    "id": "infomapMultiLevels",
                     "description": "Multi Levels",
                     "type": "checkbox",
                     "value": false,
@@ -269,6 +269,18 @@
                     },
                     "onChange": {
                         "event": "infomapMultiLevels"
+                    }
+                },
+                "louvainMultiLevels": {
+                    "id": "louvainMultiLevels",
+                    "description": "Multi Levels",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "displayed": "$currGroup.groupingBy.value === \"louvain2\""
+                    },
+                    "onChange": {
+                        "event": "louvainMultiLevels"
                     }
                 }
             }

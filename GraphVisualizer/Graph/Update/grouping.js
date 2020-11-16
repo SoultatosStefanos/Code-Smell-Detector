@@ -95,7 +95,7 @@ function groupingByNone() {
         }, 'groupingByNone');
         config.recover.groupingByNone();
     });
-    
+
 }
 
 function groupingByNamespace() {
@@ -227,11 +227,11 @@ function groupingByLouvain() {
     });
 }
 
-function groupingByLouvain2() {
+function groupingByLouvain2(mode = config.louvainMultiLevels) {
     diagram.model.commit(function (m) {
         for (let i = 0; i < m.nodeDataArray.length; ++i) {
             let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'louvain2') {
+            if (nodeData.isGroup && nodeData.type === '2louvain') {
                 m.removeNodeData(nodeData);
                 --i;
             }
@@ -248,15 +248,24 @@ function groupingByLouvain2() {
         }).filter(key => key !== undefined);
 
 
-        let communities = jLouvain(nodes, edges, 0.0000001);
+        let communities = jLouvain(nodes, edges, 0.0000001, mode);//, multiLevels);
 
         console.log(communities);
-        clusteringGrouping(communities, 'louvain2', m);
+        clusteringGroupingWithSubGroups(communities, '2louvain', m, 'rgba(128,128,128,0.33)');
+        // clusteringGrouping(communities, 'louvain2', m);
 
     });
 }
 
-function groupingByInfomap(mode = '-d --two-level --silent') {
+function louvainMultiLevels(multi) {
+    if (multi)
+        groupingByLouvain2('multiLevels');
+    else
+        groupingByLouvain2('twoLevels');
+    config.recover.louvainMultiLevels(multi);
+}
+
+function groupingByInfomap(mode = config.infomapMultiLevels) {
     diagram.model.commit(function (m) {
         for (let i = 0; i < m.nodeDataArray.length; ++i) {
             let nodeData = m.nodeDataArray[i];
@@ -298,6 +307,7 @@ function groupingByInfomap(mode = '-d --two-level --silent') {
                         nodeID: nodes[res[3]]
                     }
                 }
+                console.log(communities);
                 clusteringGroupingWithSubGroups(communities, 'infomap', m, 'rgba(238, 255, 170, 0.33)');
 
             });
@@ -312,6 +322,7 @@ function infomapMultiLevels(multi) {
         groupingByInfomap('-d --silent');
     else
         groupingByInfomap('-d --two-level --silent');
+    config.recover.infomapMultiLevels(multi);
 }
 
 function groupingByLayeredLabelPropagation(gamma = 0) {
@@ -348,6 +359,7 @@ obs.install('groupingBynamespace', groupingByNamespace);
 obs.install('groupingByfileName', groupingByFileName);
 obs.install('groupingBylouvain', groupingByLouvain);
 obs.install('groupingBylouvain2', groupingByLouvain2);
+obs.install('louvainMultiLevels', louvainMultiLevels);
 obs.install('groupingByinfomap', groupingByInfomap);
 obs.install('infomapMultiLevels', infomapMultiLevels);
 obs.install('groupingBylayeredLabelPropagation', groupingByLayeredLabelPropagation);

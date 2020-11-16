@@ -6,6 +6,8 @@ var config = {
     showWeightsFlag: true,
     groupEdgesFlag: false,
     viewOnlyDepType: 'None',
+    louvainMultiLevels: 'twoLevels', 
+    infomapMultiLevels: '-d --two-level --silent',
     recover: {
         'groupEdges': (value) => {
             config.groupEdgesFlag = value;
@@ -32,6 +34,12 @@ var config = {
         },
         'showWeights': (value) => {
             config.showWeightsFlag = value;
+        }, 
+        'louvainMultiLevels': (value) => {
+            config.louvainMultiLevels = value;
+        },
+        'infomapMultiLevels': (value) => {
+            config.infomapMultiLevels = value;
         }
     }
 };

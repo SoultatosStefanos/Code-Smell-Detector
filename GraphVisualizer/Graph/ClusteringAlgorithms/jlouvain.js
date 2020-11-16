@@ -15,12 +15,12 @@
 // there will also exist self-loops that represent the sum of all links in a given community (strictly connecting nodes inside of it) before being
 // collapsed into a single one.
 
-let jLouvain = function (nds, edgs, __MIN) { // A function expression can be stored in a variable. After it has been
+let jLouvain = function (nds, edgs, __MIN, mode) { // A function expression can be stored in a variable. After it has been
     // stored this way, it can be used as a function. Functions stored in variables do not need
     // names. They are always invoked using the variable name.
 
     // Constants
-   // let __MIN = 0.0000001; // Below this difference of actual versus previous modularity, Louvain algorithm iteration stops.
+    // let __MIN = 0.0000001; // Below this difference of actual versus previous modularity, Louvain algorithm iteration stops.
 
     // Global Variables
     let original_graph_nodes; // Defined in the core() of the algorithm.
@@ -100,12 +100,12 @@ let jLouvain = function (nds, edgs, __MIN) { // A function expression can be sto
     function add_edge_to_graph(graph, edge) { // Edge is an object that specifies the source node, target node, and weight.
         update_assoc_mat(graph, edge); // Updating assoc_mat with the new edge's weight.
 
-        if (edge_index[edge.source+'_'+edge.target]) { // There is no weight to update in edge_index.
-            graph.edges[edge_index[edge.source+'_'+edge.target]].weight = edge.weight; // Because it is already in edges
+        if (edge_index[edge.source + '_' + edge.target]) { // There is no weight to update in edge_index.
+            graph.edges[edge_index[edge.source + '_' + edge.target]].weight = edge.weight; // Because it is already in edges
             // from example.html and edge_index (because of the next part). Update the weight in graph.edges.
         } else {
             graph.edges.push(edge); // Add edge to graph.edges.
-            edge_index[edge.source+'_'+edge.target] = graph.edges.length - 1; // Update edge_index with new value.
+            edge_index[edge.source + '_' + edge.target] = graph.edges.length - 1; // Update edge_index with new value.
         }
     }
     // edge_index accumulates only the new edges that are added to graph.edges.
@@ -133,7 +133,7 @@ let jLouvain = function (nds, edgs, __MIN) { // A function expression can be sto
     // Matrix where i is the source and j the target node of the respective edge. The numeric value corresponds to the edge weight.
 
     function clone(obj) {
-        if (obj === null || typeof(obj) !== 'object')
+        if (obj === null || typeof (obj) !== 'object')
             return obj;
 
         let temp = obj.constructor();
@@ -345,7 +345,7 @@ let jLouvain = function (nds, edgs, __MIN) { // A function expression can be sto
 
     // Community aggregation:
     function induced_graph(partition, graph) { // partition has status.nodes_to_com format.
-        let ret = {nodes: [], edges: [], _assoc_mat: {}}; // Output.
+        let ret = { nodes: [], edges: [], _assoc_mat: {} }; // Output.
         let w_prec, weight;
 
         // Add nodes from partition values
@@ -358,7 +358,7 @@ let jLouvain = function (nds, edgs, __MIN) { // A function expression can be sto
             let com2 = partition[edge.target]; // Target node community.
             w_prec = (get_edge_weight(ret, com1, com2) || 0); // get_edge_weight(graph, node1, node2) {}.
             let new_weight = (w_prec + weight); // new_weight is not summing to itself.
-            add_edge_to_graph(ret, {'source': com1, 'target': com2, 'weight': new_weight}); // Inserting community aggregated edges.
+            add_edge_to_graph(ret, { 'source': com1, 'target': com2, 'weight': new_weight }); // Inserting community aggregated edges.
         });
 
         edge_index = {}; // Reset edge_index.
@@ -423,21 +423,58 @@ let jLouvain = function (nds, edgs, __MIN) { // A function expression can be sto
         return status_list; // Dendogram is a set of ordered partitions.
     }
 
-        if (nds.length > 0) {
-            original_graph_nodes = nds; // Global variable.
-            original_graph_edges = edgs; // Global variable.
+    if (nds.length > 0) {
+        original_graph_nodes = nds; // Global variable.
+        original_graph_edges = edgs; // Global variable.
 
-            let assoc_mat = make_assoc_mat(edgs);
-            original_graph = { // Global variable. Graph is an object with node (node), edge (edges) and weight (_assoc_mat) properties.
-                'nodes': original_graph_nodes,
-                'edges': original_graph_edges,
-                '_assoc_mat': assoc_mat
-            };
+        let assoc_mat = make_assoc_mat(edgs);
+        original_graph = { // Global variable. Graph is an object with node (node), edge (edges) and weight (_assoc_mat) properties.
+            'nodes': original_graph_nodes,
+            'edges': original_graph_edges,
+            '_assoc_mat': assoc_mat
+        };
+    }
+
+
+    // Krystallia Savvaki 
+
+    function data_format(dendogram) {
+        let length = dendogram.length;
+        let paths = [];
+        let obj = dendogram[0];
+        Object.keys(obj).forEach((key) => {
+            paths[key] = {
+                'path': [obj[key]],
+                'nodeId': key
+            }
+        });
+        let oldPaths = paths;
+        for (let i = 1; i < dendogram.length; ++i) {
+            obj = dendogram[i];
+            paths = [];
+            Object.keys(oldPaths).forEach((nodeId) => {
+                let path = oldPaths[nodeId].path;
+                path.unshift(obj[path[0]]);
+                paths[nodeId] = oldPaths[nodeId]
+            });
+
+            oldPaths = paths;
         }
+        return paths;
+    }
 
-        let dendogram = generate_dendogram(original_graph, partition_init); // Global variables.
+    let dendogram = generate_dendogram(original_graph, partition_init); // Global variables.
 
-    return partition_at_level(dendogram, dendogram.length - 1);
+    let data = data_format(dendogram);
+    if (mode === 'twoLevels') {
+        Object.keys(data).forEach((nodeId) => {
+            let lastLevel = data[nodeId].path[0];
+            data[nodeId].path = [ lastLevel, lastLevel ]; // ignore the last 
+         });
+    }
+
+    return data;
+    // return partition_at_level(dendogram, dendogram.length - 1);
 
 };
 
