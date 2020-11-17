@@ -218,15 +218,15 @@
                             "description": "File",
                             "value": "fileName"
                         },
+                        "louvainOld": {
+                            "id": "louvaiOld",
+                            "description": "Louvain Old",
+                            "value": "louvainOld"
+                        },
                         "louvain": {
                             "id": "louvain",
                             "description": "Louvain",
                             "value": "louvain"
-                        },
-                        "louvain2": {
-                            "id": "louvain2",
-                            "description": "Louvain_2",
-                            "value": "louvain2"
                         },
                         "infomap": {
                             "id": "infomap",
@@ -259,6 +259,18 @@
                         "event": "layeredLabelPropagationGamma"
                     }
                 },
+                "louvainMultiLevels": {
+                    "id": "louvainMultiLevels",
+                    "description": "Multi Levels",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "displayed": "$currGroup.groupingBy.value === \"louvain\""
+                    },
+                    "onChange": {
+                        "event": "louvainMultiLevels"
+                    }
+                }, 
                 "infomapMultiLevels": {
                     "id": "infomapMultiLevels",
                     "description": "Multi Levels",
@@ -269,18 +281,6 @@
                     },
                     "onChange": {
                         "event": "infomapMultiLevels"
-                    }
-                },
-                "louvainMultiLevels": {
-                    "id": "louvainMultiLevels",
-                    "description": "Multi Levels",
-                    "type": "checkbox",
-                    "value": false,
-                    "conditions": {
-                        "displayed": "$currGroup.groupingBy.value === \"louvain2\""
-                    },
-                    "onChange": {
-                        "event": "louvainMultiLevels"
                     }
                 }
             }

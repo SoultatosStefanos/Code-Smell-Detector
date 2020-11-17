@@ -1,5 +1,5 @@
 import { diagram } from "../Appearance/graphAppearance.js"
-import { obs } from "../../Observer/observer.js"
+import obs from "../../Observer/observer.js"
 import louvainCommunities from "../clusteringAlgorithms/louvain.js"
 import jLayeredLabelPropagation from "../ClusteringAlgorithms/layeredLabelPropagation.js"
 import jLouvain from "../clusteringAlgorithms/jlouvain.js"
@@ -126,6 +126,7 @@ function groupingByFileName() {
     config.recover.groupingBy();
 }
 
+// Given communities with a standard format create groups and insert them in the graph  
 function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)') {
     const communityKey = (key) => { return type + '_' + key };
 
@@ -160,6 +161,21 @@ function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)
     config.recover.groupingBy();
 }
 
+ 
+/*
+Given multi-level communities with a standard format create groups and insert them in the graph 
+[
+    node_id1 : {
+        "nodeId": node_id1, 
+        "path": [..path..]
+    }, 
+    node_id2 : ...
+]
+
+node_idi: is the key of the node i 
+path: is the path from the outer to the inner cluster (ex. [1, 2, 3])
+
+*/ 
 function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238, 255, 170, 0.33)') {
     const communityKey = (path, index) => {
         let commKey = type;
@@ -197,8 +213,6 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
         }
     });
 
-    console.log(communitiesFiles);
-
     groupsArray.forEach((group) => {
         const groupFiles = communitiesFiles[group.key];
         const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
@@ -210,11 +224,11 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
     config.recover.groupingBy();
 }
 
-function groupingByLouvain() {
+function groupingByLouvainOld() {
     diagram.model.commit(function (m) {
         for (let i = 0; i < m.nodeDataArray.length; ++i) {
             let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'louvain') {
+            if (nodeData.isGroup && nodeData.type === 'louvainOld') {
                 m.removeNodeData(nodeData);
                 --i;
             }
@@ -223,15 +237,15 @@ function groupingByLouvain() {
         };
 
         const communities = louvainCommunities(m.nodeDataArray, m.linkDataArray);
-        clusteringGrouping(communities, 'louvain', m);
+        clusteringGrouping(communities, 'louvainOld', m);
     });
 }
 
-function groupingByLouvain2(mode = config.louvainMultiLevels) {
+function groupingByLouvain(mode = config.louvainMultiLevels) {
     diagram.model.commit(function (m) {
         for (let i = 0; i < m.nodeDataArray.length; ++i) {
             let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === '2louvain') {
+            if (nodeData.isGroup && nodeData.type === 'louvain') {
                 m.removeNodeData(nodeData);
                 --i;
             }
@@ -248,20 +262,17 @@ function groupingByLouvain2(mode = config.louvainMultiLevels) {
         }).filter(key => key !== undefined);
 
 
-        let communities = jLouvain(nodes, edges, 0.0000001, mode);//, multiLevels);
+        let communities = jLouvain(nodes, edges, 0.0000001, mode);
 
-        console.log(communities);
-        clusteringGroupingWithSubGroups(communities, '2louvain', m, 'rgba(128,128,128,0.33)');
-        // clusteringGrouping(communities, 'louvain2', m);
-
+        clusteringGroupingWithSubGroups(communities, 'louvain', m, 'rgba(128,128,128,0.33)');
     });
 }
 
 function louvainMultiLevels(multi) {
     if (multi)
-        groupingByLouvain2('multiLevels');
+        groupingByLouvain('multiLevels');
     else
-        groupingByLouvain2('twoLevels');
+        groupingByLouvain('twoLevels');
     config.recover.louvainMultiLevels(multi);
 }
 
@@ -307,12 +318,9 @@ function groupingByInfomap(mode = config.infomapMultiLevels) {
                         nodeID: nodes[res[3]]
                     }
                 }
-                console.log(communities);
                 clusteringGroupingWithSubGroups(communities, 'infomap', m, 'rgba(238, 255, 170, 0.33)');
-
             });
 
-        // infomap.run(network, " -d --silent");
         infomap.run(network, mode);
     });
 }
@@ -358,7 +366,7 @@ obs.install('groupingBynone', groupingByNone);
 obs.install('groupingBynamespace', groupingByNamespace);
 obs.install('groupingByfileName', groupingByFileName);
 obs.install('groupingBylouvain', groupingByLouvain);
-obs.install('groupingBylouvain2', groupingByLouvain2);
+obs.install('groupingBylouvainOld', groupingByLouvainOld);
 obs.install('louvainMultiLevels', louvainMultiLevels);
 obs.install('groupingByinfomap', groupingByInfomap);
 obs.install('infomapMultiLevels', infomapMultiLevels);

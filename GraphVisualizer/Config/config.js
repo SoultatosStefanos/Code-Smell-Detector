@@ -1,4 +1,4 @@
-import { obs } from "../Observer/observer.js"
+import obs from "../Observer/observer.js"
 import config_window from "./components/configWindow.js"
 
 (async () => {

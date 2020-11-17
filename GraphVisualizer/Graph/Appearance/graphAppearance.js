@@ -2,7 +2,8 @@ import { PackedLayout } from "../../node_modules/gojs/extensionsJSM/PackedLayout
 import contextMenu from "./contextMenu.js"
 
 const $ = go.GraphObject.make;
-export const diagram =
+
+const diagram =
   $(go.Diagram, "diagramDiv",
     {
       "undoManager.isEnabled": true,
@@ -20,8 +21,8 @@ export const diagram =
 diagram.nodeTemplate =
   $(go.Node, "Auto",
     {
-      locationSpot: go.Spot.Center, 
-      background: "lightblue", 
+      locationSpot: go.Spot.Center,
+      background: "lightblue",
       visible: true,
       layoutConditions: go.Part.LayoutStandard & ~go.Part.LayoutNodeSized
     },
@@ -154,3 +155,8 @@ diagram.linkTemplate =
     }
   );
 
+
+export {
+  contextMenu,
+  diagram
+}

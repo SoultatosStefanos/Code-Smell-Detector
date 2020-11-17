@@ -17,4 +17,5 @@ Subject.prototype = {
     }
 }
 
-export const obs = new Subject(); 
+const obs = new Subject(); 
+export default obs;

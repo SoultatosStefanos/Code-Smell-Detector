@@ -1,6 +1,7 @@
 import update from "./updateGraph.js"
 import grouping from "./grouping.js"
 
+// contor the the interaction among the different configurations
 var config = {
     weightFilterValue: 0,
     showWeightsFlag: true,

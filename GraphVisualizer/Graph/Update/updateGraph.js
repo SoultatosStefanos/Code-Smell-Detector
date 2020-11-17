@@ -1,5 +1,5 @@
 import { diagram } from "../Appearance/graphAppearance.js"
-import { obs } from "../../Observer/observer.js"
+import obs  from "../../Observer/observer.js"
 import totalWeight from "../utilities/totalWeight.js"
 import config from "./configValues.js"
 
