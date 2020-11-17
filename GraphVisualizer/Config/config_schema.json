@@ -1,0 +1,272 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema",
+    "title": "Configurations",
+    "description": "The configuration bar",
+    "type": "object",
+    "properties": {
+        "title": {
+            "description": "The title of the bar",
+            "type": "string"
+        },
+        "groups": {
+            "description": "The groups in this bar",
+            "type": "object",
+            "additionalProperties": {
+                "description": "The group definition",
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "data": {
+                        "description": "The group elements",
+                        "type": "object",
+                        "additionalProperties": {
+                            "type": "object",
+                            "properties": {
+                                "id": {
+                                    "type": "string"
+                                },
+                                "description": {
+                                    "description": "The text that will be show",
+                                    "type": "string"
+                                },
+                                "type": {
+                                    "description": "The type of this element",
+                                    "type": "string",
+                                    "enum": [
+                                        "slider",
+                                        "checkbox",
+                                        "select",
+                                        "span",
+                                        "number",
+                                        "applyButton",
+                                        "subgroup"
+                                    ]
+                                },
+                                "conditions": {
+                                    "description": "",
+                                    "type": "object",
+                                    "properties": {
+                                        "displayed": {
+                                            "type": "string"
+                                        },
+                                        "disabled": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "onChange": {
+                                    "description": "The onChange event handler",
+                                    "type": "object",
+                                    "properties": {
+                                        "event": {
+                                            "description": "The event that will be alerted",
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "onClick": {
+                                    "description": "The onClick event handler",
+                                    "type": "object",
+                                    "properties": {
+                                        "event": {
+                                            "description": "The event that will be alerted",
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            },
+                            "allOf": [
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "slider"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "number"
+                                            },
+                                            "min": {
+                                                "type": "number"
+                                            },
+                                            "max": {
+                                                "type": "number"
+                                            },
+                                            "step": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "required": [
+                                            "value",
+                                            "min",
+                                            "max",
+                                            "step"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "checkbox"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "boolean"
+                                            }
+                                        },
+                                        "required": [
+                                            "value"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "select"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "string"
+                                            },
+                                            "options": {
+                                                "type": "object",
+                                                "additionalProperties": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "id": {
+                                                            "type": "string"
+                                                        },
+                                                        "description": {
+                                                            "description": "The text that will be show",
+                                                            "type": "string"
+                                                        },
+                                                        "value": {
+                                                            "type": "string"
+                                                        }
+                                                    },
+                                                    "required": [
+                                                        "id",
+                                                        "description",
+                                                        "value"
+                                                    ]
+                                                }
+                                            }
+                                        },
+                                        "required": [
+                                            "value",
+                                            "options"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "number"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "value": {
+                                                "type": "number"
+                                            },
+                                            "min": {
+                                                "type": "number"
+                                            },
+                                            "max": {
+                                                "type": "number"
+                                            },
+                                            "step": {
+                                                "type": "number"
+                                            }
+                                        },
+                                        "required": [
+                                            "value",
+                                            "min",
+                                            "max"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "applyButton"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "onGroupData": {
+                                                "description": "The data that it has to apply",
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "object",
+                                                    "additionalProperties": {
+                                                        "type": "array",
+                                                        "items": {
+                                                            "oneOf": [
+                                                                {
+                                                                    "type": "string"
+                                                                },
+                                                                {
+                                                                    "$ref": "#/properties/groups/additionalProperties/properties/data/additionalProperties/allOf/4/then/properties/onGroupData/items"
+                                                                }
+                                                            ]
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "if": {
+                                        "properties": {
+                                            "type": {
+                                                "const": "subgroup"
+                                            }
+                                        }
+                                    },
+                                    "then": {
+                                        "properties": {
+                                            "data": {
+                                                "$ref": "#/properties/groups/additionalProperties"
+                                            }
+                                        }
+                                    }
+                                }
+                            ],
+                            "required": [
+                                "id",
+                                "description",
+                                "type"
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "required": [
+        "title",
+        "groups"
+    ]
+}
