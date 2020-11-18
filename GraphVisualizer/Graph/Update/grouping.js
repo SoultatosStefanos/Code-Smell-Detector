@@ -95,7 +95,6 @@ function groupingByNone() {
         }, 'groupingByNone');
         config.recover.groupingByNone();
     });
-
 }
 
 function groupingByNamespace() {
@@ -125,7 +124,6 @@ function groupingByFileName() {
     });
     config.recover.groupingBy();
 }
-
 
 function cleanFromGroups(type) {
     diagram.model.commit(function (m) {
@@ -185,7 +183,6 @@ function clusteringGrouping(communities, type, m = diagram.model, fill = 'rgba(1
     m.mergeNodeDataArray(groupsArray);
     config.recover.groupingBy();
 }
-
 
 /*
 Given multi-level communities with a standard format create groups and insert them in the graph 
@@ -327,7 +324,7 @@ function infomapMultiLevels(multi) {
     config.recover.infomapMultiLevels(value);
 }
 
-function groupingByLayeredLabelPropagation(gamma = 0) {
+function groupingByLayeredLabelPropagation(gamma = config.llpGamma) {
     cleanFromGroups('llp');
     diagram.model.commit(function (m) {
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
@@ -343,6 +340,7 @@ function groupingByLayeredLabelPropagation(gamma = 0) {
 
 function layeredLabelPropagationGamma(gamma) {
     groupingByLayeredLabelPropagation(gamma);
+    config.recover.llpGamma(gamma);
 }
 
 obs.install('groupEdges', groupEdges);

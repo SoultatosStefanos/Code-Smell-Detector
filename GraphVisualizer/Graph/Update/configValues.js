@@ -9,6 +9,7 @@ var config = {
     viewOnlyDepType: 'None',
     louvainMultiLevels: 'twoLevels', 
     infomapMultiLevels: '-d --two-level --silent',
+    llpGamma: 0,
     recover: {
         'groupEdges': (value) => {
             config.groupEdgesFlag = value;
@@ -41,6 +42,9 @@ var config = {
         },
         'infomapMultiLevels': (value) => {
             config.infomapMultiLevels = value;
+        }, 
+        'llpGamma': (gamma) => {
+            config.llpGamma = gamma;
         }
     }
 };
