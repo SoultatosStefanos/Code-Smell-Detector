@@ -10,8 +10,7 @@ const diagram =
       initialAutoScale: go.Diagram.Uniform,  // an initial automatic zoom-to-fit
       contentAlignment: go.Spot.Center,
       layout:
-        $(go.ForceDirectedLayout,
-          { defaultSpringLength: 30, defaultElectricalCharge: 100 }),
+        $(go.ForceDirectedLayout)
       // "SelectionMoved": function (e) { e.diagram.layout.invalidateLayout(); }
     }
   );
@@ -94,7 +93,7 @@ diagram.groupTemplate = $(go.Group, "Vertical", { layoutConditions: go.Part.Layo
         {
           packShape: PackedLayout.Rectangular,
           // packMode: PackedLayout.ExpandToFit,
-          spacing: 15,
+          spacing: 20,
           aspectRatio: 2,
         })
   }

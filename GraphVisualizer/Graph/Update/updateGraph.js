@@ -1,7 +1,8 @@
 import { diagram } from "../Appearance/graphAppearance.js"
-import obs  from "../../Observer/observer.js"
+import obs from "../../Observer/observer.js"
 import totalWeight from "../utilities/totalWeight.js"
 import config from "./configValues.js"
+import { PackedLayout } from "../../node_modules/gojs/extensionsJSM/PackedLayout.js"
 
 function filterWeights(value = config.weightFilterValue) {
   diagram.model.commit(function (m) {
@@ -87,6 +88,20 @@ function dependenciesConfig(data) {
   }, 'dependenciesConfig');
 }
 
+
+function outerLayout() {
+  let $ = go.GraphObject.make;
+  if (diagram.layout instanceof go.ForceDirectedLayout) {
+    diagram.layout = $(PackedLayout, {
+      packShape: PackedLayout.Rectangular,
+      spacing: 50
+    });
+  } else {
+    diagram.layout = $(go.ForceDirectedLayout);
+  }
+}
+
+
 obs.install('weightFilter', weightFilter);
 obs.install('showWeights', showWeights);
 obs.install('highlightNone', highlight('None'));
@@ -117,10 +132,13 @@ obs.install('viewOnlyNodes', viewOnly('Nodes'));
 
 obs.install('dependenciesConfig', dependenciesConfig);
 
+obs.install('outerLayoutForceDirected', outerLayout);
+obs.install('outerLayoutPacked', outerLayout);
+
 export default {
   weightFilter,
   showWeights,
   highlight,
-  viewOnly, 
+  viewOnly,
   filterWeights
 }

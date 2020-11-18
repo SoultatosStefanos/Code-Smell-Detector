@@ -126,9 +126,34 @@ function groupingByFileName() {
     config.recover.groupingBy();
 }
 
-// Given communities with a standard format create groups and insert them in the graph  
-function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)') {
+
+function cleanFromGroups(type) {
+    diagram.model.commit(function (m) {
+        for (let i = 0; i < m.nodeDataArray.length; ++i) {
+            let nodeData = m.nodeDataArray[i];
+            if (nodeData.isGroup && nodeData.type === type) {
+                m.removeNodeData(nodeData);
+                --i;
+            }
+            else if (nodeData.isGroup)
+                m.set(nodeData, 'visible', false)
+        };
+    });
+}
+
+/* 
+    Given communities with a standard format create groups and insert them in the graph 
+    {
+        node_id1 : group_id1, 
+        node_id2 : group_id2
+    }
+    node_idi: is the key of the node i 
+    group_idi: is the group that node i own to 
+*/
+function clusteringGrouping(communities, type, m = diagram.model, fill = 'rgba(128,128,128,0.33)') {
     const communityKey = (key) => { return type + '_' + key };
+
+    console.log(communities);
 
     const communitiesFiles = {};
     Object.values(communities).forEach((key) => {
@@ -161,7 +186,7 @@ function clusteringGrouping(communities, type, m, fill = 'rgba(128,128,128,0.33)
     config.recover.groupingBy();
 }
 
- 
+
 /*
 Given multi-level communities with a standard format create groups and insert them in the graph 
 [
@@ -175,8 +200,8 @@ Given multi-level communities with a standard format create groups and insert th
 node_idi: is the key of the node i 
 path: is the path from the outer to the inner cluster (ex. [1, 2, 3])
 
-*/ 
-function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238, 255, 170, 0.33)') {
+*/
+function clusteringGroupingWithSubGroups(communities, type, m = diagram.model, fill = 'rgba(238, 255, 170, 0.33)') {
     const communityKey = (path, index) => {
         let commKey = type;
         for (let j = 0; j <= index; ++j) {
@@ -225,34 +250,16 @@ function clusteringGroupingWithSubGroups(communities, type, m, fill = 'rgba(238,
 }
 
 function groupingByLouvainOld() {
+    cleanFromGroups('louvainOld');
     diagram.model.commit(function (m) {
-        for (let i = 0; i < m.nodeDataArray.length; ++i) {
-            let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'louvainOld') {
-                m.removeNodeData(nodeData);
-                --i;
-            }
-            else if (nodeData.isGroup)
-                m.set(nodeData, 'visible', false)
-        };
-
         const communities = louvainCommunities(m.nodeDataArray, m.linkDataArray);
         clusteringGrouping(communities, 'louvainOld', m);
     });
 }
 
 function groupingByLouvain(mode = config.louvainMultiLevels) {
+    cleanFromGroups('louvain');
     diagram.model.commit(function (m) {
-        for (let i = 0; i < m.nodeDataArray.length; ++i) {
-            let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'louvain') {
-                m.removeNodeData(nodeData);
-                --i;
-            }
-            else if (nodeData.isGroup)
-                m.set(nodeData, 'visible', false)
-        }
-
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
             if (weight !== 0 && type === 'nodeEdge') {
@@ -269,25 +276,14 @@ function groupingByLouvain(mode = config.louvainMultiLevels) {
 }
 
 function louvainMultiLevels(multi) {
-    if (multi)
-        groupingByLouvain('multiLevels');
-    else
-        groupingByLouvain('twoLevels');
-    config.recover.louvainMultiLevels(multi);
+    let value = multi ? 'multiLevels' : 'twoLevels';
+    groupingByLouvain(value);
+    config.recover.louvainMultiLevels(value);
 }
 
 function groupingByInfomap(mode = config.infomapMultiLevels) {
+    cleanFromGroups('infomap');
     diagram.model.commit(function (m) {
-        for (let i = 0; i < m.nodeDataArray.length; ++i) {
-            let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'infomap') {
-                m.removeNodeData(nodeData);
-                i--;
-            }
-            else if (nodeData.isGroup)
-                m.set(nodeData, 'visible', false)
-        };
-
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         let network = `*Vertices ` + nodes.length + '\n';
         nodes.forEach((nodeName, index) => {
@@ -326,25 +322,14 @@ function groupingByInfomap(mode = config.infomapMultiLevels) {
 }
 
 function infomapMultiLevels(multi) {
-    if (multi)
-        groupingByInfomap('-d --silent');
-    else
-        groupingByInfomap('-d --two-level --silent');
-    config.recover.infomapMultiLevels(multi);
+    let value = multi ? '-d --silent' : '-d --two-level --silent';
+    groupingByLouvain(value);
+    config.recover.infomapMultiLevels(value);
 }
 
 function groupingByLayeredLabelPropagation(gamma = 0) {
+    cleanFromGroups('llp');
     diagram.model.commit(function (m) {
-        for (let i = 0; i < m.nodeDataArray.length; ++i) {
-            let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === 'llp') {
-                m.removeNodeData(nodeData);
-                --i;
-            }
-            else if (nodeData.isGroup)
-                m.set(nodeData, 'visible', false)
-        };
-
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
             if (weight !== 0 && type === 'nodeEdge')
@@ -352,7 +337,7 @@ function groupingByLayeredLabelPropagation(gamma = 0) {
         }).filter(key => key !== undefined);
 
         let communities = jLayeredLabelPropagation(nodes, edges, gamma);
-        clusteringGrouping(communities, 'llp', m); //, 'rgba(105, 196,	47, 0.33)');
+        clusteringGrouping(communities, 'llp', m, 'rgba(105, 196, 47, 0.33)');
     });
 }
 

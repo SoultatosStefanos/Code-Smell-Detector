@@ -23,14 +23,17 @@ config.setRecoverer = function (recoverer) {
 }
 
 // The callback gets as first arg the node, and as second arg the contextMenu button(if it is needed)
-let nodeContextMenu = {};
-nodeContextMenu.add = function (description, action) {
+let nodesContextMenu = {};
+nodesContextMenu.add = function (description, action) {
     contextMenu.nodeContextMenu.add(makeButton(description, (e, obj) => { action(obj.part.adornedPart, obj); }));
 }
 
 var graph = {
     go_diagram: diagram,
-    nodeContextMenu
+    nodesContextMenu, 
+    getNode: function (key) {
+        diagram.findNodeForKey(key);
+    }
 };
 
 export default {

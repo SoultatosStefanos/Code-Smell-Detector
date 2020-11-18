@@ -270,7 +270,7 @@
                     "onChange": {
                         "event": "louvainMultiLevels"
                     }
-                }, 
+                },
                 "infomapMultiLevels": {
                     "id": "infomapMultiLevels",
                     "description": "Multi Levels",
@@ -857,6 +857,35 @@
                             ]
                         }
                     ]
+                }
+            }
+        },
+        "layout": {
+            "id": "layout",
+            "description": "Graph Layout",
+            "type": "group",
+            "data": {
+                "outerLayout": {
+                    "id": "outerLaout",
+                    "description": "Outer Layout",
+                    "type": "select",
+                    "value": "ForceDirected",
+                    "options": {
+                        "ForceDirected": {
+                            "id": "ForceDirected",
+                            "description": "Force Directed",
+                            "value": "ForceDirected"
+                        },
+                        "Packed": {
+                            "id": "Packed",
+                            "description": "Packed",
+                            "value": "Packed"
+                        }
+                    },
+                    "conditions": {},
+                    "onChange": {
+                        "event": "outerLayout"
+                    }
                 }
             }
         }

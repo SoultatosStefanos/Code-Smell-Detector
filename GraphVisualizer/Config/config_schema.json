@@ -257,7 +257,8 @@
                             "required": [
                                 "id",
                                 "description",
-                                "type"
+                                "type", 
+                                "conditions"
                             ]
                         }
                     }
