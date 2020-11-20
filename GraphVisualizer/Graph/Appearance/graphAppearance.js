@@ -35,7 +35,8 @@ diagram.nodeTemplate =
         fill: "rgb(188, 229, 183)",
         stroke: "rgb(56, 160, 85)",
         strokeWidth: 2
-      }),
+      }, 
+      new go.Binding("fill", "fill")),
     $(go.TextBlock,
       "default",
       {

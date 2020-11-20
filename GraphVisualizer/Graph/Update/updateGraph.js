@@ -1,10 +1,9 @@
 import { diagram } from "../Appearance/graphAppearance.js"
-import obs from "../../Observer/observer.js"
-import totalWeight from "../utilities/totalWeight.js"
-import config from "./configValues.js"
 import { PackedLayout } from "../../node_modules/gojs/extensionsJSM/PackedLayout.js"
+import totalWeight from "../utilities/totalWeight.js"
+import configApplicator from "../configApplicator.js"
 
-function filterWeights(value = config.weightFilterValue) {
+function filterWeights(value = configApplicator.values.weightFilterValue) {
   diagram.model.commit(function (m) {
     m.linkDataArray.forEach((linkData) => {
       if (linkData.weight < value)
@@ -16,7 +15,7 @@ function filterWeights(value = config.weightFilterValue) {
 function weightFilter(value) {
   diagram.model.commit(function (m) {
     let type;
-    if (config.groupEdgesFlag)
+    if (configApplicator.values.groupEdgesFlag)
       type = 'groupEdge'
     else
       type = 'nodeEdge'
@@ -24,9 +23,10 @@ function weightFilter(value) {
       if (linkData.type === type)
         m.set(linkData, 'visibleLink', true);
     });
+
     filterWeights(value);
 
-    config.recover.weightFilter(value);
+    // recover.weightFilter(value);
   });
 }
 
@@ -36,7 +36,7 @@ function showWeights(value) {
       m.set(linkData, 'visibleWeight', value);
     });
   }, 'showWeights');
-  config.recover.showWeights(value);
+  // recover.showWeights(value);
 };
 
 function highlight(depKind) {
@@ -76,7 +76,7 @@ function viewOnly(depKind) {
       }
     }, 'viewOnly');
 
-    config.recover.viewOnly(depKind);
+    recover.viewOnly(configApplicator.values, depKind);
   }
 }
 
@@ -87,7 +87,6 @@ function dependenciesConfig(data) {
     });
   }, 'dependenciesConfig');
 }
-
 
 function outerLayout() {
   let $ = go.GraphObject.make;
@@ -101,39 +100,56 @@ function outerLayout() {
   }
 }
 
+let recover = {
+  'weightFilter': (configValues, value) => {
+    configValues.weightFilterValue = value;
+    if (!configValues.groupEdgesFlag)
+      viewOnly(configValues.viewOnlyDepType);
+  },
+  'viewOnly': (configValues, depKind) => {
+    if (depKind)
+      configValues.viewOnlyDepType = depKind;
+    filterWeights();
+  },
+  'showWeights': (configValues, value) => {
+    configValues.showWeightsFlag = value;
+  }
+}
 
-obs.install('weightFilter', weightFilter);
-obs.install('showWeights', showWeights);
-obs.install('highlightNone', highlight('None'));
-obs.install('highlightClassField', highlight('ClassField'));
-obs.install('highlightClassTemplateParent', highlight('ClassTemplateParent'));
-obs.install('highlightClassTemplateArg', highlight('ClassTemplateArg'));
-obs.install('highlightInherite', highlight('Inherite'));
-obs.install('highlightFriend', highlight('Friend'));
-obs.install('highlightNestedClass', highlight('NestedClass'));
-obs.install('highlightMethodArg', highlight('MethodArg'));
-obs.install('highlightMethodDefinition', highlight('MethodDefinition'));
-obs.install('highlightMethodReturn', highlight('MethodReturn'));
-obs.install('highlightMethodTemplateArg', highlight('MethodTemplateArg'));
-obs.install('highlightMemberExpr', highlight('MemberExpr'));
-obs.install('viewOnlyNone', viewOnly('None'));
-obs.install('viewOnlyClassField', viewOnly('ClassField'));
-obs.install('viewOnlyClassTemplateParent', viewOnly('ClassTemplateParent'));
-obs.install('viewOnlyClassTemplateArg', viewOnly('ClassTemplateArg'));
-obs.install('viewOnlyInherite', viewOnly('Inherite'));
-obs.install('viewOnlyFriend', viewOnly('Friend'));
-obs.install('viewOnlyNestedClass', viewOnly('NestedClass'));
-obs.install('viewOnlyMethodArg', viewOnly('MethodArg'));
-obs.install('viewOnlyMethodDefinition', viewOnly('MethodDefinition'));
-obs.install('viewOnlyMethodReturn', viewOnly('MethodReturn'));
-obs.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
-obs.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
-obs.install('viewOnlyNodes', viewOnly('Nodes'));
 
-obs.install('dependenciesConfig', dependenciesConfig);
+configApplicator.install('weightFilter', weightFilter, recover.weightFilter);
+configApplicator.install('showWeights', showWeights, recover.showWeights);
+configApplicator.install('highlightNone', highlight('None'));
+configApplicator.install('highlightClassField', highlight('ClassField'));
+configApplicator.install('highlightClassTemplateParent', highlight('ClassTemplateParent'));
+configApplicator.install('highlightClassTemplateArg', highlight('ClassTemplateArg'));
+configApplicator.install('highlightInherite', highlight('Inherite'));
+configApplicator.install('highlightFriend', highlight('Friend'));
+configApplicator.install('highlightNestedClass', highlight('NestedClass'));
+configApplicator.install('highlightMethodArg', highlight('MethodArg'));
+configApplicator.install('highlightMethodDefinition', highlight('MethodDefinition'));
+configApplicator.install('highlightMethodReturn', highlight('MethodReturn'));
+configApplicator.install('highlightMethodTemplateArg', highlight('MethodTemplateArg'));
+configApplicator.install('highlightMemberExpr', highlight('MemberExpr'));
+configApplicator.install('viewOnlyNone', viewOnly('None'));
+configApplicator.install('viewOnlyClassField', viewOnly('ClassField'));
+configApplicator.install('viewOnlyClassTemplateParent', viewOnly('ClassTemplateParent'));
+configApplicator.install('viewOnlyClassTemplateArg', viewOnly('ClassTemplateArg'));
+configApplicator.install('viewOnlyInherite', viewOnly('Inherite'));
+configApplicator.install('viewOnlyFriend', viewOnly('Friend'));
+configApplicator.install('viewOnlyNestedClass', viewOnly('NestedClass'));
+configApplicator.install('viewOnlyMethodArg', viewOnly('MethodArg'));
+configApplicator.install('viewOnlyMethodDefinition', viewOnly('MethodDefinition'));
+configApplicator.install('viewOnlyMethodReturn', viewOnly('MethodReturn'));
+configApplicator.install('viewOnlyMethodTemplateArg', viewOnly('MethodTemplateArg'));
+configApplicator.install('viewOnlyMemberExpr', viewOnly('MemberExpr'));
+configApplicator.install('viewOnlyNodes', viewOnly('Nodes'));
 
-obs.install('outerLayoutForceDirected', outerLayout);
-obs.install('outerLayoutPacked', outerLayout);
+configApplicator.install('dependenciesConfig', dependenciesConfig);
+
+configApplicator.install('outerLayoutForceDirected', outerLayout);
+configApplicator.install('outerLayoutPacked', outerLayout);
+
 
 export default {
   weightFilter,

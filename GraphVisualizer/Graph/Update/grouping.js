@@ -1,9 +1,10 @@
 import { diagram } from "../Appearance/graphAppearance.js"
-import obs from "../../Observer/observer.js"
 import louvainCommunities from "../clusteringAlgorithms/louvain.js"
 import jLayeredLabelPropagation from "../ClusteringAlgorithms/layeredLabelPropagation.js"
 import jLouvain from "../clusteringAlgorithms/jlouvain.js"
-import config from "./configValues.js"
+import recover from "./groupsRecover.js"
+import configApplicator from "../configApplicator.js"
+import clusteringAlgorithmsUtils from "../Utilities/clusteringAlgorithmsUtilities.js"
 
 function groupEdges(value) {
     diagram.model.commit(function (m) {
@@ -60,7 +61,7 @@ function groupEdges(value) {
                         weight: groupEdges[from][to].weight,
                         type: 'groupEdge',
                         data: { dependencies: groupEdges[from][to].dependencies },
-                        visibleWeight: config.showWeightsFlag
+                        visibleWeight: configApplicator.values.showWeightsFlag
                     });
                 });
             });
@@ -80,7 +81,7 @@ function groupEdges(value) {
                     m.set(linkData, 'visibleLink', true);
             }
         }
-        config.recover.groupEdges(value);
+        // recover.groupEdges(value);
     });
 
 }
@@ -93,7 +94,7 @@ function groupingByNone() {
             else
                 m.set(nodeData, 'visible', false)
         }, 'groupingByNone');
-        config.recover.groupingByNone();
+        // recover.groupingByNone();
     });
 }
 
@@ -108,7 +109,7 @@ function groupingByNamespace() {
                 m.set(nodeData, 'visible', false)
         }, 'groupingByNamespace');
     });
-    config.recover.groupingBy();
+    //recover.groupingBy();
 }
 
 function groupingByFileName() {
@@ -122,140 +123,21 @@ function groupingByFileName() {
                 m.set(nodeData, 'visible', false)
         }, 'groupingByFileName');
     });
-    config.recover.groupingBy();
-}
-
-function cleanFromGroups(type) {
-    diagram.model.commit(function (m) {
-        for (let i = 0; i < m.nodeDataArray.length; ++i) {
-            let nodeData = m.nodeDataArray[i];
-            if (nodeData.isGroup && nodeData.type === type) {
-                m.removeNodeData(nodeData);
-                --i;
-            }
-            else if (nodeData.isGroup)
-                m.set(nodeData, 'visible', false)
-        };
-    });
-}
-
-/* 
-    Given communities with a standard format create groups and insert them in the graph 
-    {
-        node_id1 : group_id1, 
-        node_id2 : group_id2
-    }
-    node_idi: is the key of the node i 
-    group_idi: is the group that node i own to 
-*/
-function clusteringGrouping(communities, type, m = diagram.model, fill = 'rgba(128,128,128,0.33)') {
-    const communityKey = (key) => { return type + '_' + key };
-
-    console.log(communities);
-
-    const communitiesFiles = {};
-    Object.values(communities).forEach((key) => {
-        communitiesFiles[communityKey(key)] = {};
-    });
-
-    const groupsArray = [];
-    m.nodeDataArray.forEach(nodeData => {
-        const commKey = communityKey(communities[nodeData.key]);
-        if (!nodeData.isGroup) {
-            if (communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] === undefined)
-                communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] = 1;
-            else
-                communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] += 1;
-        }
-        if (!nodeData.isGroup && !groupsArray.some((group) => { return group.key === commKey })) {
-            groupsArray.push({ key: commKey, name: commKey, isGroup: true, type, visible: true, fill });
-        }
-        m.set(nodeData, 'group', commKey);
-    });
-
-    groupsArray.forEach((group) => {
-        const groupFiles = communitiesFiles[group.key];
-        const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
-        group.name = name;
-    });
-
-    groupsArray.splice(0, 0, ...m.nodeDataArray);
-    m.mergeNodeDataArray(groupsArray);
-    config.recover.groupingBy();
-}
-
-/*
-Given multi-level communities with a standard format create groups and insert them in the graph 
-[
-    node_id1 : {
-        "nodeId": node_id1, 
-        "path": [..path..]
-    }, 
-    node_id2 : ...
-]
-
-node_idi: is the key of the node i 
-path: is the path from the outer to the inner cluster (ex. [1, 2, 3])
-
-*/
-function clusteringGroupingWithSubGroups(communities, type, m = diagram.model, fill = 'rgba(238, 255, 170, 0.33)') {
-    const communityKey = (path, index) => {
-        let commKey = type;
-        for (let j = 0; j <= index; ++j) {
-            commKey += '_' + path[j];
-        }
-        return commKey;
-    };
-
-    const communitiesFiles = {};
-    const groupsArray = [];
-    m.nodeDataArray.forEach(nodeData => {
-        if (!nodeData.isGroup) {
-            let path = communities[nodeData.key].path;
-            let parentCommKey = undefined;
-            for (let i = 0; i < path.length - 1; ++i) {        // ignore the last group since contains just the node
-                const commKey = communityKey(path, i);
-                if (!nodeData.isGroup) {
-                    if (communitiesFiles[commKey] === undefined)
-                        communitiesFiles[commKey] = {};
-                    if (communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] === undefined)
-                        communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] = 1;
-                    else
-                        communitiesFiles[commKey][nodeData.data.srcInfo.cleanFileName] += 1;
-                }
-
-                if (!groupsArray.some((group) => { return group.key === commKey })) {
-                    groupsArray.push({ key: commKey, name: commKey, isGroup: true, type, visible: true, group: parentCommKey, fill });
-                }
-                if (i == path.length - 2) {
-                    m.set(nodeData, 'group', commKey);
-                }
-                parentCommKey = commKey;
-            }
-        }
-    });
-
-    groupsArray.forEach((group) => {
-        const groupFiles = communitiesFiles[group.key];
-        const name = Object.keys(groupFiles).reduce((a, b) => groupFiles[a] > groupFiles[b] ? a : b);
-        group.name = name;
-    });
-
-    groupsArray.splice(0, 0, ...m.nodeDataArray);
-    m.mergeNodeDataArray(groupsArray);
-    config.recover.groupingBy();
+    //recover.groupingBy();
 }
 
 function groupingByLouvainOld() {
-    cleanFromGroups('louvainOld');
+    clusteringAlgorithmsUtils.setClusteringAlgorithmType('louvainOld');
+    clusteringAlgorithmsUtils.graphCleanFromGroups('louvainOld');
     diagram.model.commit(function (m) {
         const communities = louvainCommunities(m.nodeDataArray, m.linkDataArray);
-        clusteringGrouping(communities, 'louvainOld', m);
+        clusteringAlgorithmsUtils.applyTwoLevelClustering(communities, 'louvainOld');
     });
 }
 
-function groupingByLouvain(mode = config.louvainMultiLevels) {
-    cleanFromGroups('louvain');
+function groupingByLouvain(mode = configApplicator.values.louvainMultiLevels) {
+    clusteringAlgorithmsUtils.setClusteringAlgorithmType('louvain');
+    clusteringAlgorithmsUtils.graphCleanFromGroups('louvain');
     diagram.model.commit(function (m) {
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
@@ -268,18 +150,19 @@ function groupingByLouvain(mode = config.louvainMultiLevels) {
 
         let communities = jLouvain(nodes, edges, 0.0000001, mode);
 
-        clusteringGroupingWithSubGroups(communities, 'louvain', m, 'rgba(128,128,128,0.33)');
+        clusteringAlgorithmsUtils.applyMultiLevelClustering(communities, 'louvain', 'rgba(128,128,128,0.33)');
     });
 }
 
 function louvainMultiLevels(multi) {
     let value = multi ? 'multiLevels' : 'twoLevels';
     groupingByLouvain(value);
-    config.recover.louvainMultiLevels(value);
+    // recover.louvainMultiLevels(value);
 }
 
-function groupingByInfomap(mode = config.infomapMultiLevels) {
-    cleanFromGroups('infomap');
+function groupingByInfomap(mode = configApplicator.values.infomapMultiLevels) {
+    clusteringAlgorithmsUtils.setClusteringAlgorithmType('infomap');
+    clusteringAlgorithmsUtils.graphCleanFromGroups('infomap');
     diagram.model.commit(function (m) {
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         let network = `*Vertices ` + nodes.length + '\n';
@@ -311,7 +194,9 @@ function groupingByInfomap(mode = config.infomapMultiLevels) {
                         nodeID: nodes[res[3]]
                     }
                 }
-                clusteringGroupingWithSubGroups(communities, 'infomap', m, 'rgba(238, 255, 170, 0.33)');
+                clusteringAlgorithmsUtils.applyMultiLevelClustering(communities, 'infomap', 'rgba(238, 255, 170, 0.33)');
+                recover.groupingBy(configApplicator.values);
+
             });
 
         infomap.run(network, mode);
@@ -320,12 +205,13 @@ function groupingByInfomap(mode = config.infomapMultiLevels) {
 
 function infomapMultiLevels(multi) {
     let value = multi ? '-d --silent' : '-d --two-level --silent';
-    groupingByLouvain(value);
-    config.recover.infomapMultiLevels(value);
+    groupingByInfomap(value);
+    //recover.infomapMultiLevels(value);
 }
 
-function groupingByLayeredLabelPropagation(gamma = config.llpGamma) {
-    cleanFromGroups('llp');
+function groupingByLayeredLabelPropagation(gamma = configApplicator.values.llpGamma) {
+    clusteringAlgorithmsUtils.setClusteringAlgorithmType('llp');
+    clusteringAlgorithmsUtils.graphCleanFromGroups('llp');
     diagram.model.commit(function (m) {
         const nodes = m.nodeDataArray.map((node) => { if (!node.isGroup) return node.key }).filter(key => key !== undefined);
         const edges = m.linkDataArray.map(({ from, to, weight, type }) => {
@@ -334,27 +220,27 @@ function groupingByLayeredLabelPropagation(gamma = config.llpGamma) {
         }).filter(key => key !== undefined);
 
         let communities = jLayeredLabelPropagation(nodes, edges, gamma);
-        clusteringGrouping(communities, 'llp', m, 'rgba(105, 196, 47, 0.33)');
+        clusteringAlgorithmsUtils.applyTwoLevelClustering(communities, 'llp', 'rgba(105, 196, 47, 0.33)');
     });
 }
 
 function layeredLabelPropagationGamma(gamma) {
     groupingByLayeredLabelPropagation(gamma);
-    config.recover.llpGamma(gamma);
+    // recover.llpGamma(gamma);
 }
 
-obs.install('groupEdges', groupEdges);
+configApplicator.install('groupEdges', groupEdges, recover.groupEdges);
 
-obs.install('groupingBynone', groupingByNone);
-obs.install('groupingBynamespace', groupingByNamespace);
-obs.install('groupingByfileName', groupingByFileName);
-obs.install('groupingBylouvain', groupingByLouvain);
-obs.install('groupingBylouvainOld', groupingByLouvainOld);
-obs.install('louvainMultiLevels', louvainMultiLevels);
-obs.install('groupingByinfomap', groupingByInfomap);
-obs.install('infomapMultiLevels', infomapMultiLevels);
-obs.install('groupingBylayeredLabelPropagation', groupingByLayeredLabelPropagation);
-obs.install('layeredLabelPropagationGamma', layeredLabelPropagationGamma);
+configApplicator.install('groupingBynone', groupingByNone, recover.groupingByNone);
+configApplicator.install('groupingBynamespace', groupingByNamespace, recover.groupingBy);
+configApplicator.install('groupingByfileName', groupingByFileName, recover.groupingBy);
+configApplicator.install('groupingBylouvain', groupingByLouvain, recover.groupingBy);
+configApplicator.install('groupingBylouvainOld', groupingByLouvainOld, recover.groupingBy);
+configApplicator.install('louvainMultiLevels', louvainMultiLevels, recover.louvainMultiLevels);
+configApplicator.install('groupingByinfomap', groupingByInfomap);
+configApplicator.install('infomapMultiLevels', infomapMultiLevels, recover.infomapMultiLevels);
+configApplicator.install('groupingBylayeredLabelPropagation', groupingByLayeredLabelPropagation, recover.groupingBy);
+configApplicator.install('layeredLabelPropagationGamma', layeredLabelPropagationGamma, recover.llpGamma);
 
 export default {
     groupEdges
