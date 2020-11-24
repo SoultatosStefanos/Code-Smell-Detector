@@ -27,8 +27,10 @@ bool IgnoredNamespaces::isIgnored(const std::string& nameSpace) {
 IgnoredFilePaths::IgnoredFilePaths(const std::string& inputFile) {
 	if (inputFile == "")
 		return;
+	std::string fullPath = std::string(__FILE__); 
+	std::size_t found = fullPath.find_last_of("/\\");
 	std::string line;
-	std::ifstream file(inputFile);
+	std::ifstream file(fullPath.substr(0, found + 1) + inputFile);
 	if (file.is_open()) {
 		while (std::getline(file, line)) {
 			Insert(line);

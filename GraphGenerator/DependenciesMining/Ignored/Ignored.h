@@ -26,9 +26,8 @@ namespace dependenciesMining {
 
 	class IgnoredFilePaths : public Ignored {
 	public:
-		//IgnoredFilePaths();
-		//IgnoredFilePaths(const std::string& inputFile = "C:\\Users\\user\\Desktop\\Git\\Architecture-Mining\\DependenciesMining\\Ignore.txt");
-		IgnoredFilePaths(const std::string& inputFile = "C:\\Users\\Krystallia Savvaki\\Desktop\\Git\\Architecture-Mining\\GraphGenerator\\DependenciesMining\\Ignore.txt");
+		// inputFile path staring from this file folder
+		IgnoredFilePaths(const std::string& inputFile = "..\\Ignore.txt");
 		virtual bool isIgnored(const std::string& file);
 
 
