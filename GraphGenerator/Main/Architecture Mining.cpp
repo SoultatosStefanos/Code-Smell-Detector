@@ -9,12 +9,12 @@
 
 int main(int argc, const char** argv) {
 	std::string path = argv[1];
-	sourceLoader::SourceLoader srcLoader(path);
+	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
-	std::vector<std::string> srcs = srcLoader.GetSources();
+	std::vector<std::string> srcs = srcLoader.GetSources();*/
 	
-	//std::vector<std::string> srcs;
-	//srcs.push_back(path + "\\classes_simple.cpp");			
+	std::vector<std::string> srcs;
+	srcs.push_back(path + "\\classes_simple.cpp");			
 	/*srcs.push_back(path + "\\fields.cpp");					
 	srcs.push_back(path + "\\friends.cpp");					
 	srcs.push_back(path + "\\member_classes.cpp");			
