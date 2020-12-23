@@ -2,6 +2,7 @@
 #include "Utilities.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
+//#include "clang/Tooling/CompilationDatabase.h"
 #include <vector>
 
 #define CLASS_DECL "ClassDecl"
@@ -639,6 +640,32 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
+/* *** temporary func ***
+* 
+*
+* RET:
+*	0 on success.
+*	-1 on fail.
+*/
+static int LoadCompilationDatabase(const char* pathToCDB) {
+	std::vector<std::string> srcs;
+	std::string error_msg;
+	auto cmp_db = CompilationDatabase::loadFromDirectory(pathToCDB, error_msg);
+
+	if (!cmp_db) { // Input error, exit program.
+		std::cerr << "In '" << pathToCDB << "'\n";
+		std::cerr << error_msg << "\n";
+		return -1;
+	}
+
+	srcs = cmp_db->getAllFiles();
+	std::cout << "Files from Compilation Database:\n\n";
+	for (auto file : srcs) {
+		std::cout << file << std::endl;
+	}
+
+	return 0;
+}
 /*
 	Clang Tool Creation
 */
@@ -647,7 +674,7 @@ static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
 int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
-
+	LoadCompilationDatabase("C:\\Users\\Phoivos\\Documents\\Architecture-Mining\\Sample_Compilation_DB"); // Testing. Break Point after this.
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 

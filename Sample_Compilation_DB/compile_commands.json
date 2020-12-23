@@ -1,0 +1,32 @@
+[
+	{
+		"directory": "/home/user/llvm/build",
+		"command": "/usr/bin/clang++ -Irelative -DSOMEDEF=\"With spaces, quotes and \\-es.\" -c -o file.o file.cc",
+		"file": "file.cc" 
+	},
+	{
+		"directory": "C:/Users/Phoivos/source/repos/Architecture_Mining/Architecture_Mining/GraphGenerator/Testfiles",
+		"command": "g++ classes_simple.cpp",
+		"file": "classes_simple.cpp"
+	},
+	{
+		"directory": "C:/Users/Phoivos/source/repos/Architecture_Mining/Architecture_Mining/GraphGenerator/Testfiles",
+		"command": "g++ fields.cpp",
+		"file": "fields.cpp"
+	},
+	{
+		"directory": "C:/Users/Phoivos/source/repos/Architecture_Mining/Architecture_Mining/GraphGenerator/Testfiles",
+		"command": "g++ friends.cpp",
+		"file": "friends.cpp"
+	},
+	{
+		"directory": "C:/Users/Phoivos/source/repos/Architecture_Mining/Architecture_Mining/GraphGenerator/Testfiles",
+		"command": "g++ member_classes.cpp",
+		"file": "member_classes.cpp"
+	},
+	{
+		"directory": "C:/Users/Phoivos/source/repos/Architecture_Mining/Architecture_Mining/GraphGenerator/Testfiles",
+		"command": "g++ methods.cpp",
+		"file": "methods.cpp"
+	}
+]
