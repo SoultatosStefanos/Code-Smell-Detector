@@ -647,24 +647,23 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 *	0 on success.
 *	-1 on fail.
 */
-static int LoadCompilationDatabase(const char* pathToCDB) {
-	std::vector<std::string> srcs;
+static std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char* pathToCDB) {
 	std::string error_msg;
 	auto cmp_db = CompilationDatabase::loadFromDirectory(pathToCDB, error_msg);
 
 	if (!cmp_db) { // Input error, exit program.
 		std::cerr << "In '" << pathToCDB << "'\n";
 		std::cerr << error_msg << "\n";
-		return -1;
+		return nullptr;
 	}
 
-	srcs = cmp_db->getAllFiles();
+	auto srcs = cmp_db->getAllFiles();
 	std::cout << "Files from Compilation Database:\n\n";
 	for (auto file : srcs) {
 		std::cout << file << std::endl;
 	}
 
-	return 0;
+	return cmp_db;
 }
 /*
 	Clang Tool Creation
@@ -674,12 +673,13 @@ static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
 int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
-	LoadCompilationDatabase("C:\\Users\\Phoivos\\Documents\\Architecture-Mining\\Sample_Compilation_DB"); // Testing. Break Point after this.
+	auto cmp_db = LoadCompilationDatabase("C:\\Users\\Phoivos\\Documents\\Architecture-Mining\\Sample_Compilation_DB"); // tmp
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 
-	CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-	ClangTool Tool(OptionsParser.getCompilations(), srcs);
+	ClangTool Tool(*cmp_db, cmp_db->getAllFiles());
+	//CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
+	//ClangTool Tool(OptionsParser.getCompilations(), srcs);
 
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;
