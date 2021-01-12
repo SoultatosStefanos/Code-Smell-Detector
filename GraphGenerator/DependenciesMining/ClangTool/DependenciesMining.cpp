@@ -641,11 +641,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 }
 
 /* *** temporary func ***
-* 
-*
-* RET:
-*	0 on success.
-*	-1 on fail.
 */
 static std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char* pathToCDB) {
 	std::string error_msg;
