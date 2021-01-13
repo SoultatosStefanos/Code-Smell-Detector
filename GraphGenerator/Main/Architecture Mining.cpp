@@ -8,13 +8,13 @@
 #include "GraphToJson.h"
 
 int main(int argc, const char** argv) {
-	std::string path = argv[1];
+	const char* cmp_db_path = argv[1];
 	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();*/
 	
-	std::vector<std::string> srcs;
-	srcs.push_back(path + "\\classes_simple.cpp");			
+	//std::vector<std::string> srcs;
+	//srcs.push_back(path + "\\classes_simple.cpp");			
 	/*srcs.push_back(path + "\\fields.cpp");					
 	srcs.push_back(path + "\\friends.cpp");					
 	srcs.push_back(path + "\\member_classes.cpp");			
@@ -31,7 +31,7 @@ int main(int argc, const char** argv) {
 	srcs.push_back(path + "\\include2.h");*/
 				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-	int result = dependenciesMining::CreateClangTool(argc, argv, srcs);
+	int result = dependenciesMining::CreateClangTool(cmp_db_path);
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	std::string json = graphToJson::GetJson(graph);
 

@@ -640,14 +640,15 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
-/* *** temporary func ***
+/*
+	returns nullptr on fail.
 */
-static std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char* pathToCDB) {
+std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmp_db_path) {
 	std::string error_msg;
-	auto cmp_db = CompilationDatabase::loadFromDirectory(pathToCDB, error_msg);
+	auto cmp_db = CompilationDatabase::loadFromDirectory(cmp_db_path, error_msg);
 
 	if (!cmp_db) { // Input error, exit program.
-		std::cerr << "In '" << pathToCDB << "'\n";
+		std::cerr << "In '" << cmp_db_path << "'\n";
 		std::cerr << error_msg << "\n";
 		return nullptr;
 	}
@@ -667,8 +668,8 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
-	auto cmp_db = LoadCompilationDatabase("C:\\Users\\Phoivos\\Documents\\Architecture-Mining\\Sample_Compilation_DB"); // tmp
+int dependenciesMining::CreateClangTool(const char* cmp_db_path) {
+	auto cmp_db = LoadCompilationDatabase(cmp_db_path); // tmp
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 

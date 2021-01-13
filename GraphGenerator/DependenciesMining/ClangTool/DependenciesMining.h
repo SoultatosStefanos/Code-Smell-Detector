@@ -52,5 +52,6 @@ namespace dependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& result);
 	};
 
-	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
+	std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char*);
+	int CreateClangTool(const char*);
 }
