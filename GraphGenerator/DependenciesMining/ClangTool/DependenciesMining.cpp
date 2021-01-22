@@ -669,7 +669,9 @@ static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
 int dependenciesMining::CreateClangTool(const char* cmp_db_path) {
-	auto cmp_db = LoadCompilationDatabase(cmp_db_path); // tmp
+	auto cmp_db = LoadCompilationDatabase(cmp_db_path);
+	if (!cmp_db)
+		return -1;
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 
