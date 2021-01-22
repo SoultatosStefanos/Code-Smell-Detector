@@ -5,7 +5,7 @@ export default Vue.component('config-window', {
     components: { group },
     template: `
     <div>
-        <h2 id="configTitle">{{ data.title }}</h2>
+        <h5 id="configTitle">{{ data.title }}</h5>
         <div id="configData">
             <div class="group" v-for="group in data.groups">
                 <group :groups="data.groups" :group="group" :confighandler="confighandler" /> 
