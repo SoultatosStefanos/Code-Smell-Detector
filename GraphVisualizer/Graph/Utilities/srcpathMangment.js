@@ -1,5 +1,8 @@
+let srcpathManager = {}; 
 
-function cleanDoubleDots(filePath) {
+srcpathManager.commonPath = ""; 
+
+srcpathManager.cleanDoubleDots = function(filePath) {
     const regex = /\/|\\/g;
     const pathFolders = filePath.split(regex);
 
@@ -15,9 +18,11 @@ function cleanDoubleDots(filePath) {
     return cleanPath.slice(0, -1);
 }
 
-let commonPathDetection = function () {
-    let commonPath = "";
+
+srcpathManager.commonPathDetection = function () {
+    let commonPath = srcpathManager.commonPath;
     return function (filePath) {
+        filePath = srcpathManager.cleanDoubleDots(filePath);
         if (commonPath === "")
             commonPath = filePath;
         else {
@@ -30,7 +35,27 @@ let commonPathDetection = function () {
     }
 }(); 
 
-export default {
-    cleanDoubleDots, 
-    commonPathDetection
+
+srcpathManager.findCommonPath = function(filePaths) {
+    for(let filePath of filePaths){
+        filePath = srcpathManager.cleanDoubleDots(filePath);
+        if (srcpathManager.commonPath === "")
+        srcpathManager.commonPath = filePath;
+        else {
+            let i = 0;
+            let minLength = srcpathManager.commonPath.length < filePath.length ? srcpathManager.commonPath.length : filePath.length;
+            while (i < minLength && srcpathManager.commonPath.charAt(i) === filePath.charAt(i)) i++;
+            srcpathManager.commonPath = srcpathManager.commonPath.substring(0, i);
+        }
+    }
+    return srcpathManager.commonPath;
 }
+
+
+srcpathManager.getCleanFileName = function(fullFileName) {
+    fullFileName = srcpathManager.cleanDoubleDots(fullFileName);
+    return fullFileName.substring(srcpathManager.commonPath.length, fullFileName.length);
+}
+
+
+export default srcpathManager;
