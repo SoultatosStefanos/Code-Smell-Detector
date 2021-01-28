@@ -4,8 +4,7 @@ import UIManager from '../UIManager.js';
 export default Vue.component('group', {
     props: [
         'groups',
-        'group',
-        'confighandler'
+        'group'
     ],
     components: { slider, checkbox, selector, number, applyButton },
     template:
@@ -37,7 +36,7 @@ export default Vue.component('group', {
                     </div>
 
                     <div v-else-if="data.type == 'applyButton'">
-                        <applyButton :data="data" :group="group" :disabled="evalCondition(data.conditions.disabled)" :onClick="onClick"/>
+                        <applyButton :data="data" :group="group" :disabled="evalCondition(data.conditions.disabled)"/>
                     </div>
 
                     <div v-else-if="data.type == 'span'">
@@ -45,17 +44,16 @@ export default Vue.component('group', {
                     </div>
 
                     <div v-else-if="data.type == 'subgroup'">
-                        <group :groups="groups" :group="data" :confighandler="confighandler" class="subgroup" /> 
+                        <group :groups="groups" :group="data" class="subgroup" /> 
                     </div>
                 </div>
             </div>
         </div>
     </div>`,
     methods: {
-        evalCondition: UIManager.evalCondition,
         onChange: UIManager.onChange,
         onChangeSelect: UIManager.onChangeSelect,
-        onClick: UIManager.onClick,
-        Collapsible: UIManager.collapseCard
+        Collapsible: UIManager.collapseCard,
+        evalCondition: UIManager.evalCondition
     }
 });

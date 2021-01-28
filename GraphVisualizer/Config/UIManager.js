@@ -1,25 +1,20 @@
+import obs from "../Observer/observer.js"
+
 let UIManager = {}; 
 
 // ----------------------------------------------------------------------------------
 
-UIManager.evalCondition = function(condition) {
-    let $currGroup = this.group.data;
-    return eval(' ' + condition);
-}
-
-// ----------------------------------------------------------------------------------
-
 UIManager.onChange = function(event, data) {
-    this.confighandler.fire(event, data);
+    obs.fire(event, data);
 }
 
 
 UIManager.onChangeSelect = function(event, data) {
-    this.confighandler.fire(event + data);
+    obs.fire(event + data);
 }
 
 
-UIManager.onClick = function(event, groupData, applyOnGroupData) {
+UIManager.applyChanges = function(event, groupData, applyOnGroupData) {
     let data = {};
 
     function dataCreation(element, data, groupData) {
@@ -38,7 +33,7 @@ UIManager.onClick = function(event, groupData, applyOnGroupData) {
     applyOnGroupData.forEach(element => {
         dataCreation(element, data, groupData);
     });
-    this.confighandler.fire(event, data)
+    obs.fire(event, data)
 }
 
 // ----------------------------------------------------------------------------------
@@ -52,6 +47,13 @@ UIManager.collapseCard = function(e) {
     } else {
         content.style.maxHeight = 4*content.scrollHeight + "px";
     }
+}
+
+// ----------------------------------------------------------------------------------
+
+UIManager.evalCondition = function(condition) {
+    let $currGroup = this.group.data;
+    return eval(' ' + condition);
 }
 
 // ----------------------------------------------------------------------------------

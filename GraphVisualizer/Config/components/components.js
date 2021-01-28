@@ -1,3 +1,5 @@
+import UIManager from '../UIManager.js';
+
 export const slider = Vue.component('slider', {
     props: { 
         data: Object, 
@@ -34,6 +36,7 @@ export const checkbox = Vue.component('checkbox', {
     </div>`, 
 })
 
+
 export const selector = Vue.component('selector', {
     props: {
         data: Object, 
@@ -50,6 +53,7 @@ export const selector = Vue.component('selector', {
     </div>`
 })
 
+
 export const number = Vue.component('number', {
     props: {
         data: Object, 
@@ -64,6 +68,7 @@ export const number = Vue.component('number', {
     </div>`
 })
 
+
 export const applyButton = Vue.component('applyButton', {
     props: {
         data: Object, 
@@ -73,8 +78,11 @@ export const applyButton = Vue.component('applyButton', {
     }, 
     template:
     `<div>
-        <button class="btn btn-primary" :disabled="disabled" @click="onClick(data.onClick.event, group.data, data.onGroupData)" style="width: 5rem;">
+        <button class="btn btn-primary" :disabled="disabled" @click="applyChanges(data.onClick.event, group.data, data.onGroupData)" style="width: 5rem;">
             {{data.description}}
         </button>
-    </div>`
+    </div>`, 
+    methods: {
+        applyChanges: UIManager.applyChanges,
+    }
 })
