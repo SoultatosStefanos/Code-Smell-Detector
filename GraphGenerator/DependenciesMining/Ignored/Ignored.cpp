@@ -14,6 +14,20 @@ void Ignored::Remove(const std::string& entity) {
 		entities.erase(it);
 }
 
+// --------------------------------------------------------------------
+
+IgnoredNamespaces::IgnoredNamespaces(const std::string& inputFile)  {
+	Insert("std");
+	if (inputFile == "")
+		return;
+	std::string line;
+	std::ifstream file(inputFile);
+	if (file.is_open()) {
+		while (std::getline(file, line)) {
+			Insert(line);
+		}
+	}
+};
 
 bool IgnoredNamespaces::isIgnored(const std::string& nameSpace) {
 	for (auto n : entities) {
@@ -24,252 +38,31 @@ bool IgnoredNamespaces::isIgnored(const std::string& nameSpace) {
 	return false;
 }
 
+// --------------------------------------------------------------------
+
 IgnoredFilePaths::IgnoredFilePaths(const std::string& inputFile) {
-	if (inputFile == "")
-		return;
+	// file that we define to ignore standar lib and some system files (on windows)
+	std::string systemIgnoreFilePaths = "..\\Ignore.txt"; 
 	std::string fullPath = std::string(__FILE__); 
 	std::size_t found = fullPath.find_last_of("/\\");
 	std::string line;
-	std::ifstream file(fullPath.substr(0, found + 1) + inputFile);
-	if (file.is_open()) {
-		while (std::getline(file, line)) {
+	std::ifstream systemFile(fullPath.substr(0, found + 1) + systemIgnoreFilePaths);
+	if (systemFile.is_open()) {
+		while (std::getline(systemFile, line)) {
+			Insert(line);
+		}
+	}
+
+	// user defined inputFile
+	if (inputFile == "")
+		return;
+	std::ifstream userFile(inputFile);
+	if (userFile.is_open()) {
+		while (std::getline(userFile, line)) {
 			Insert(line);
 		}
 	}
 }
-
-
-/*IgnoredFilePaths::IgnoredFilePaths() {
-	Insert("__msvc_all_public_headers.hpp");
-	Insert("__msvc_system_error_abi.hpp");
-	Insert("agents.h");
-	Insert("agile.h");
-	Insert("algorithm");
-	Insert("ammintrin.h");
-	Insert("amp.h");
-	Insert("amp_graphics.h");
-	Insert("amp_math.h");
-	Insert("amp_short_vectors.h");
-	Insert("amprt.h");
-	Insert("amprt_exceptions.h");
-	Insert("any");
-	Insert("arm64_neon.h");
-	Insert("arm64intr.h");
-	Insert("arm_neon.h");
-	Insert("armintr.h");
-	Insert("array");
-	Insert("atomic");
-	Insert("bit");
-	Insert("bitset");
-	Insert("cassert");
-	Insert("ccomplex");
-	Insert("cctype");
-	Insert("cerrno");
-	Insert("cfenv");
-	Insert("cfguard.h");
-	Insert("cfloat");
-	Insert("charconv");
-	Insert("chrono");
-	Insert("cinttypes");
-	Insert("ciso646");
-	Insert("climits");
-	Insert("clocale");
-	Insert("cmath");
-	Insert("codecvt");
-	Insert("collection.h");
-	Insert("comdef.h");
-	Insert("comdefsp.h");
-	Insert("comip.h");
-	Insert("compare");
-	Insert("complex");
-	Insert("comutil.h");
-	Insert("concepts");
-	Insert("concrt.h");
-	Insert("concrtrm.h");
-	Insert("concurrencysal.h");
-	Insert("concurrent_priority_queue.h");
-	Insert("concurrent_queue.h");
-	Insert("concurrent_unordered_map.h");
-	Insert("concurrent_unordered_set.h");
-	Insert("concurrent_vector.h");
-	Insert("condition_variable");
-	Insert("crtdefs.h");
-	Insert("crtversion.h");
-	Insert("csetjmp");
-	Insert("csignal");
-	Insert("cstdalign");
-	Insert("cstdarg");
-	Insert("cstdbool");
-	Insert("cstddef");
-	Insert("cstdint");
-	Insert("cstdio");
-	Insert("cstdlib");
-	Insert("cstring");
-	Insert("ctgmath");
-	Insert("ctime");
-	Insert("cuchar");
-	Insert("cwchar");
-	Insert("cwctype");
-	Insert("delayhlp.cpp");
-	Insert("delayimp.h");
-	Insert("deque");
-	Insert("dloadsup.h");
-	Insert("dvec.h");
-	Insert("eh.h");
-	Insert("ehdata.h");
-	Insert("ehdata4.h");
-	Insert("ehdata4_export.h");
-	Insert("ehdata_forceinclude.h");
-	Insert("ehdata_values.h");
-	Insert("emmintrin.h");
-	Insert("exception");
-	Insert("excpt.h");
-	Insert("execution");
-	Insert("filesystem");
-	Insert("forward_list");
-	Insert("fstream");
-	Insert("functional");
-	Insert("future");
-	Insert("fvec.h");
-	Insert("gcroot.h");
-	Insert("hash_map");
-	Insert("hash_set");
-	Insert("immintrin.h");
-	Insert("initializer_list");
-	Insert("internal_concurrent_hash.h");
-	Insert("internal_split_ordered_list.h");
-	Insert("intrin.h");
-	Insert("intrin0.h");
-	Insert("invkprxy.h");
-	Insert("iomanip");
-	Insert("ios");
-	Insert("iosfwd");
-	Insert("iostream");
-	Insert("isa_availability.h");
-	Insert("iso646.h");
-	Insert("istream");
-	Insert("iterator");
-	Insert("ivec.h");
-	Insert("limits");
-	Insert("limits.h");
-	Insert("list");
-	Insert("listing.inc");
-	Insert("locale");
-	Insert("map");
-	Insert("memory");
-	Insert("memory_resource");
-	Insert("mm3dnow.h");
-	Insert("mmintrin.h");
-	Insert("mutex");
-	Insert("new");
-	Insert("nmmintrin.h");
-	Insert("numbers");
-	Insert("numeric");
-	Insert("omp.h");
-	Insert("optional");
-	Insert("ostream");
-	Insert("pgobootrun.h");
-	Insert("pmmintrin.h");
-	Insert("ppl.h");
-	Insert("pplawait.h");
-	Insert("pplcancellation_token.h");
-	Insert("pplinterface.h");
-	Insert("ppltasks.h");
-	Insert("ppltaskscheduler.h");
-	Insert("pplwin.h");
-	Insert("queue");
-	Insert("random");
-	Insert("ranges");
-	Insert("ratio");
-	Insert("regex");
-	Insert("rtcapi.h");
-	Insert("rttidata.h");
-	Insert("sal.h");
-	Insert("scoped_allocator");
-	Insert("set");
-	Insert("setjmp.h");
-	Insert("setjmpex.h");
-	Insert("shared_mutex");
-	Insert("smmintrin.h");
-	Insert("span");
-	Insert("srv.h");
-	Insert("sstream");
-	Insert("stack");
-	Insert("stdarg.h");
-	Insert("stdbool.h");
-	Insert("stdexcept");
-	Insert("stdint.h");
-	Insert("streambuf");
-	Insert("string");
-	Insert("string_view");
-	Insert("strstream");
-	Insert("system_error");
-	Insert("thread");
-	Insert("tmmintrin.h");
-	Insert("tuple");
-	Insert("type_traits");
-	Insert("typeindex");
-	Insert("typeinfo");
-	Insert("unordered_map");
-	Insert("unordered_set");
-	Insert("use_ansi.h");
-	Insert("utility");
-	Insert("vadefs.h");
-	Insert("valarray");
-	Insert("varargs.h");
-	Insert("variant");
-	Insert("vcclr.h");
-	Insert("vccorlib.h");
-	Insert("vcruntime.h");
-	Insert("vcruntime_exception.h");
-	Insert("vcruntime_new.h");
-	Insert("vcruntime_new_debug.h");
-	Insert("vcruntime_startup.h");
-	Insert("vcruntime_string.h");
-	Insert("vcruntime_typeinfo.h");
-	Insert("vector");
-	Insert("version");
-	Insert("wmmintrin.h");
-	Insert("xatomic.h");
-	Insert("xbit_ops.h");
-	Insert("xcall_once.h");
-	Insert("xcharconv.h");
-	Insert("xcharconv_ryu.h");
-	Insert("xcharconv_ryu_tables.h");
-	Insert("xerrc.h");
-	Insert("xfacet");
-	Insert("xfilesystem_abi.h");
-	Insert("xhash");
-	Insert("xiosbase");
-	Insert("xkeycheck.h");
-	Insert("xlocale");
-	Insert("xlocbuf");
-	Insert("xlocinfo");
-	Insert("xlocinfo.h");
-	Insert("xlocmes");
-	Insert("xlocmon");
-	Insert("xlocnum");
-	Insert("xloctime");
-	Insert("xmemory");
-	Insert("xmmintrin.h");
-	Insert("xnode_handle.h");
-	Insert("xpolymorphic_allocator.h");
-	Insert("xsmf_control.h");
-	Insert("xstddef");
-	Insert("xstring");
-	Insert("xthreads.h");
-	Insert("xtimec.h");
-	Insert("xtr1common");
-	Insert("xtree");
-	Insert("xutility");
-	Insert("xxamp.h");
-	Insert("xxamp_inl.h");
-	Insert("ymath.h");
-	Insert("yvals.h");
-	Insert("yvals_core.h");
-	Insert("zmmintrin.h");
-}*/
-
 
 bool IgnoredFilePaths::isIgnored(const std::string& file) {
 	for (auto n : entities) {
@@ -279,243 +72,3 @@ bool IgnoredFilePaths::isIgnored(const std::string& file) {
 	}
 	return false;
 }
-
-
-
-
-
-
-
-
-/*
-
-"__msvc_all_public_headers.hpp"
-"__msvc_system_error_abi.hpp"
-"agents.h"
-"agile.h"
-"algorithm"
-"ammintrin.h"
-"amp.h"
-"amp_graphics.h"
-"amp_math.h"
-"amp_short_vectors.h"
-"amprt.h"
-"amprt_exceptions.h"
-"any"
-"arm64_neon.h"
-"arm64intr.h"
-"arm_neon.h"
-"armintr.h"
-"array"
-"atomic"
-"bit"
-"bitset"
-"cassert"
-"ccomplex"
-"cctype"
-"cerrno"
-"cfenv"
-"cfguard.h"
-"cfloat"
-"charconv"
-"chrono"
-"cinttypes"
-"ciso646"
-"climits"
-"clocale"
-"cmath"
-"codecvt"
-"collection.h"
-"comdef.h"
-"comdefsp.h"
-"comip.h"
-"compare"
-"complex"
-"comutil.h"
-"concepts"
-"concrt.h"
-"concrtrm.h"
-"concurrencysal.h"
-"concurrent_priority_queue.h"
-"concurrent_queue.h"
-"concurrent_unordered_map.h"
-"concurrent_unordered_set.h"
-"concurrent_vector.h"
-"condition_variable"
-"crtdefs.h"
-"crtversion.h"
-"csetjmp"
-"csignal"
-"cstdalign"
-"cstdarg"
-"cstdbool"
-"cstddef"
-"cstdint"
-"cstdio"
-"cstdlib"
-"cstring"
-"ctgmath"
-"ctime"
-"cuchar"
-"cwchar"
-"cwctype"
-"delayhlp.cpp"
-"delayimp.h"
-"deque"
-"dloadsup.h"
-"dvec.h"
-"eh.h"
-"ehdata.h"
-"ehdata4.h"
-"ehdata4_export.h"
-"ehdata_forceinclude.h"
-"ehdata_values.h"
-"emmintrin.h"
-"exception"
-"excpt.h"
-"execution"
-"filesystem"
-"forward_list"
-"fstream"
-"functional"
-"future"
-"fvec.h"
-"gcroot.h"
-"hash_map"
-"hash_set"
-"immintrin.h"
-"initializer_list"
-"internal_concurrent_hash.h"
-"internal_split_ordered_list.h"
-"intrin.h"
-"intrin0.h"
-"invkprxy.h"
-"iomanip"
-"ios"
-"iosfwd"
-"iostream"
-"isa_availability.h"
-"iso646.h"
-"istream"
-"iterator"
-"ivec.h"
-"limits"
-"limits.h"
-"list"
-"listing.inc"
-"locale"
-"map"
-"memory"
-"memory_resource"
-"mm3dnow.h"
-"mmintrin.h"
-"mutex"
-"new"
-"nmmintrin.h"
-"numbers"
-"numeric"
-"omp.h"
-"optional"
-"ostream"
-"pgobootrun.h"
-"pmmintrin.h"
-"ppl.h"
-"pplawait.h"
-"pplcancellation_token.h"
-"pplinterface.h"
-"ppltasks.h"
-"ppltaskscheduler.h"
-"pplwin.h"
-"queue"
-"random"
-"ranges"
-"ratio"
-"regex"
-"rtcapi.h"
-"rttidata.h"
-"sal.h"
-"scoped_allocator"
-"set"
-"setjmp.h"
-"setjmpex.h"
-"shared_mutex"
-"smmintrin.h"
-"span"
-"srv.h"
-"sstream"
-"stack"
-"stdarg.h"
-"stdbool.h"
-"stdexcept"
-"stdint.h"
-"streambuf"
-"string"
-"string_view"
-"strstream"
-"system_error"
-"thread"
-"tmmintrin.h"
-"tuple"
-"type_traits"
-"typeindex"
-"typeinfo"
-"unordered_map"
-"unordered_set"
-"use_ansi.h"
-"utility"
-"vadefs.h"
-"valarray"
-"varargs.h"
-"variant"
-"vcclr.h"
-"vccorlib.h"
-"vcruntime.h"
-"vcruntime_exception.h"
-"vcruntime_new.h"
-"vcruntime_new_debug.h"
-"vcruntime_startup.h"
-"vcruntime_string.h"
-"vcruntime_typeinfo.h"
-"vector"
-"version"
-"wmmintrin.h"
-"xatomic.h"
-"xbit_ops.h"
-"xcall_once.h"
-"xcharconv.h"
-"xcharconv_ryu.h"
-"xcharconv_ryu_tables.h"
-"xerrc.h"
-"xfacet"
-"xfilesystem_abi.h"
-"xhash"
-"xiosbase"
-"xkeycheck.h"
-"xlocale"
-"xlocbuf"
-"xlocinfo"
-"xlocinfo.h"
-"xlocmes"
-"xlocmon"
-"xlocnum"
-"xloctime"
-"xmemory"
-"xmmintrin.h"
-"xnode_handle.h"
-"xpolymorphic_allocator.h"
-"xsmf_control.h"
-"xstddef"
-"xstring"
-"xthreads.h"
-"xtimec.h"
-"xtr1common"
-"xtree"
-"xutility"
-"xxamp.h"
-"xxamp_inl.h"
-"ymath.h"
-"yvals.h"
-"yvals_core.h"
-"zmmintrin.h"
-
-*/

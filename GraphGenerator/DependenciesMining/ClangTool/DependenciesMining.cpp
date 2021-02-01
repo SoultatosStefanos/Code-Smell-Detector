@@ -13,14 +13,24 @@
 
 using namespace dependenciesMining;
 
-SymbolTable dependenciesMining::structuresTable;
-std::unordered_map<std::string, Ignored*> dependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()},
-																			{"filePaths", new IgnoredFilePaths()} };
+// ----------------------------------------------------------------------------------------------
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
 DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
 DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
+
+// ----------------------------------------------------------------------------------------------
+
+SymbolTable dependenciesMining::structuresTable;
+std::unordered_map<std::string, Ignored*> dependenciesMining::ignored;
+
+void initializeIgnored(const std::string& ignoredFiles, const std::string& ignoredNamespaces = "") {
+	ignored["filePaths"] = new IgnoredFilePaths(ignoredFiles);
+	ignored["namespaces"] = new IgnoredNamespaces(ignoredNamespaces);
+}
+
+// ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -239,6 +249,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structuresTable.Install(structure.GetID(), structure);
 }
 
+// ----------------------------------------------------------------------------------------------
+
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
@@ -291,6 +303,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 }
+
+// ----------------------------------------------------------------------------------------------
 
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -448,6 +462,8 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
+// ----------------------------------------------------------------------------------------------
+
 // Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
 	auto* decl = memberExpr->getMemberDecl();
@@ -572,6 +588,8 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	return true;
 }
 
+// ----------------------------------------------------------------------------------------------
+
 // Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
@@ -640,6 +658,9 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
+
+// ----------------------------------------------------------------------------------------------
+
 /*
 	returns nullptr on fail.
 */
@@ -661,6 +682,7 @@ std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase
 
 	return cmp_db;
 }
+
 /*
 	Clang Tool Creation
 */
@@ -668,7 +690,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(const char* cmp_db_path) {
+int dependenciesMining::CreateClangTool(const char* cmp_db_path, const char* ignoredFilePaths, const char* ignoredNamespaces) {
 	auto cmp_db = LoadCompilationDatabase(cmp_db_path);
 	if (!cmp_db)
 		return -1;
@@ -678,6 +700,8 @@ int dependenciesMining::CreateClangTool(const char* cmp_db_path) {
 	ClangTool Tool(*cmp_db, cmp_db->getAllFiles());
 	//CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
 	//ClangTool Tool(OptionsParser.getCompilations(), srcs);
+
+	initializeIgnored(ignoredFilePaths, ignoredNamespaces);
 
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;

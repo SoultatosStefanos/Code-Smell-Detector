@@ -5,6 +5,7 @@
 #include <fstream>
 
 namespace dependenciesMining {
+	
 	class Ignored {
 	protected:
 		std::list<std::string> entities;
@@ -14,22 +15,20 @@ namespace dependenciesMining {
 		virtual bool isIgnored(const std::string& entity) = 0;
 	};
 
-
+	// --------------------------------------------------------------------
 
 	class IgnoredNamespaces : public Ignored {
 	public:
-		IgnoredNamespaces() {
-			Insert("std");
-		};
+		IgnoredNamespaces(const std::string& inputFile = ""); 
 		virtual bool isIgnored(const std::string& nameSpace);
 	};
 
+	// --------------------------------------------------------------------
+
 	class IgnoredFilePaths : public Ignored {
 	public:
-		// inputFile path staring from this file folder
-		IgnoredFilePaths(const std::string& inputFile = "..\\Ignore.txt");
+		IgnoredFilePaths(const std::string& inputFile = "");
 		virtual bool isIgnored(const std::string& file);
-
-
 	};
+
 }

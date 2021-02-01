@@ -9,34 +9,37 @@
 
 int main(int argc, const char** argv) {
 	const char* cmp_db_path = argv[1];
+	const char* ignoredFilePaths = argv[2];
+	const char* ignoredNamespaces = argv[3];
+
 	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();*/
 	
 	//std::vector<std::string> srcs;
-	//srcs.push_back(path + "\\classes_simple.cpp");			
-	/*srcs.push_back(path + "\\fields.cpp");					
+	/*srcs.push_back(path + "\\classes_simple.cpp");			
+	srcs.push_back(path + "\\fields.cpp");					
 	srcs.push_back(path + "\\friends.cpp");					
 	srcs.push_back(path + "\\member_classes.cpp");			
 	srcs.push_back(path + "\\methods_args_vars.cpp");		
 	srcs.push_back(path + "\\methods.cpp");					
-	srcs.push_back(path + "\\namespaces.cpp");	*/		
+	srcs.push_back(path + "\\namespaces.cpp");			
 	//srcs.push_back(path + "\\objects_used_on_methods.cpp");	
-	/*srcs.push_back(path + "\\template_methods.cpp");		
+	srcs.push_back(path + "\\template_methods.cpp");		
 	srcs.push_back(path + "\\template_types.cpp");			
 	srcs.push_back(path + "\\templates.cpp");				
-	
-	/*srcs.push_back(path + "\\test0.cpp");					
+
+	srcs.push_back(path + "\\test0.cpp");					
 	srcs.push_back(path + "\\include.h");						
 	srcs.push_back(path + "\\include2.h");*/
 				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-	int result = dependenciesMining::CreateClangTool(cmp_db_path);
+	int result = dependenciesMining::CreateClangTool(cmp_db_path, ignoredFilePaths, ignoredNamespaces);
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	std::string json = graphToJson::GetJson(graph);
 
 	std::ofstream jsonFile;
-	jsonFile.open(argv[2]);
+	jsonFile.open(argv[4]);
 	jsonFile << json;
  	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
