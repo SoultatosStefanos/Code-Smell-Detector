@@ -1,10 +1,10 @@
-import { slider, checkbox, selector, number, applyButton } from "./components.js"
+import { slider, checkbox, selector, number, applyButton } from "./components.js";
+import UIManager from '../UIManager.js';
 
 export default Vue.component('group', {
     props: [
         'groups',
-        'group',
-        'confighandler'
+        'group'
     ],
     components: { slider, checkbox, selector, number, applyButton },
     template:
@@ -36,7 +36,7 @@ export default Vue.component('group', {
                     </div>
 
                     <div v-else-if="data.type == 'applyButton'">
-                        <applyButton :data="data" :group="group" :disabled="evalCondition(data.conditions.disabled)" :onClick="onClick"/>
+                        <applyButton :data="data" :group="group" :disabled="evalCondition(data.conditions.disabled)"/>
                     </div>
 
                     <div v-else-if="data.type == 'span'">
@@ -44,54 +44,16 @@ export default Vue.component('group', {
                     </div>
 
                     <div v-else-if="data.type == 'subgroup'">
-                        <group :groups="groups" :group="data" :confighandler="confighandler" class="subgroup" /> 
+                        <group :groups="groups" :group="data" class="subgroup" /> 
                     </div>
                 </div>
             </div>
         </div>
     </div>`,
     methods: {
-        evalCondition(condition) {
-            let $currGroup = this.group.data;
-            return eval(' ' + condition);
-        },
-        onChange(event, data) {
-            this.confighandler.fire(event, data);
-        },
-        onChangeSelect(event, data) {
-            this.confighandler.fire(event + data);
-        },
-        onClick(event, groupData, applyOnGroupData) {
-            let data = {};
-
-            function dataCreation(element, data, groupData) {
-                if (typeof element === 'object' && element !== null) {
-                    let subData = {};
-                    Object.keys(element).forEach(key => {
-                        element[key].forEach(el => {
-                            dataCreation(el, subData, groupData[key].data);
-                            data[key] = subData;
-                        })
-                    });
-                } else {
-                    data[element] = groupData[element].value;
-                }
-            }
-            applyOnGroupData.forEach(element => {
-                dataCreation(element, data, groupData);
-            });
-            this.confighandler.fire(event, data)
-        },
-        Collapsible(e) {
-            const button = e.target;
-            button.classList.toggle("active");
-            var content = button.nextElementSibling;
-            if (content.style.maxHeight) {
-                content.style.maxHeight = null;
-            } else {
-                content.style.maxHeight = 4*content.scrollHeight + "px";
-            }
-
-        }
+        onChange: UIManager.onChange,
+        onChangeSelect: UIManager.onChangeSelect,
+        Collapsible: UIManager.collapseCard,
+        evalCondition: UIManager.evalCondition
     }
 });

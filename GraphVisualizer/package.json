@@ -11,8 +11,11 @@
   "dependencies": {
     "@mapequation/infomap": "^1.2.0",
     "ajv": "^6.12.6",
+    "bootstrap": "^4.6.0",
     "gojs": "^2.1.21",
     "graphology-communities-louvain": "^1.2.0",
+    "jQuery": "^1.7.4",
+    "jquery": "^3.5.1",
     "npm": "^6.14.7",
     "serve": "^11.3.2",
     "vue": "^2.6.12",

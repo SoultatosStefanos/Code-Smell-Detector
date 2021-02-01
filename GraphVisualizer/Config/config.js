@@ -1,4 +1,3 @@
-import obs from "../Observer/observer.js"
 import config_window from "./components/configWindow.js"
 
 (async () => {
@@ -8,14 +7,13 @@ import config_window from "./components/configWindow.js"
     var valid = ajv.validate(schema, json);
     if (!valid)
         console.log(ajv.errors);
-        else
+    else
         console.log("schema validation succeed!");
-   
+
     var config = new Vue({
         el: '#config',
         data: {
-            data: json,
-            confighandler: obs
+            data: json
         },
         components: {
             config_window

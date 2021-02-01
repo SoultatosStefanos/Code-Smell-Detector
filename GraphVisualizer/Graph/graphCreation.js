@@ -3,38 +3,45 @@ import totalWeight from "./utilities/totalWeight.js"
 import srcpathManager from "./utilities/srcpathMangment.js"
 
 (async () => {
-  // Create graph from json
-  const data = await fetch("./Graph/graph.json").then(response => response.json());
 
-  const nodes = data.nodes;
-  const edges = data.edges;
+  // ----------------------------------------------------------------------------------
 
-  const groupsHolder = [];
+  let groupsHolder = [];
+
   groupsHolder.namespace = [];
   groupsHolder.fileName = [];
+
   groupsHolder.createGroup = function (type, key, name = key, fill = 'rgba(128,128,128,0.33)', visible = false) {
-    if (!this[type].some((group) => { return group.key === key })) {
-      this[type].push({ key, name, isGroup: true, type, fill, visible });
+    if (!groupsHolder[type].some((group) => { return group.key === key })) {
+      groupsHolder[type].push({ key, name, isGroup: true, type, fill, visible });
     }
   }
 
-  let commonPath = "";
-  Object.keys(nodes).map(id => {
-    nodes[id].srcInfo.fileName = srcpathManager.cleanDoubleDots(nodes[id].srcInfo.fileName);
-    commonPath = srcpathManager.commonPathDetection(nodes[id].srcInfo.fileName);
+  // ----------------------------------------------------------------------------------
+
+  const data = await fetch("./Graph/graph.json").then(response => response.json());
+  const nodes = data.nodes;
+  const edges = data.edges;
+
+  let filePaths = Object.values(nodes).map(value => {
+    value.srcInfo.fileName = srcpathManager.cleanDoubleDots(value.srcInfo.fileName);
+    return value.srcInfo.fileName;
   });
+  srcpathManager.findCommonPath(filePaths);
 
   const nodeDataArray = Object.keys(nodes).map(id => {
 
     const { id: key, name, namespace, structureType, srcInfo, methods, fields, bases, friends, nestedParent, templateArguments } = nodes[id];
 
-    srcInfo.cleanFileName = srcInfo.fileName.substring(commonPath.length, srcInfo.fileName.length);
+    srcInfo.cleanFileName = srcpathManager.getCleanFileName(srcInfo.fileName);
 
     groupsHolder.createGroup('namespace', namespace, namespace, 'rgba(238, 255, 170, 0.33)');
     groupsHolder.createGroup('fileName', srcInfo.fileName, srcInfo.cleanFileName, 'rgba(173, 216, 230, 0.4)');
 
-    return {
-      key, name, data: {
+    const node = {
+      key,
+      name,
+      data: {
         namespace,
         structureType,
         srcInfo,
@@ -46,8 +53,9 @@ import srcpathManager from "./utilities/srcpathMangment.js"
         templateArguments
       }
     };
-  });
 
+    return node;
+  });
 
   nodeDataArray.splice(0, 0, ...groupsHolder.namespace);
   nodeDataArray.splice(0, 0, ...groupsHolder.fileName);

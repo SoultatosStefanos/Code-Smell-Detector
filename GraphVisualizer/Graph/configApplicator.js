@@ -1,52 +1,10 @@
 import obs from "../Observer/observer.js"
 
-function ConfigApplicator() {
-    let values = {};
-    let recover = {}; 
+let configApplicator = {};
 
-    function callWithRecover(action, data){
-        action(data);
-        if(recover[action.name]){
-            recover[action.name](this.values, data);
-        }
-    } 
-    // Install/Uninstall the handler for the "eventName" configuration
-    function install(eventName, action, recoverAction) {
-        recover[action.name] = recoverAction;
-        obs.install(eventName, (data) => {
-            action(data);
-            if (recoverAction)
-                recoverAction(this.values, data);
-        });
-    }
+// ----------------------------------------------------------------------------------
 
-    function uninstall(eventName) {
-        obs.uninstall(eventName);
-    }
-
-    // Store a configuration Value
-    function storeValue(name, value) {
-        this.values[name] = value;
-    }
-
-    function getValue(name) {
-        return this.values[name];
-    }
-
-    return {
-        values,
-        // Install/Uninstall the handler for the "eventName" configuration
-        install,
-        uninstall,
-        storeValue, 
-        getValue, 
-        callWithRecover
-    }
-}
-
-let configApplicator = new ConfigApplicator();
-
-// set my configs
+// initialized with my configurations
 configApplicator.values = {
     weightFilterValue: 0,
     showWeightsFlag: true,
@@ -56,4 +14,44 @@ configApplicator.values = {
     infomapMultiLevels: '-d --two-level --silent',
     llpGamma: 0,
 };
+
+configApplicator.recover = {};
+
+// ----------------------------------------------------------------------------------
+
+configApplicator.callWithRecover = function(action, data) {
+    action(data);
+    if (configApplicator.recover[action.name]) {
+        configApplicator.recover[action.name](this.values, data);
+    }
+}
+
+// ----------------------------------------------------------------------------------
+
+configApplicator.install = function (eventName, action, recoverAction) {
+    configApplicator.recover[action.name] = recoverAction;
+    obs.install(eventName, (data) => {
+        action(data);
+        if (recoverAction)
+            recoverAction(this.values, data);
+    });
+}
+
+configApplicator.uninstall = function (eventName) {
+    obs.uninstall(eventName);
+}
+
+// ----------------------------------------------------------------------------------
+
+// Store a configuration Value
+configApplicator.storeValue = function(name, value) {
+    this.values[name] = value;
+}
+
+configApplicator.getValue = function(name) {
+    return this.values[name];
+}
+
+// ----------------------------------------------------------------------------------
+
 export default configApplicator;
