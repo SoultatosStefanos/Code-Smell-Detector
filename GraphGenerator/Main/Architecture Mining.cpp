@@ -12,7 +12,7 @@ int main(int argc, const char** argv) {
 	sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
 	std::vector<std::string> srcs = srcLoader.GetSources();
-	
+
 	//std::vector<std::string> srcs;
 	//srcs.push_back(path + "\\classes_simple.cpp");			
 	/*srcs.push_back(path + "\\fields.cpp");					
@@ -35,8 +35,11 @@ int main(int argc, const char** argv) {
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	std::string json = graphToJson::GetJson(graph);
 
+	std::string fullPath = std::string(__FILE__);
+	std::size_t found = fullPath.find_last_of("/\\");
+	std::string jsonPath = (argc >= 3) ? argv[2] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
 	std::ofstream jsonFile;
-	jsonFile.open(argv[2]);
+	jsonFile.open(jsonPath);
 	jsonFile << json;
  	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
