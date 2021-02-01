@@ -9,8 +9,9 @@
 
 int main(int argc, const char** argv) {
 	const char* cmp_db_path = argv[1];
-	const char* ignoredFilePaths = argv[2];
-	const char* ignoredNamespaces = argv[3];
+	const char* ignoredFilePaths = (argc >= 3) ? argv[2] : "";
+	const char* ignoredNamespaces = (argc >= 4) ? argv[3] : "";
+	const char* jsonPath = (argc >= 5) ? argv[4] : "TODO: default path";
 
 	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
@@ -39,7 +40,8 @@ int main(int argc, const char** argv) {
 	std::string json = graphToJson::GetJson(graph);
 
 	std::ofstream jsonFile;
-	jsonFile.open(argv[4]);
+
+	jsonFile.open(jsonPath);
 	jsonFile << json;
  	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
