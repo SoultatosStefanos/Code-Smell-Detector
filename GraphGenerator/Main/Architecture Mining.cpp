@@ -11,7 +11,10 @@ int main(int argc, const char** argv) {
 	const char* cmp_db_path = argv[1];
 	const char* ignoredFilePaths = (argc >= 3) ? argv[2] : "";
 	const char* ignoredNamespaces = (argc >= 4) ? argv[3] : "";
-	const char* jsonPath = (argc >= 5) ? argv[4] : "TODO: default path";
+	
+	std::string fullPath = std::string(__FILE__);
+	std::size_t found = fullPath.find_last_of("/\\");
+	std::string jsonPath = (argc >= 5) ? argv[4] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
 
 	/*sourceLoader::SourceLoader srcLoader(path);
 	srcLoader.LoadSources();
