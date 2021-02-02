@@ -170,3 +170,20 @@ ID_T dependenciesMining::GetIDfromDecl(const FieldDecl* d) {
 ID_T dependenciesMining::GetIDfromDecl(const VarDecl* d) {
 	return d->getQualifiedNameAsString();
 }
+
+// -------------------------------------------------------------------------
+
+bool dependenciesMining::isIgnoredDecl(const RecordDecl* d) {
+	if (d->isImplicit()) {
+		return true;
+	}
+
+	if (d->isAnonymousStructOrUnion()) {
+		return true;
+	}
+
+	if (d->isUnion() || d->isEnum()) {
+		return true;
+	}
+	return false;
+}

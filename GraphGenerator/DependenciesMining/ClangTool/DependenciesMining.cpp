@@ -46,11 +46,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
-	if (d->isImplicit()) {
-		return;
-	}
-
-	if (d->isAnonymousStructOrUnion()) {
+	if (isIgnoredDecl(d)) {
 		return;
 	}
 
@@ -268,7 +264,9 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
-		if (parent->isAnonymousStructOrUnion()) {
+
+		if(isIgnoredDecl(parent)) {
+		//if (parent->isAnonymousStructOrUnion()) {
 			return;
 		}
 
@@ -328,14 +326,20 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
-		if (parent->isAnonymousStructOrUnion()) {
-			return; 
+
+		if (isIgnoredDecl(parent)) {
+			//if (parent->isAnonymousStructOrUnion()) {
+			return;
 		}
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
-		assert(parentStructure);
-		//if(!parentStructure)
-		//	parentStructure = structuresTable.Insert(parentID, parentName);
+		//assert(parentStructure);
+		if (!parentStructure) {
+			std::cout << parentID << ":\n";
+			std::cout << parent->isAnonymousStructOrUnion() << "\n";
+			std::cout << parent->isUnion() << "\n";
+			parentStructure = (Structure*)structuresTable.Install(parentID, parentName);
+		}
 		Method method(methodID, GetFullMethodName(d), parentStructure->GetNamespace());
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
@@ -606,6 +610,10 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				return;
 
 			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
+
+			if (isIgnoredDecl(parentClass)) {
+				return;
+			}
 
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
