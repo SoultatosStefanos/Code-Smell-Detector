@@ -664,13 +664,13 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 /*
 	returns nullptr on fail.
 */
-std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmp_db_path) {
+std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmpDBPath) {
 	std::string errorMsg;
-	auto cmpDB = CompilationDatabase::loadFromDirectory(cmp_db_path, errorMsg);
-
+	auto cmpDB = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
 	if (!cmpDB) { // Input error, exit program.
-		std::cerr << "In '" << cmp_db_path << "'\n";
+		std::cerr << "In '" << cmpDBPath << "'\n";
 		std::cerr << errorMsg << "\n";
+		std::cerr << "Make sure Compilation Database .json is named: 'compile_commands.json'\n";
 		return nullptr;
 	}
 
