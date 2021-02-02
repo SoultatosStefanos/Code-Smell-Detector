@@ -176,7 +176,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		auto* type = it->getFriendType();
 		if (type) {																							// Classes
 			auto parent = type->getType()->getAsCXXRecordDecl();
-			if (!parent)
+			if (!parent)																					// ignore decls that does not have definitions
 				continue;
 			auto parentID = GetIDfromDecl(parent); 
 			//assert(parentID);
@@ -213,7 +213,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			else if (decl->isTemplateDecl()) {																// Template Classes
 				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();			
 				auto structureDefinition = recdecl->getDefinition(); 
-				assert(structureDefinition);
+				if (!structureDefinition)																	// ignore decls that does not have definitions
+					continue;	
+
 				auto parentID = GetIDfromDecl(structureDefinition);
 				auto parentName = GetFullStructureName(structureDefinition);
 				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
