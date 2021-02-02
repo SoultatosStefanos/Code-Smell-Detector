@@ -8,7 +8,7 @@
 #include "GraphToJson.h"
 
 int main(int argc, const char** argv) {
-	const char* cmp_db_path = argv[1];
+	const char* cmpDBPath = argv[1];
 	const char* ignoredFilePaths = (argc >= 3) ? argv[2] : "";
 	const char* ignoredNamespaces = (argc >= 4) ? argv[3] : "";
 	
@@ -38,7 +38,7 @@ int main(int argc, const char** argv) {
 	srcs.push_back(path + "\\include2.h");*/
 				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-	int result = dependenciesMining::CreateClangTool(cmp_db_path, ignoredFilePaths, ignoredNamespaces);
+	int result = dependenciesMining::CreateClangTool(cmpDBPath, ignoredFilePaths, ignoredNamespaces);
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	std::string json = graphToJson::GetJson(graph);
 

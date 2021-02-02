@@ -672,23 +672,23 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 /*
 	returns nullptr on fail.
 */
-std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmp_db_path) {
-	std::string error_msg;
-	auto cmp_db = CompilationDatabase::loadFromDirectory(cmp_db_path, error_msg);
-
-	if (!cmp_db) { // Input error, exit program.
-		std::cerr << "In '" << cmp_db_path << "'\n";
-		std::cerr << error_msg << "\n";
+std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmpDBPath) {
+	std::string errorMsg;
+	auto cmpDB = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
+	if (!cmpDB) { // Input error, exit program.
+		std::cerr << "In '" << cmpDBPath << "'\n";
+		std::cerr << errorMsg << "\n";
+		std::cerr << "Make sure Compilation Database .json is named: 'compile_commands.json'\n";
 		return nullptr;
 	}
 
-	auto srcs = cmp_db->getAllFiles();
+	auto srcs = cmpDB->getAllFiles();
 	std::cout << "Files from Compilation Database:\n\n";
 	for (auto file : srcs) {
 		std::cout << file << std::endl;
 	}
 
-	return cmp_db;
+	return cmpDB;
 }
 
 /*
@@ -698,14 +698,14 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(const char* cmp_db_path, const char* ignoredFilePaths, const char* ignoredNamespaces) {
-	auto cmp_db = LoadCompilationDatabase(cmp_db_path);
-	if (!cmp_db)
+int dependenciesMining::CreateClangTool(const char* cmpDBPath, const char* ignoredFilePaths, const char* ignoredNamespaces) {
+	auto cmpDB = LoadCompilationDatabase(cmpDBPath);
+	if (!cmpDB)
 		return -1;
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 
-	ClangTool Tool(*cmp_db, cmp_db->getAllFiles());
+	ClangTool Tool(*cmpDB, cmpDB->getAllFiles());
 	//CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
 	//ClangTool Tool(OptionsParser.getCompilations(), srcs);
 
