@@ -268,7 +268,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		if(isIgnoredDecl(parent)) {
-		//if (parent->isAnonymousStructOrUnion()) {
 			return;
 		}
 
@@ -330,18 +329,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		if (isIgnoredDecl(parent)) {
-			//if (parent->isAnonymousStructOrUnion()) {
 			return;
 		}
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
-		//assert(parentStructure);
-		if (!parentStructure) {
-			std::cout << parentID << ":\n";
-			std::cout << parent->isAnonymousStructOrUnion() << "\n";
-			std::cout << parent->isUnion() << "\n";
+		assert(parentStructure);
+		/*if (!parentStructure) {
 			parentStructure = (Structure*)structuresTable.Install(parentID, parentName);
-		}
+		}*/
 		Method method(methodID, GetFullMethodName(d), parentStructure->GetNamespace());
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
