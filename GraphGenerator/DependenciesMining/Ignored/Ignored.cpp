@@ -69,13 +69,17 @@ void IgnoredFilePaths::SplitStrWithChar(std::vector<std::string>& splitStr, cons
 		splitStr.push_back(item);
 }
 
-std::stack<std::string> IgnoredFilePaths::GetReverseStack(std::stack<std::string> stack) {
+/*
+* empties stack (param)
+* returns new reversed stack
+*/
+void IgnoredFilePaths::ReverseStack(std::stack<std::string>& stack) {
 	std::stack<std::string> reversedStack;
 	while (!stack.empty()) {
 		reversedStack.push(stack.top());
 		stack.pop();
 	}
-	return reversedStack;
+	stack = reversedStack;
 }
 
 std::string IgnoredFilePaths::GetFixedPath(const std::vector<std::string>& pathTokens, const char delim) {
@@ -93,7 +97,7 @@ std::string IgnoredFilePaths::GetFixedPath(const std::vector<std::string>& pathT
 		else
 			stack.push(i);
 	}
-	stack = GetReverseStack(stack);
+	ReverseStack(stack);
 	while (stack.size() > 1) {
 		fixedPath += stack.top();
 		fixedPath += delim;
@@ -137,8 +141,9 @@ IgnoredFilePaths::IgnoredFilePaths(const std::string& inputFile) {
 }
 
 bool IgnoredFilePaths::isIgnored(const std::string& file) {
+	std::string fileFixed = PathFix(file);
 	for (auto n : entities) {
-		if (file.find(n) <= file.length()) {
+		if (fileFixed.find(n) <= fileFixed.length()) {
 			return true;
 		}
 	}
