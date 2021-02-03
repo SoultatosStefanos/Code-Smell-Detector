@@ -22,7 +22,7 @@ namespace dependenciesMining {
 		Struct,
 		TemplateDefinition,
 		TemplateFullSpecialization,
-		TemplateInstatiationSpecialization,
+		TemplateInstantiationSpecialization,
 		TemplatePartialSpecialization
 	};
 
@@ -38,7 +38,7 @@ namespace dependenciesMining {
 		OverloadedOperator_UserDefined,
 		TemplateDefinition,
 		TemplateFullSpecialization,
-		TemplateInstatiationSpecialization
+		TemplateInstantiationSpecialization
 	};
 
 
@@ -258,7 +258,7 @@ namespace dependenciesMining {
 		bool IsOverloadedOperator() const;
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
-		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTrivial() const; 
 	};
 
@@ -311,7 +311,7 @@ namespace dependenciesMining {
 
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
-		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTemplatePartialSpecialization() const;
 		bool IsTemplate() const;
 		bool IsUndefined() const;

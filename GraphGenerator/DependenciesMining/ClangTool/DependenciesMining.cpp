@@ -50,7 +50,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
-	// gia ta declerations
+	// gia ta declarations
 	if (!(d->isCompleteDefinition())) {
 		if (!d->hasDefinition()){									// for templateDefinition Declarations only
 			if(!d->getDescribedClassTemplate())
@@ -71,7 +71,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	} 
 	else if (d->getKind() == d->ClassTemplateSpecialization) {
 		if(d->getTemplateSpecializationKind() == 1)
-			structure.SetStructureType(StructureType::TemplateInstatiationSpecialization);
+			structure.SetStructureType(StructureType::TemplateInstantiationSpecialization);
 		else 
 			structure.SetStructureType(StructureType::TemplateFullSpecialization);
 	}else if (d->getKind() == d->TemplateTemplateParm) {
@@ -100,8 +100,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetNamespace(fullEnclosingNamespace);
 
 
-	// Templates
-	if (!d->hasDefinition()) {
+	// Templates 
+	if (!d->hasDefinition()) {															// Templates that has Declaration only
 		assert(structure.GetStructureType() == StructureType::TemplateDefinition);
 		structure.SetStructureType(StructureType::Undefined);
 		structuresTable.Install(structure.GetID(), structure);
@@ -109,20 +109,20 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-	//if (structure.IsTemplateInstatiationSpecialization()){
+	//if (structure.IsTemplateInstantiationSpecialization()){
 		// Template parent
 		std::string parentName;
 		ID_T parentID; 
 
 		Structure* templateParent;
-		if (structure.IsTemplateInstatiationSpecialization()) {
+		if (structure.IsTemplateInstantiationSpecialization()) {								// template Instantiation Specialization
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = GetIDfromDecl(parent); 
 			//assert(parentID); 
 			parentName = GetFullStructureName(parent);
 			templateParent = (Structure*)structuresTable.Lookup(parentID);
 		}
-		else {
+		else {																					// template Full and Parsial Specialization
 			parentName = d->getQualifiedNameAsString();	
 			templateParent = (Structure*)structuresTable.Lookup(parentName);
 			assert(templateParent);
@@ -289,7 +289,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-			if (parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
+			if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
 				return;
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
@@ -371,7 +371,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			}
 			else if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
 				if (d->isTemplateInstantiation()) {
-					method.SetMethodType(MethodType::TemplateInstatiationSpecialization);
+					method.SetMethodType(MethodType::TemplateInstantiationSpecialization);
 				}
 				else {
 					method.SetMethodType(MethodType::TemplateFullSpecialization);
@@ -390,14 +390,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		//Template
-		if (method.IsTemplateFullSpecialization() || method.IsTemplateInstatiationSpecialization()) {
+		if (method.IsTemplateFullSpecialization() || method.IsTemplateInstantiationSpecialization()) {
 		/*	// Tempalte Method's parent
 			Method* templateParentMethod = nullptr;
 			std::string parentMethodName = GetFullMethodName(d);
 			size_t start = parentMethodName.find("<");
 			size_t end = parentMethodName.find(">");
 			parentMethodName.erase(parentMethodName.begin() + start, parentMethodName.begin() + end + 1);
-			if (parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstatiationSpecialization()) {
+			if (parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstantiationSpecialization()) {
 				
 				templateParentMethod = parentStructure->GetTemplateParent()->GetMethod(parentMethodName);
 			}
@@ -630,8 +630,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			Method* parentMethod = (Method*)parentStructure->LookupMethod(parentMethodID);
 			//assert(parentMethod);
 			
-			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
-			//if (parentMethod->isTemplateInstatiationSpecialization()) {
+			// remove from TemplateInstantiationSpecialization methods the decletarions and arguments 
+			//if (parentMethod->isTemplateInstantiationSpecialization()) {
 			//	return;
 			//}
 
