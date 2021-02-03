@@ -35,3 +35,8 @@ GraphVisualizer/node_modules
 
 
 GraphVisualizer/.vscode/launch.json
+output.json
+compille_commands.json
+IgnoredFilePaths.txt
+IngoredNamespaces.txt
+compile_commands.json
