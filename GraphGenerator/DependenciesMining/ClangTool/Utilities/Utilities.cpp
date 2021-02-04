@@ -185,5 +185,13 @@ bool dependenciesMining::isIgnoredDecl(const RecordDecl* d) {
 	if (d->isUnion() || d->isEnum()) {
 		return true;
 	}
+
+	if(d->isCXXClassMember()) {
+		const auto* parent = d->getParent();
+		if (isIgnoredDecl((RecordDecl*)parent)) {
+			return true;
+		}
+	}
+
 	return false;
 }

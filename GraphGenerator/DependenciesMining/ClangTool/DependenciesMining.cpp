@@ -137,11 +137,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			auto templateArg = temp->getTemplateArgs()[i];
 			TemplateArgsVisit(templateArg, [](TemplateArgument templateArg, Structure *structure) {
-				RecordDecl* d = nullptr;
-				if (templateArg.getKind() == TemplateArgument::Template) {
-					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
-				}
-				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
+					RecordDecl* d = nullptr;
+					if (templateArg.getKind() == TemplateArgument::Template) {
+						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
+						if (!d)													// a set of function templates 
+							return;
+					}
+
+					if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
 						std::string argStructName = GetFullStructureName(d);
@@ -237,6 +240,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
 		auto parentID = GetIDfromDecl((RecordDecl*)parent);
 		//assert(parentID);
+		if (isIgnoredDecl((RecordDecl*)parent)) {
+			return;
+		}
 		if (parentName != structure.GetName()) {
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			auto* inst = d->getInstantiatedFromMemberClass();
