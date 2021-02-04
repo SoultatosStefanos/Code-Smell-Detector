@@ -679,12 +679,11 @@ std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase
 		return nullptr;
 	}
 
-	auto srcs = cmpDB->getAllFiles();
+	/*auto srcs = cmpDB->getAllFiles();
 	std::cout << "Files from Compilation Database:\n\n";
 	for (auto file : srcs) {
 		std::cout << file << std::endl;
-	}
-
+	}*/
 	return cmpDB;
 }
 
@@ -695,16 +694,31 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(const char* cmpDBPath, const char* ignoredFilePaths, const char* ignoredNamespaces) {
-	auto cmpDB = LoadCompilationDatabase(cmpDBPath);
-	if (!cmpDB)
-		return -1;
+int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string> srcs, const char* ignoredFilePaths, const char* ignoredNamespaces) {
+	ClangTool* Tool;
+	std::unique_ptr<CompilationDatabase> cmpDB;
+	CommonOptionsParser *OptionsParser = nullptr;
+
+	if (cmpDBPath == nullptr) {
+		int argc = 3;
+		const char* argv[3];
+		argv[0] = "";
+		argv[1] = "";
+		argv[2] = "--";
+		OptionsParser = new CommonOptionsParser(argc, argv, MyToolCategory);
+		Tool = new ClangTool(OptionsParser->getCompilations(), srcs);
+	}
+	else {
+		cmpDB = LoadCompilationDatabase(cmpDBPath);
+		if (!cmpDB)
+			return -1;
+		Tool = new ClangTool(*cmpDB, cmpDB->getAllFiles());
+	}
+
+
+	
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
-
-	ClangTool Tool(*cmpDB, cmpDB->getAllFiles());
-	//CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-	//ClangTool Tool(OptionsParser.getCompilations(), srcs);
 
 	initializeIgnored(ignoredFilePaths, ignoredNamespaces);
 
@@ -717,6 +731,9 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, const char* ignor
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
-	int result = Tool.run(newFrontendActionFactory(&Finder).get());
+	int result = Tool->run(newFrontendActionFactory(&Finder).get());
+	delete Tool;
+	if (OptionsParser)
+		delete OptionsParser;
 	return result;
 }
