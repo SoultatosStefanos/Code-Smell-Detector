@@ -419,6 +419,8 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 					RecordDecl* d = nullptr;
 					if (templateArg.getKind() == TemplateArgument::Template) {
 						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
+						if (!d)													// a set of function templates 
+							return;
 					}
 					else if (templateArg.getKind() == TemplateArgument::Integral) {
 						return;
@@ -478,9 +480,9 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	auto* base = memberExpr->getBase();
 
 	if (base) {
-		base = base->IgnoreUnlessSpelledInSource();
+		base = base->IgnoreUnlessSpelledInSource();				// clean all the invisble AST nodes that may surround this stmt
 
-		if (base->getStmtClass() == memberExpr->CXXThisExprClass)
+		if (base->getStmtClass() == memberExpr->CXXThisExprClass)	// ignore this
 			return true;
 
 		std::string str; 
@@ -537,24 +539,25 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
 	std::string exprString;
 
-	if (decl->getKind() == decl->CXXMethod) {
-		auto end = sm->getCharacterData(range.getEnd());
-		int openCount = 0, closeCount = 0;
-		while (!(openCount == closeCount && openCount)) {
-			if (*end == '(') {
-				openCount++;
-			}
-			else if (*end == ')') {
-				closeCount++;
-			}
-			end++;
-		}
-		const char* beginstr = sm->getCharacterData(range.getBegin());
-		exprString = std::string(beginstr, end);
-	}
-	else {
-		exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
-	}
+	//if (decl->getKind() == decl->CXXMethod) {
+	//	auto end = sm->getCharacterData(range.getEnd());
+	//	int openCount = 0, closeCount = 0;
+	//	while (!(openCount == closeCount && openCount)) {
+	//		if (*end == '(') {
+	//			openCount++;
+	//		}
+	//		else if (*end == ')') {
+	//			closeCount++;
+	//		}
+	//		end++;
+	//	}
+	//	const char* beginstr = sm->getCharacterData(range.getBegin());
+	//	exprString = std::string(beginstr, end);
+	//}
+	//else {
+	//	exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
+	//}
+
 	Method::MemberExpr methodMemberExpr(exprString, locEnd, locBegin.GetFileName(), locBegin.GetLine(), locBegin.GetColumn());
 	MethodDeclsCallback::currentMethod->UpdateMemberExpr(methodMemberExpr, locBegin.toString());
 
