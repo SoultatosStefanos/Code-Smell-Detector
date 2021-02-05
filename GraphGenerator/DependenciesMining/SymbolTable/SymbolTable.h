@@ -22,7 +22,7 @@ namespace dependenciesMining {
 		Struct,
 		TemplateDefinition,
 		TemplateFullSpecialization,
-		TemplateInstatiationSpecialization,
+		TemplateInstantiationSpecialization,
 		TemplatePartialSpecialization
 	};
 
@@ -38,7 +38,7 @@ namespace dependenciesMining {
 		OverloadedOperator_UserDefined,
 		TemplateDefinition,
 		TemplateFullSpecialization,
-		TemplateInstatiationSpecialization
+		TemplateInstantiationSpecialization
 	};
 
 
@@ -74,6 +74,8 @@ namespace dependenciesMining {
 		bool  operator==(SourceInfo const& loc) const;		
 	};
 
+	// ----------------------------------------------------------------------------------------
+
 	class Symbol {
 	protected:
 		ID_T id = "";
@@ -103,6 +105,7 @@ namespace dependenciesMining {
 		virtual void SetNamespace(const std::string& nameSpace);
 	};
 
+	// ----------------------------------------------------------------------------------------
 
 	class SymbolTable {
 	private:
@@ -137,6 +140,7 @@ namespace dependenciesMining {
 
 	};
 
+	// ----------------------------------------------------------------------------------------
 
 	template<typename Parent_T> class Template {
 	private:
@@ -152,6 +156,7 @@ namespace dependenciesMining {
 		Symbol* InstallArguments(const ID_T& id, Structure* structure);
 	};
 
+	// ----------------------------------------------------------------------------------------
 
 	class Definition : public Symbol {
 	private:
@@ -253,10 +258,11 @@ namespace dependenciesMining {
 		bool IsOverloadedOperator() const;
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
-		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTrivial() const; 
 	};
 
+	// ----------------------------------------------------------------------------------------
 
 	class Structure : public Symbol {
 	private:
@@ -305,7 +311,7 @@ namespace dependenciesMining {
 
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
-		bool IsTemplateInstatiationSpecialization() const;
+		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTemplatePartialSpecialization() const;
 		bool IsTemplate() const;
 		bool IsUndefined() const;

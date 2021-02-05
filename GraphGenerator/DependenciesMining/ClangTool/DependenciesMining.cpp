@@ -2,6 +2,7 @@
 #include "Utilities.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
+//#include "clang/Tooling/CompilationDatabase.h"
 #include <vector>
 
 #define CLASS_DECL "ClassDecl"
@@ -12,14 +13,24 @@
 
 using namespace dependenciesMining;
 
-SymbolTable dependenciesMining::structuresTable;
-std::unordered_map<std::string, Ignored*> dependenciesMining::ignored = {	{"namespaces", new IgnoredNamespaces()},
-																			{"filePaths", new IgnoredFilePaths()} };
+// ----------------------------------------------------------------------------------------------
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
 DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
 DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
 DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
+
+// ----------------------------------------------------------------------------------------------
+
+SymbolTable dependenciesMining::structuresTable;
+std::unordered_map<std::string, Ignored*> dependenciesMining::ignored;
+
+void initializeIgnored(const std::string& ignoredFiles, const std::string& ignoredNamespaces = "") {
+	ignored["filePaths"] = new IgnoredFilePaths(ignoredFiles);
+	ignored["namespaces"] = new IgnoredNamespaces(ignoredNamespaces);
+}
+
+// ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -35,15 +46,11 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
-	if (d->isImplicit()) {
+	if (isIgnoredDecl(d)) {
 		return;
 	}
 
-	if (d->isAnonymousStructOrUnion()) {
-		return;
-	}
-
-	// gia ta declerations
+	// gia ta declarations
 	if (!(d->isCompleteDefinition())) {
 		if (!d->hasDefinition()){									// for templateDefinition Declarations only
 			if(!d->getDescribedClassTemplate())
@@ -64,7 +71,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	} 
 	else if (d->getKind() == d->ClassTemplateSpecialization) {
 		if(d->getTemplateSpecializationKind() == 1)
-			structure.SetStructureType(StructureType::TemplateInstatiationSpecialization);
+			structure.SetStructureType(StructureType::TemplateInstantiationSpecialization);
 		else 
 			structure.SetStructureType(StructureType::TemplateFullSpecialization);
 	}else if (d->getKind() == d->TemplateTemplateParm) {
@@ -93,8 +100,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	structure.SetNamespace(fullEnclosingNamespace);
 
 
-	// Templates
-	if (!d->hasDefinition()) {
+	// Templates 
+	if (!d->hasDefinition()) {															// Templates that has Declaration only
 		assert(structure.GetStructureType() == StructureType::TemplateDefinition);
 		structure.SetStructureType(StructureType::Undefined);
 		structuresTable.Install(structure.GetID(), structure);
@@ -102,20 +109,20 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-	//if (structure.IsTemplateInstatiationSpecialization()){
+	//if (structure.IsTemplateInstantiationSpecialization()){
 		// Template parent
 		std::string parentName;
 		ID_T parentID; 
 
 		Structure* templateParent;
-		if (structure.IsTemplateInstatiationSpecialization()) {
+		if (structure.IsTemplateInstantiationSpecialization()) {								// template Instantiation Specialization
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = GetIDfromDecl(parent); 
 			//assert(parentID); 
 			parentName = GetFullStructureName(parent);
 			templateParent = (Structure*)structuresTable.Lookup(parentID);
 		}
-		else {
+		else {																					// template Full and Parsial Specialization
 			parentName = d->getQualifiedNameAsString();	
 			templateParent = (Structure*)structuresTable.Lookup(parentName);
 			assert(templateParent);
@@ -130,11 +137,14 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
 			auto templateArg = temp->getTemplateArgs()[i];
 			TemplateArgsVisit(templateArg, [](TemplateArgument templateArg, Structure *structure) {
-				RecordDecl* d = nullptr;
-				if (templateArg.getKind() == TemplateArgument::Template) {
-					d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
-				}
-				if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
+					RecordDecl* d = nullptr;
+					if (templateArg.getKind() == TemplateArgument::Template) {
+						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
+						if (!d)													// a set of function templates 
+							return;
+					}
+
+					if (d || GetTemplateArgType(templateArg)->isStructureOrClassType()) {
 						if (!d)
 							d = GetTemplateArgType(templateArg)->getAsCXXRecordDecl();			
 						std::string argStructName = GetFullStructureName(d);
@@ -169,7 +179,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		auto* type = it->getFriendType();
 		if (type) {																							// Classes
 			auto parent = type->getType()->getAsCXXRecordDecl();
-			if (!parent)
+			if (!parent)																					// ignore decls that does not have definitions
 				continue;
 			auto parentID = GetIDfromDecl(parent); 
 			//assert(parentID);
@@ -206,7 +216,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			else if (decl->isTemplateDecl()) {																// Template Classes
 				auto recdecl = (RecordDecl*)((TemplateDecl*)decl)->getTemplatedDecl();			
 				auto structureDefinition = recdecl->getDefinition(); 
-				assert(structureDefinition);
+				if (!structureDefinition)																	// ignore decls that does not have definitions
+					continue;	
+
 				auto parentID = GetIDfromDecl(structureDefinition);
 				auto parentName = GetFullStructureName(structureDefinition);
 				Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
@@ -228,6 +240,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string parentName = GetFullStructureName((RecordDecl*)parent);
 		auto parentID = GetIDfromDecl((RecordDecl*)parent);
 		//assert(parentID);
+		if (isIgnoredDecl((RecordDecl*)parent)) {
+			return;
+		}
 		if (parentName != structure.GetName()) {
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			auto* inst = d->getInstantiatedFromMemberClass();
@@ -237,6 +252,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 	structuresTable.Install(structure.GetID(), structure);
 }
+
+// ----------------------------------------------------------------------------------------------
 
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -255,7 +272,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
-		if (parent->isAnonymousStructOrUnion()) {
+
+		if(isIgnoredDecl(parent)) {
 			return;
 		}
 
@@ -277,7 +295,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-			if (parentStructure->IsTemplateInstatiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
+			if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
 				return;
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
@@ -290,6 +308,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 }
+
+// ----------------------------------------------------------------------------------------------
 
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
@@ -313,14 +333,16 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
-		if (parent->isAnonymousStructOrUnion()) {
-			return; 
+
+		if (isIgnoredDecl(parent)) {
+			return;
 		}
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 		assert(parentStructure);
-		//if(!parentStructure)
-		//	parentStructure = structuresTable.Insert(parentID, parentName);
+		/*if (!parentStructure) {
+			parentStructure = (Structure*)structuresTable.Install(parentID, parentName);
+		}*/
 		Method method(methodID, GetFullMethodName(d), parentStructure->GetNamespace());
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
@@ -355,7 +377,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			}
 			else if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
 				if (d->isTemplateInstantiation()) {
-					method.SetMethodType(MethodType::TemplateInstatiationSpecialization);
+					method.SetMethodType(MethodType::TemplateInstantiationSpecialization);
 				}
 				else {
 					method.SetMethodType(MethodType::TemplateFullSpecialization);
@@ -374,14 +396,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		//Template
-		if (method.IsTemplateFullSpecialization() || method.IsTemplateInstatiationSpecialization()) {
+		if (method.IsTemplateFullSpecialization() || method.IsTemplateInstantiationSpecialization()) {
 		/*	// Tempalte Method's parent
 			Method* templateParentMethod = nullptr;
 			std::string parentMethodName = GetFullMethodName(d);
 			size_t start = parentMethodName.find("<");
 			size_t end = parentMethodName.find(">");
 			parentMethodName.erase(parentMethodName.begin() + start, parentMethodName.begin() + end + 1);
-			if (parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstatiationSpecialization()) {
+			if (parentStructure->IsTemplateFullSpecialization() || parentStructure->IsTemplateInstantiationSpecialization()) {
 				
 				templateParentMethod = parentStructure->GetTemplateParent()->GetMethod(parentMethodName);
 			}
@@ -397,6 +419,8 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 					RecordDecl* d = nullptr;
 					if (templateArg.getKind() == TemplateArgument::Template) {
 						d = (RecordDecl*)templateArg.getAsTemplateOrTemplatePattern().getAsTemplateDecl()->getTemplatedDecl();
+						if (!d)													// a set of function templates 
+							return;
 					}
 					else if (templateArg.getKind() == TemplateArgument::Integral) {
 						return;
@@ -447,6 +471,8 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
+// ----------------------------------------------------------------------------------------------
+
 // Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
 	auto* decl = memberExpr->getMemberDecl();
@@ -454,9 +480,9 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	auto* base = memberExpr->getBase();
 
 	if (base) {
-		base = base->IgnoreUnlessSpelledInSource();
+		base = base->IgnoreUnlessSpelledInSource();				// clean all the invisble AST nodes that may surround this stmt
 
-		if (base->getStmtClass() == memberExpr->CXXThisExprClass)
+		if (base->getStmtClass() == memberExpr->CXXThisExprClass)	// ignore this
 			return true;
 
 		std::string str; 
@@ -513,24 +539,25 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	SourceInfo locEnd(srcLocationEnd.getFilename(), srcLocationEnd.getLine(), srcLocationEnd.getColumn());
 	std::string exprString;
 
-	if (decl->getKind() == decl->CXXMethod) {
-		auto end = sm->getCharacterData(range.getEnd());
-		int openCount = 0, closeCount = 0;
-		while (!(openCount == closeCount && openCount)) {
-			if (*end == '(') {
-				openCount++;
-			}
-			else if (*end == ')') {
-				closeCount++;
-			}
-			end++;
-		}
-		const char* beginstr = sm->getCharacterData(range.getBegin());
-		exprString = std::string(beginstr, end);
-	}
-	else {
-		exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
-	}
+	//if (decl->getKind() == decl->CXXMethod) {
+	//	auto end = sm->getCharacterData(range.getEnd());
+	//	int openCount = 0, closeCount = 0;
+	//	while (!(openCount == closeCount && openCount)) {
+	//		if (*end == '(') {
+	//			openCount++;
+	//		}
+	//		else if (*end == ')') {
+	//			closeCount++;
+	//		}
+	//		end++;
+	//	}
+	//	const char* beginstr = sm->getCharacterData(range.getBegin());
+	//	exprString = std::string(beginstr, end);
+	//}
+	//else {
+	//	exprString = std::string(sm->getCharacterData(range.getBegin()), sm->getCharacterData(range.getEnd())) + decl->getNameAsString();
+	//}
+
 	Method::MemberExpr methodMemberExpr(exprString, locEnd, locBegin.GetFileName(), locBegin.GetLine(), locBegin.GetColumn());
 	MethodDeclsCallback::currentMethod->UpdateMemberExpr(methodMemberExpr, locBegin.toString());
 
@@ -571,6 +598,8 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	return true;
 }
 
+// ----------------------------------------------------------------------------------------------
+
 // Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
@@ -587,6 +616,10 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				return;
 
 			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
+
+			if (isIgnoredDecl(parentClass)) {
+				return;
+			}
 
 			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 			if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
@@ -606,8 +639,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			Method* parentMethod = (Method*)parentStructure->LookupMethod(parentMethodID);
 			//assert(parentMethod);
 			
-			// remove from TemplateInstatiationSpecialization methods the decletarions and arguments 
-			//if (parentMethod->isTemplateInstatiationSpecialization()) {
+			// remove from TemplateInstantiationSpecialization methods the decletarions and arguments 
+			//if (parentMethod->isTemplateInstantiationSpecialization()) {
 			//	return;
 			//}
 
@@ -639,6 +672,30 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 }
 
+
+// ----------------------------------------------------------------------------------------------
+
+/*
+	returns nullptr on fail.
+*/
+std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmpDBPath) {
+	std::string errorMsg;
+	auto cmpDB = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
+	if (!cmpDB) { // Input error, exit program.
+		std::cerr << "In '" << cmpDBPath << "'\n";
+		std::cerr << errorMsg << "\n";
+		std::cerr << "Make sure Compilation Database .json is named: 'compile_commands.json'\n";
+		return nullptr;
+	}
+
+	/*auto srcs = cmpDB->getAllFiles();
+	std::cout << "Files from Compilation Database:\n\n";
+	for (auto file : srcs) {
+		std::cout << file << std::endl;
+	}*/
+	return cmpDB;
+}
+
 /*
 	Clang Tool Creation
 */
@@ -646,13 +703,33 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs) {
+int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string> srcs, const char* ignoredFilePaths, const char* ignoredNamespaces) {
+	ClangTool* Tool;
+	std::unique_ptr<CompilationDatabase> cmpDB;
+	CommonOptionsParser *OptionsParser = nullptr;
 
+	if (cmpDBPath == nullptr) {
+		int argc = 3;
+		const char* argv[3];
+		argv[0] = "";
+		argv[1] = "";
+		argv[2] = "--";
+		OptionsParser = new CommonOptionsParser(argc, argv, MyToolCategory);
+		Tool = new ClangTool(OptionsParser->getCompilations(), srcs);
+	}
+	else {
+		cmpDB = LoadCompilationDatabase(cmpDBPath);
+		if (!cmpDB)
+			return -1;
+		Tool = new ClangTool(*cmpDB, cmpDB->getAllFiles());
+	}
+
+
+	
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
 
-	CommonOptionsParser OptionsParser(argc, argv, MyToolCategory);
-	ClangTool Tool(OptionsParser.getCompilations(), srcs);
+	initializeIgnored(ignoredFilePaths, ignoredNamespaces);
 
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;
@@ -663,6 +740,9 @@ int dependenciesMining::CreateClangTool(int argc, const char** argv, std::vector
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
-	int result = Tool.run(newFrontendActionFactory(&Finder).get());
+	int result = Tool->run(newFrontendActionFactory(&Finder).get());
+	delete Tool;
+	if (OptionsParser)
+		delete OptionsParser;
 	return result;
 }

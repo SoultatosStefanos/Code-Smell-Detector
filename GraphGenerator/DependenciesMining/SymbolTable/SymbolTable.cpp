@@ -204,8 +204,8 @@ std::string Method::GetMethodTypeAsString() const {
 	else if (methodType == MethodType::TemplateFullSpecialization) {
 		return "TemplateFullSpecialization";
 	}
-	else if (methodType == MethodType::TemplateInstatiationSpecialization) {
-		return "TemplateInstatiationSpecialization";
+	else if (methodType == MethodType::TemplateInstantiationSpecialization) {
+		return "TemplateInstantiationSpecialization";
 	}
 	else {
 		assert(0); 
@@ -321,8 +321,8 @@ bool Method::IsTemplateFullSpecialization() const {
 	return false;
 }
 
-bool Method::IsTemplateInstatiationSpecialization() const {
-	if (methodType == MethodType::TemplateInstatiationSpecialization)
+bool Method::IsTemplateInstantiationSpecialization() const {
+	if (methodType == MethodType::TemplateInstantiationSpecialization)
 		return true;
 	return false;
 }
@@ -431,8 +431,8 @@ std::string Structure::GetStructureTypeAsString() const{
 	else if (structureType == StructureType::TemplateFullSpecialization) {
 		return "TemplateFullSpecialization";
 	}
-	else if (structureType == StructureType::TemplateInstatiationSpecialization) {
-		return "TemplateInstatiationSpecialization";
+	else if (structureType == StructureType::TemplateInstantiationSpecialization) {
+		return "TemplateInstantiationSpecialization";
 	}
 	else if (structureType == StructureType::TemplatePartialSpecialization) {
 		return "TemplatePartialSpecialization";
@@ -527,8 +527,8 @@ bool Structure::IsTemplateFullSpecialization() const {
 	return false;
 }
 
-bool Structure::IsTemplateInstatiationSpecialization() const {
-	if (structureType == StructureType::TemplateInstatiationSpecialization)
+bool Structure::IsTemplateInstantiationSpecialization() const {
+	if (structureType == StructureType::TemplateInstantiationSpecialization)
 		return true;
 	return false;
 }

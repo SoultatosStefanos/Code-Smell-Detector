@@ -34,6 +34,11 @@ namespace dependenciesMining {
 	ID_T GetIDfromDecl(const FieldDecl* d);
 	ID_T GetIDfromDecl(const VarDecl* d);
 
+
+	// ----------------------------------------------------------------------------------------------
+
+	bool isIgnoredDecl(const RecordDecl* d);
+
 	// ---------------------------- template function definition ---------------------------------
 	template<typename Callback, typename ...Types>
 	void TemplateArgsVisit(const TemplateArgument& templateArg, const Callback& callback, Types... args) {

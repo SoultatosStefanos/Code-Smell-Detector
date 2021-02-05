@@ -25,6 +25,7 @@ namespace friends{
 
     void f(){}
     template<typename T1, typename T2> class template_Z;
+    //template<typename T1, typename T2> class template_Z2;
     template<> class template_Z <int, int>;
 
     struct S {
@@ -33,6 +34,7 @@ namespace friends{
         friend class template_Z <int, int>;
         friend class template_Z <int, float>;
         template<typename T1, typename T2> friend class template_Z;     // ~
+        template<typename T1, typename T2> friend class template_Z2;    // only declaretion -> ignored
         template<typename T> friend T A::method();
         template<typename T> friend void tempF();
         friend Anonymous2;

@@ -4,7 +4,6 @@
 
 #include <iostream>
 #include "SymbolTable.h"
-//#include "SymbolTableTempl.h"
 #include "../Ignored/Ignored.h";
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -19,10 +18,12 @@ using namespace llvm;
 using namespace clang::tooling;
 
 namespace dependenciesMining {
+
 	extern SymbolTable structuresTable;
 	extern std::unordered_map<std::string, Ignored*> ignored; 
 	
-	
+	// ----------------------------------------------------------------------------------
+
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
@@ -52,5 +53,9 @@ namespace dependenciesMining {
 		virtual void run(const MatchFinder::MatchResult& result);
 	};
 
-	int CreateClangTool(int argc, const char** argv, std::vector<std::string> srcs);
+	// ----------------------------------------------------------------------------------
+
+	std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char*);
+	int CreateClangTool(const char* cmpDBPath, std::vector<std::string> srcs, const char* ignoredFilePaths, const char* ignoredNamespaces);
+
 }
