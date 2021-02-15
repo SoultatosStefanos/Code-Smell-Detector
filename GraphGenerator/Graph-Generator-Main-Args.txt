@@ -1,0 +1,50 @@
+main takes 5 args: 
+	arg[1]: 
+			either '--src' either '--cmp-db' to indicate wether the project will be loaded from a directory or with a compilation database.
+
+
+	arg[2]: 
+			if the project is loaded via directory directly arg[2] is the path the directory.
+			(Example: C:\Files\Projects\ProjectA).
+
+			if the project is loaded via compilation DB arg[2] is the path to the compilation DB.
+			Compilation DB must be named compile_commands.json.
+			(Example: C:\Files\Projects\ProjectA\compile_commands.json)
+
+
+	arg[3]: 
+			path to a .txt file with a list of keywords (or even full paths) indicating the files from the project that should not be processed. 
+			For example if the .txt contains this:
+				allegro5
+				jsoncpp
+
+			All files with 'allegro5' or 'jsoncpp' keywords in their path will not be processed.
+			This is usefull to avoid processing large libraries.
+
+
+	arg[4]: 
+			similar with arg[3] but the list is used to exclude namespaces not entire files.
+
+
+	arg[5]:
+			path to the output .json file.
+			Example("C\Files\Projects\ProjectA\output.json")
+
+
+
+NOTES:
+	*** Compilation Database:
+		A Compilation DB is acquired by using cmake to make the project by adding: '-D CMAKE_EXPORT_COMPILE_COMMANDS=ON'.
+		(Example: cmake -G Ninja -D CMAKE_EXPORT_COMPILE_COMMANDS=ON the_project/).
+
+		Only 'Makefile Generators' or 'Ninja' generators can create a compilation database.
+
+		It is also possible to create a compilation database directly from Visual Studio with the open source extension: 'Sourcetrail'.
+
+		Creating a compilation database will generate a file named compile_commands.json - do not rename the file.
+
+		Using a compilation database after changing the source files which it refers to will cause undefined behavior.
+
+
+	*** Optional Arguments:
+		It is possible to skip main args 3,4,5 / 4,5 / 5.
