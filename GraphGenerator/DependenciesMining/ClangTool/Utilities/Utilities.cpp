@@ -4,7 +4,7 @@ using namespace dependenciesMining;
 
 bool dependenciesMining::isStructureOrStructurePointerType(const clang::QualType& type) {
 	if (!type->isStructureOrClassType()) {
-		if (type->isPointerType()) {
+		if (type->isPointerType() || type->isReferenceType()) {
 			if (!type->getPointeeType()->isStructureOrClassType()) {
 				return false;
 			}

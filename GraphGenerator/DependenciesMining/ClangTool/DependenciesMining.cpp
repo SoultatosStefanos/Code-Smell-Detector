@@ -282,7 +282,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			std::string typeName;
 			ID_T parentID = GetIDfromDecl(parent);
 			ID_T typeID = "";
-			if (d->getType()->isPointerType()) {
+			if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsRecordDecl()); // CXX
 				typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsRecordDecl());			// CXX
 			}
@@ -295,7 +295,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-			if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherite its dependencies from the parent template
+			if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherit its dependencies from the parent template
 				return;
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
@@ -445,7 +445,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (isStructureOrStructurePointerType(returnType)) {
 			std::string typeName;
 			ID_T typeID;
-			if (returnType->isPointerType()) {
+			if (returnType->isPointerType() || returnType->isReferenceType()) {
 				typeName = GetFullStructureName(returnType->getPointeeType()->getAsCXXRecordDecl());
 				typeID = GetIDfromDecl(returnType->getPointeeType()->getAsCXXRecordDecl());
 			}
@@ -515,7 +515,7 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 			
 		std::string typeName;
 		ID_T typeID;
-		if (baseType->isPointerType()) {
+		if (baseType->isPointerType() || baseType->isReferenceType()) {
 			typeName = GetFullStructureName(baseType->getPointeeType()->getAsCXXRecordDecl());
 			typeID = GetIDfromDecl(baseType->getPointeeType()->getAsCXXRecordDecl());
 		}
@@ -578,7 +578,7 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 
 	std::string typeName;
 	ID_T typeID; 
-	if (type->isPointerType()) {
+	if (type->isPointerType() || type->isReferenceType()) {
 		typeName = GetFullStructureName(type->getPointeeType()->getAsCXXRecordDecl());
 		typeID = GetIDfromDecl(type->getPointeeType()->getAsCXXRecordDecl());
 	}
@@ -646,7 +646,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 			std::string typeName;
 			ID_T typeID; 
-			if (d->getType()->isPointerType()) {
+			if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
 				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
 				typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsCXXRecordDecl());
 			}

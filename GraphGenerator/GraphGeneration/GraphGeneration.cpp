@@ -61,7 +61,7 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	}
 
 	untyped::Object basesObj;
-	currDepType = Inherite_dep_t;
+	currDepType = Inherit_dep_t;
 	double index = 0;
 	for (auto& it : s->GetBases()) {
 		auto* base = it.second;

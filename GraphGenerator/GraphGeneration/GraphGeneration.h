@@ -4,7 +4,7 @@
 #include "Graph.h"
 
 // Dependency Types
-#define Inherite_dep_t "Inherite"
+#define Inherit_dep_t "Inherit"
 #define Friend_dep_t "Friend"
 #define NestedClass_dep_t "NestedClass"
 #define ClassField_dep_t "ClassField"
