@@ -58,7 +58,7 @@ function linkProperties(d) {
     "ClassField": "Class Fields",
     "ClassTemplateParent": "Class Template Parent",
     "ClassTemplateArg": "Class Template Arguments",
-    "Inherite": "Class Base",
+    "Inherit": "Class Base",
     "NestedClass": "Outer Class",
     "Friend": "Class Friends",
     "MethodArg": "Method Arguments",
