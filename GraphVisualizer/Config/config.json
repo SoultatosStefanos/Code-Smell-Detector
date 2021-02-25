@@ -173,22 +173,10 @@
                         }
                     },
                     "conditions": {
-                        "disabled": "$currGroup.groupEdges.value === true"
+                        "disabled": "this.groups.grouping.data.groupEdges.value === true"
                     },
                     "onChange": {
                         "event": "viewOnly"
-                    }
-                },
-                "groupEdges": {
-                    "id": "groypEdges",
-                    "description": "Show group Edges",
-                    "type": "checkbox",
-                    "value": false,
-                    "conditions": {
-                        "disabled": "this.groups.grouping.data.groupingBy.value === \"none\""
-                    },
-                    "onChange": {
-                        "event": "groupEdges"
                     }
                 }
             }
@@ -281,6 +269,18 @@
                     },
                     "onChange": {
                         "event": "infomapMultiLevels"
+                    }
+                }, 
+                "groupEdges": {
+                    "id": "groupEdges",
+                    "description": "Show group Edges",
+                    "type": "checkbox",
+                    "value": false,
+                    "conditions": {
+                        "disabled": "this.groups.grouping.data.groupingBy.value === \"none\""
+                    },
+                    "onChange": {
+                        "event": "groupEdges"
                     }
                 }
             }
