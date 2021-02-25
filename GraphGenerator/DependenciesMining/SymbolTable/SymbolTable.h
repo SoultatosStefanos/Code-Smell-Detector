@@ -124,6 +124,7 @@ namespace dependenciesMining {
 		//const Symbol* Lookup(const std::string& name) const;
 
 		void Print();
+		void Print2(int level);
 		void Accept(STVisitor* visitor);
 		void Accept(STVisitor* visitor) const;
 

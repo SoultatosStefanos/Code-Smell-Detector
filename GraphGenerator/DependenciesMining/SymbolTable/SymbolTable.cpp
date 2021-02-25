@@ -713,6 +713,38 @@ void SymbolTable::Print() {
 	}
 }
 
+// Testing purpose.
+void SymbolTable::Print2(int level) {
+	for (auto& t : byID) {
+		std::cout << "level " << level << ", Name: " << t.first << std::endl;
+		//std::cout << "--------------------------------------------\n";
+		if (t.second->GetClassType() == ClassType::Structure) {
+			Structure* structure = (Structure*)t.second;
+			structure->GetMethods().Print2(level + 1);
+			structure->GetFields().Print2(level + 1);
+			structure->GetBases().Print2(level + 1);
+			structure->GetContains().Print2(level + 1);
+			structure->GetFriends().Print2(level + 1);
+		}
+		else if (t.second->GetClassType() == ClassType::Method) {
+			Method* method = (Method*)t.second;
+			std::cout << "args: ---------\n";
+			method->GetArguments().Print2(level + 1);
+			std::cout << "end : ---------\n";
+			method->GetDefinitions().Print2(level + 1);
+			method->GetTemplateArguments().Print2(level + 1);
+			const auto& member_expr = method->GetMemberExpr();
+			for (auto& i : member_expr) {
+				std::cout << "Member EXPR: " << i.first << std::endl;
+				for (auto& it : i.second.GetMembers()) {
+					std::cout << "Member: " << it.GetName() << std::endl;
+				}
+			}
+
+		}
+	}
+}
+
 void SymbolTable::Accept(STVisitor* visitor) {
 	for (auto it : byID) {
 		auto* symbol = it.second;
