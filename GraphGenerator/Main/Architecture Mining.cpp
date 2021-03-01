@@ -6,6 +6,7 @@
 #include "DependenciesMining.h"
 #include "GraphGeneration.h"
 #include "GraphToJson.h"
+#include "json/writer.h"
 
 static void PrintMainArgInfo(void) {
 	std::cout << "MAIN ARGUMENTS:\n\n";
@@ -65,7 +66,14 @@ int main(int argc, const char** argv) {
 				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int result = dependenciesMining::CreateClangTool(cmpDBPath, srcs, ignoredFilePaths, ignoredNamespaces);
+	
+
+
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
+	Json::Value jsonObj;
+	structuresTable.WriteToJson(jsonObj);
+	std::cout << jsonObj << std::endl;
+
 	std::string json = graphToJson::GetJson(graph);
 
 	std::ofstream jsonFile;

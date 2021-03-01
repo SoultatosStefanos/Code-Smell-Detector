@@ -5,6 +5,7 @@
 #include <map>
 #include <cassert>
 #include <Vector>
+#include "json/writer.h"
 
 #define ID_T std::string 
 
@@ -125,6 +126,8 @@ namespace dependenciesMining {
 
 		void Print();
 		void Print2(int level);
+		Json::Value GetStructure(dependenciesMining::Structure* structure);
+		void WriteToJson(Json::Value& obj);
 		void Accept(STVisitor* visitor);
 		void Accept(STVisitor* visitor) const;
 

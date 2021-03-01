@@ -745,6 +745,44 @@ void SymbolTable::Print2(int level) {
 	}
 }
 
+Json::Value SymbolTable::GetStructure(dependenciesMining::Structure* structure) {
+	Json::Value json_structure;
+	json_structure["methods"] = "place-holder0"; // fix
+	json_structure["fields"] = "place-holder1"; // fix
+	json_structure["bases"] = "place-holder2"; // fix
+	json_structure["contains"] = "place-holder3"; // fix
+	json_structure["friends"] = "place-holder4"; // fix
+	return json_structure;
+}
+
+void SymbolTable::WriteToJson(Json::Value& obj) {
+	Json::Value vec(Json::arrayValue);
+
+	for (auto& t : byID) {
+		Json::Value new_obj;
+		if (t.second->GetClassType() == ClassType::Structure) {
+			new_obj = GetStructure((dependenciesMining::Structure*)t.second);
+		}
+		else if (t.second->GetClassType() == ClassType::Definition) {
+			// new_obj = ...
+		}
+		else if (t.second->GetClassType() == ClassType::Method) {
+			// new_obj = ...
+		}
+		else if (t.second->GetClassType() == ClassType::Undefined) {
+			// new_obj = ...
+		}
+		else
+			assert(0);
+
+		vec.append(new_obj);
+	}
+
+	obj["??"] = vec;
+}
+
+
+
 void SymbolTable::Accept(STVisitor* visitor) {
 	for (auto it : byID) {
 		auto* symbol = it.second;
