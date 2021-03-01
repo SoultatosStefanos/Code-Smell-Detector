@@ -747,7 +747,6 @@ void SymbolTable::Print2(int level) {
 
 Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
 	Json::Value json_structure;
-	Json::Value tmp_obj;
 
 	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();;
 	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();;
@@ -758,26 +757,56 @@ Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structu
 	return json_structure;
 }
 
+Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
+	Json::Value json_method;
+
+	/*auto iss = method->GetMemberExpr();
+	std::cout << iss.size() << std::endl;
+	for (auto is : iss) {
+		std::cout << is.first << std::endl;
+	}*/
+	auto* ret_type = method->GetReturnType();
+#pragma warning ("FIX ME!!!!")
+	if (!ret_type)
+		json_method["ret_type"] = "void";
+	else
+		json_method["ret_type"] = ret_type->GetID();
+	json_method["args"] = method->GetArguments().GetJsonSymbolTable();
+	json_method["definitions"] = method->GetDefinitions().GetJsonSymbolTable();
+	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
+
+#pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
+	return json_method;
+}
+
+Json::Value SymbolTable::GetJsonDefinition(dependenciesMining::Definition* definition) {
+	Json::Value json_definition;
+
+	json_definition["type"] = definition->GetType()->GetID();
+	return json_definition;
+}
+
 Json::Value SymbolTable::GetJsonSymbolTable(void) {
 	Json::Value vec(Json::arrayValue);
 
 	for (auto& t : byID) {
 		Json::Value new_obj;
+		
 		if (t.second->GetClassType() == ClassType::Structure) {
 			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
 		}
 		else if (t.second->GetClassType() == ClassType::Definition) {
-			// new_obj = ...
+			new_obj = GetJsonDefinition((dependenciesMining::Definition*)t.second);
 		}
 		else if (t.second->GetClassType() == ClassType::Method) {
-			// new_obj = ...
+			new_obj = GetJsonMethod(((dependenciesMining::Method*)t.second));
 		}
 		else if (t.second->GetClassType() == ClassType::Undefined) {
 			// new_obj = ...
 		}
 		else
 			assert(0);
-
+		new_obj["id"] = t.second->GetID();
 		vec.append(new_obj);
 	}
 

@@ -127,6 +127,8 @@ namespace dependenciesMining {
 		void Print();
 		void Print2(int level);
 		Json::Value GetJsonStructure(dependenciesMining::Structure* structure);
+		Json::Value GetJsonMethod(dependenciesMining::Method* method);
+		Json::Value GetJsonDefinition(dependenciesMining::Definition* definition);
 		Json::Value GetJsonSymbolTable(void);
 		void Accept(STVisitor* visitor);
 		void Accept(STVisitor* visitor) const;
