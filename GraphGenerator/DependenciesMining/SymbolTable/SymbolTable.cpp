@@ -745,23 +745,26 @@ void SymbolTable::Print2(int level) {
 	}
 }
 
-Json::Value SymbolTable::GetStructure(dependenciesMining::Structure* structure) {
+Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
 	Json::Value json_structure;
-	json_structure["methods"] = "place-holder0"; // fix
-	json_structure["fields"] = "place-holder1"; // fix
-	json_structure["bases"] = "place-holder2"; // fix
-	json_structure["contains"] = "place-holder3"; // fix
-	json_structure["friends"] = "place-holder4"; // fix
+	Json::Value tmp_obj;
+
+	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();;
+	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();;
+	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();;
+	json_structure["contains"] = structure->GetContains().GetJsonSymbolTable();
+	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();;
+
 	return json_structure;
 }
 
-void SymbolTable::WriteToJson(Json::Value& obj) {
+Json::Value SymbolTable::GetJsonSymbolTable(void) {
 	Json::Value vec(Json::arrayValue);
 
 	for (auto& t : byID) {
 		Json::Value new_obj;
 		if (t.second->GetClassType() == ClassType::Structure) {
-			new_obj = GetStructure((dependenciesMining::Structure*)t.second);
+			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
 		}
 		else if (t.second->GetClassType() == ClassType::Definition) {
 			// new_obj = ...
@@ -778,7 +781,7 @@ void SymbolTable::WriteToJson(Json::Value& obj) {
 		vec.append(new_obj);
 	}
 
-	obj["??"] = vec;
+	return vec;
 }
 
 

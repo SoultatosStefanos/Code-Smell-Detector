@@ -70,8 +70,7 @@ int main(int argc, const char** argv) {
 
 
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
-	Json::Value jsonObj;
-	structuresTable.WriteToJson(jsonObj);
+	Json::Value jsonObj = structuresTable.GetJsonSymbolTable();
 	std::cout << jsonObj << std::endl;
 
 	std::string json = graphToJson::GetJson(graph);
