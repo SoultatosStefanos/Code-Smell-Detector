@@ -254,7 +254,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 }
 
 // ----------------------------------------------------------------------------------------------
-
+// Hanlde all the Fields in classes/structs (non structure fields)
 void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		auto* parent = d->getParent();
@@ -300,7 +300,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 
 
 
-// Hanlde all the Fields in classes/structs
+// Hanlde all the Fields in classes/structs (structure fields)
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		auto* parent = d->getParent();
@@ -513,15 +513,34 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		// Body - MemberExpr
 		auto* body = d->getBody();
 		FindMemberExprVisitor visitor; 
+		std::cout << "TraverseStmt ----------- " << std::endl;
 		visitor.TraverseStmt(body);
+		std::cout << "TraverseStmt END ------- " << std::endl;
 		currentMethod = nullptr;
+
+
 	}
 }
 
 // ----------------------------------------------------------------------------------------------
 
+bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
+	if (!stmt)
+		return false;
+	for (auto it = stmt->child_begin(); it != stmt->child_end(); it++) {
+		RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(*it);
+	}
+	std::cout << stmt->getStmtClassName() << std::endl;
+	RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(stmt);
+	return true;
+}
+
+
 // Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
+
+	std::cout << "Membr Expr callbakk ------------ " << std::endl;
+
 	auto* decl = memberExpr->getMemberDecl();
 	auto type = memberExpr->getType();
 	auto* base = memberExpr->getBase();
@@ -728,7 +747,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				parentMethod->InstallArg(defID, *def);
 			}
 
-			free(def);
+			delete def;
 		}
 	}
 }

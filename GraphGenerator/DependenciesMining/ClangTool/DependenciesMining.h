@@ -31,7 +31,7 @@ namespace dependenciesMining {
 
 	class FeildDeclsCallback : public MatchFinder::MatchCallback {
 	private:
-		virtual void installFundamentalField(const MatchFinder::MatchResult& result);
+		void installFundamentalField(const MatchFinder::MatchResult& result);
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
 	};
@@ -43,6 +43,7 @@ namespace dependenciesMining {
 		class FindMemberExprVisitor : public RecursiveASTVisitor<FindMemberExprVisitor> {
 		public:
 			bool VisitMemberExpr(MemberExpr* expr);
+			bool TraverseStmt(Stmt* stmt);
 		};
 	private: 
 		friend FindMemberExprVisitor;
