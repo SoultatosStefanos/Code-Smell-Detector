@@ -265,7 +265,6 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		std::string parentName = GetFullStructureName(parent);
 		std::string typeName = d->getType().getAsString();
 		ID_T parentID = GetIDfromDecl(parent);
-		ID_T typeID = "";
 		//if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
 		//	typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsRecordDecl()); // CXX
 		//	typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsRecordDecl());			// CXX
@@ -660,9 +659,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 		if (d->isLocalVarDeclOrParm() && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
 		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
-			if (!isStructureOrStructurePointerType(d->getType()))
-				return;
-
 			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
 
 			if (isIgnoredDecl(parentClass)) {
@@ -693,29 +689,46 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			//}
 
 			std::string typeName;
-			ID_T typeID; 
-			if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
-				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-				typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-			}
-			else {
-				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
-				typeID = GetIDfromDecl(d->getType()->getAsCXXRecordDecl());
-			}
-			//assert(typeID);
-			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-			if (!typeStructure)
-				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
+			ID_T typeID;
 			auto defID = GetIDfromDecl(d);
-			//assert(defID);
-			Definition def(defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
-			def.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-			if (d->isLocalVarDecl()) {
-				parentMethod->InstallDefinition(defID, def);
+			Definition* def = nullptr;
+
+			if (isStructureOrStructurePointerType(d->getType())) {
+				if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
+					typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
+					typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsCXXRecordDecl());
+				}
+				else {
+					typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
+					typeID = GetIDfromDecl(d->getType()->getAsCXXRecordDecl());
+				}
+				//assert(typeID);
+				Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
+				if (!typeStructure)
+					typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
+				//assert(defID);
+				def = new Definition (defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
+				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			}
 			else {
-				parentMethod->InstallArg(defID, def);
+
+				typeName = d->getType().getAsString();
+				def = new Definition (defID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
+				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+				def->SetFundamental(typeName);
 			}
+
+
+			
+			
+			if (d->isLocalVarDecl()) {
+				parentMethod->InstallDefinition(defID, *def);
+			}
+			else {
+				parentMethod->InstallArg(defID, *def);
+			}
+
+			free(def);
 		}
 	}
 }
