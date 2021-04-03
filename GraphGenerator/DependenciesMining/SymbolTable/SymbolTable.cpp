@@ -247,6 +247,14 @@ std::map<std::string, Method::MemberExpr>  Method::GetMemberExpr() const {
 	return memberExprs;
 }
 
+int Method::GetLiterals() const {
+	return literals;
+}
+
+int Method::GetStatements() const {
+	return statements;
+}
+
 void Method::SetMethodType(const MethodType& type) {
 	methodType = type;
 }
@@ -257,6 +265,14 @@ void Method::SetReturnType(Structure* structure) {
 
 void Method::SetTemplateParent(Method* method) {
 	templateInfo.SetParent(method);
+}
+
+void Method::SetLiterals(int literals) {
+	this->literals = literals;
+}
+
+void Method::SetStatements(int statements) {
+	this->statements = statements;
 }
 
 void Method::InstallArg(const ID_T& id, const Definition& definition) {
@@ -377,7 +393,6 @@ void Method::Member::SetLocEnd(const SourceInfo& locEnd) {
 void Method::Member::SetType(Structure* type) {
 	this->type = type;
 }
-
 
 
 // MemberExpr 
@@ -787,6 +802,8 @@ Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
 	json_method["args"] = method->GetArguments().GetJsonSymbolTable();
 	json_method["definitions"] = method->GetDefinitions().GetJsonSymbolTable();
 	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
+	json_method["literals"] = method->GetLiterals();
+	json_method["statements"] = method->GetStatements();
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 	return json_method;

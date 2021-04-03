@@ -513,9 +513,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		// Body - MemberExpr
 		auto* body = d->getBody();
 		FindMemberExprVisitor visitor; 
-		std::cout << "TraverseStmt ----------- " << std::endl;
+
+		literal_count = 0;
+		statement_count = 0;
 		visitor.TraverseStmt(body);
-		std::cout << "TraverseStmt END ------- " << std::endl;
+
+		currentMethod->SetLiterals(literal_count);
+		currentMethod->SetStatements(statement_count);
+
 		currentMethod = nullptr;
 
 
@@ -526,11 +531,18 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 	if (!stmt)
-		return false;
-	for (auto it = stmt->child_begin(); it != stmt->child_end(); it++) {
-		RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(*it);
-	}
-	std::cout << stmt->getStmtClassName() << std::endl;
+		return true;
+
+	if(stmt->getStmtClass() == Stmt::StmtClass::CompoundStmtClass)
+		MethodDeclsCallback::statement_count += std::distance(stmt->child_begin(), stmt->child_end());
+
+
+	std::string class_name = stmt->getStmtClassName();
+	std::cout << class_name << std::endl;
+	if (class_name.find("Literal") != std::string::npos)
+		MethodDeclsCallback::literal_count++;
+
+
 	RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(stmt);
 	return true;
 }
@@ -538,9 +550,6 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 
 // Handle all the MemberExpr in a method 
 bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* memberExpr) {
-
-	std::cout << "Membr Expr callbakk ------------ " << std::endl;
-
 	auto* decl = memberExpr->getMemberDecl();
 	auto type = memberExpr->getType();
 	auto* base = memberExpr->getBase();

@@ -49,6 +49,8 @@ namespace dependenciesMining {
 		friend FindMemberExprVisitor;
 		inline static Method* currentMethod = nullptr;
 		inline static SourceManager* sm = nullptr;
+		inline static int literal_count;
+		inline static int statement_count;
 	};
 
 	class MethodVarsCallback : public MatchFinder::MatchCallback {
