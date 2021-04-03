@@ -167,6 +167,7 @@ namespace dependenciesMining {
 	class Definition : public Symbol {
 	private:
 		Structure* type = nullptr;
+		std::string fundamental = "";
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
@@ -175,8 +176,11 @@ namespace dependenciesMining {
 		Definition(const ID_T& id, const std::string& name, const std::string& nameSpace, Structure* type, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Definition, fileName, line, column), type(type) {};
 
+		bool isStructure() const;
 		const Structure* GetType() const;
+		std::string GetFundamental() const;
 		void SetType(Structure* structure);
+		void SetFundamental(const std::string& type);
 	};
 
 	#define Value_mem_t "Value"
@@ -323,4 +327,8 @@ namespace dependenciesMining {
 		bool IsUndefined() const;
 		bool IsNestedClass() const;
 	};
+
+	/*class Fundamental : public Symbol {
+
+	};*/
 }

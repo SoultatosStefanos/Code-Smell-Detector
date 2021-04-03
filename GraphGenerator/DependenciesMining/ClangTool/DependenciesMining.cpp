@@ -255,12 +255,55 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 // ----------------------------------------------------------------------------------------------
 
+void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
+	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
+		auto* parent = d->getParent();
+
+		// Ignored
+		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+
+		std::string parentName = GetFullStructureName(parent);
+		std::string typeName = d->getType().getAsString();
+		ID_T parentID = GetIDfromDecl(parent);
+		ID_T typeID = "";
+		//if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
+		//	typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsRecordDecl()); // CXX
+		//	typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsRecordDecl());			// CXX
+		//}
+		//else {
+		//	typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
+		//	typeID = GetIDfromDecl(d->getType()->getAsCXXRecordDecl());
+		//}
+
+
+
+
+		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
+
+		//Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
+
+
+		//if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherit its dependencies from the parent template
+		//	return;
+		//if (!typeStructure)
+		//	typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
+
+		auto fieldID = GetIDfromDecl(d);
+		//assert(fieldID);
+
+		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
+		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+		field.SetFundamental(typeName);
+		parentStructure->InstallField(fieldID, field);
+
+	}
+}
+
+
+
 // Hanlde all the Fields in classes/structs
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
-		if (!isStructureOrStructurePointerType(d->getType()))
-			return;
-
 		auto* parent = d->getParent();
 
 		// Ignored
@@ -274,6 +317,11 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		if(isIgnoredDecl(parent)) {
+			return;
+		}
+
+		if (!isStructureOrStructurePointerType(d->getType())) {
+			installFundamentalField(result);
 			return;
 		}
 

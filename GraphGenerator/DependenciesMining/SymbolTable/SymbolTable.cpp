@@ -163,12 +163,25 @@ template<typename Parent_T> Symbol* Template<Parent_T>::InstallArguments(const I
 
 
 //Definition
+bool Definition::isStructure() const {
+	return type != nullptr;
+}
+
+
 const Structure* Definition::GetType() const {
 	return type;
 }
 
+std::string Definition::GetFundamental() const {
+	return fundamental;
+}
+
 void Definition::SetType(Structure* structure) {
 	type = structure;
+}
+
+void Definition::SetFundamental(const std::string& type) {
+	fundamental = type;
 }
 
 // Method
@@ -781,8 +794,11 @@ Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
 
 Json::Value SymbolTable::GetJsonDefinition(dependenciesMining::Definition* definition) {
 	Json::Value json_definition;
+	if (definition->isStructure())
+		json_definition["type"] = definition->GetType()->GetID();
+	else // is fundamental
+		json_definition["type"] = definition->GetFundamental();
 
-	json_definition["type"] = definition->GetType()->GetID();
 	return json_definition;
 }
 

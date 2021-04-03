@@ -30,6 +30,8 @@ namespace dependenciesMining {
 	};
 
 	class FeildDeclsCallback : public MatchFinder::MatchCallback {
+	private:
+		virtual void installFundamentalField(const MatchFinder::MatchResult& result);
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
 	};

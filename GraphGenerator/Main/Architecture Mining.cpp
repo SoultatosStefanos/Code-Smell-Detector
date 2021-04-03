@@ -69,16 +69,16 @@ int main(int argc, const char** argv) {
 	
 
 
-	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
+	//graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	Json::Value jsonObj = structuresTable.GetJsonSymbolTable();
 	std::cout << jsonObj << std::endl;
 
-	std::string json = graphToJson::GetJson(graph);
+	//std::string json = graphToJson::GetJson(graph);
 
-	std::ofstream jsonFile;
+	//std::ofstream jsonFile;
 
-	jsonFile.open(jsonPath);
-	jsonFile << json;
- 	jsonFile.close();
+	//jsonFile.open(jsonPath);
+	//jsonFile << json;
+ 	//jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 }
