@@ -289,7 +289,6 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 
 		auto fieldID = GetIDfromDecl(d);
 		//assert(fieldID);
-
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
 		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 		field.SetFundamental(typeName);
@@ -516,10 +515,14 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		literal_count = 0;
 		statement_count = 0;
+		branch_count = 0;
+		loop_count = 0;
 		visitor.TraverseStmt(body);
 
 		currentMethod->SetLiterals(literal_count);
 		currentMethod->SetStatements(statement_count);
+		currentMethod->SetBranches(branch_count);
+		currentMethod->SetLoops(loop_count);
 
 		currentMethod = nullptr;
 
@@ -533,14 +536,35 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 	if (!stmt)
 		return true;
 
-	if(stmt->getStmtClass() == Stmt::StmtClass::CompoundStmtClass)
-		MethodDeclsCallback::statement_count += std::distance(stmt->child_begin(), stmt->child_end());
-
-
 	std::string class_name = stmt->getStmtClassName();
+
+	switch (stmt->getStmtClass()) {
+		case Stmt::StmtClass::CompoundStmtClass:
+			MethodDeclsCallback::statement_count += std::distance(stmt->child_begin(), stmt->child_end());
+			break;
+
+		case Stmt::StmtClass::IfStmtClass:
+		case Stmt::StmtClass::SwitchStmtClass:
+		case Stmt::StmtClass::BreakStmtClass:
+		case Stmt::StmtClass::ContinueStmtClass:
+		case Stmt::StmtClass::GotoStmtClass:
+		case Stmt::StmtClass::ReturnStmtClass:
+			MethodDeclsCallback::branch_count++;
+			break;
+	
+		case Stmt::StmtClass::ForStmtClass:
+		case Stmt::StmtClass::WhileStmtClass:
+			MethodDeclsCallback::loop_count++;
+			break;
+
+		default: {
+			if (class_name.find("Literal") != std::string::npos)
+				MethodDeclsCallback::literal_count++;
+		}
+	}
+	
 	std::cout << class_name << std::endl;
-	if (class_name.find("Literal") != std::string::npos)
-		MethodDeclsCallback::literal_count++;
+	
 
 
 	RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(stmt);

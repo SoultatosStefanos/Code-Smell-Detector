@@ -51,6 +51,8 @@ namespace dependenciesMining {
 		inline static SourceManager* sm = nullptr;
 		inline static int literal_count;
 		inline static int statement_count;
+		inline static int loop_count;
+		inline static int branch_count;
 	};
 
 	class MethodVarsCallback : public MatchFinder::MatchCallback {

@@ -238,6 +238,8 @@ namespace dependenciesMining {
 		std::map<std::string, MemberExpr> memberExprs;	// <location, MemberExpr>
 		int literals = 0;
 		int statements = 0;
+		int branches = 0;
+		int loops = 0;
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
@@ -254,12 +256,16 @@ namespace dependenciesMining {
 		std::map<std::string, MemberExpr> GetMemberExpr() const;
 		int GetLiterals() const;
 		int GetStatements() const;
+		int GetBranches() const;
+		int GetLoops() const;
 
 		void SetMethodType(const MethodType& type);
 		void SetReturnType(Structure* structure);
 		void SetTemplateParent(Method* structure);
 		void SetLiterals(int literals);
 		void SetStatements(int statements);
+		void SetBranches(int branches);
+		void SetLoops(int loops);
 
 		void InstallArg(const ID_T& id, const Definition& definition);
 		void InstallDefinition(const ID_T& id, const Definition& definition);

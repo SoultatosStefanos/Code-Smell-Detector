@@ -255,6 +255,14 @@ int Method::GetStatements() const {
 	return statements;
 }
 
+int Method::GetBranches() const {
+	return branches;
+}
+
+int Method::GetLoops() const {
+	return loops;
+}
+
 void Method::SetMethodType(const MethodType& type) {
 	methodType = type;
 }
@@ -273,6 +281,14 @@ void Method::SetLiterals(int literals) {
 
 void Method::SetStatements(int statements) {
 	this->statements = statements;
+}
+
+void Method::SetBranches(int branches) {
+	this->branches = branches;
+}
+
+void Method::SetLoops(int loops) {
+	this->loops = loops;
 }
 
 void Method::InstallArg(const ID_T& id, const Definition& definition) {
@@ -734,6 +750,16 @@ const Symbol* SymbolTable::Lookup(const ID_T& id) const {
 //		return nullptr;
 //}
 
+static Json::Value GetJsonSourceInfo(Symbol* symbol) {
+	Json::Value json_src_info;
+	auto src_info = symbol->GetSourceInfo();
+	json_src_info["file"] = src_info.GetFileName();
+	json_src_info["line"] = src_info.GetLine();
+	json_src_info["column"] = src_info.GetColumn();
+
+	return json_src_info;
+}
+
 void SymbolTable::Print() {
 	for (auto& t : byName) {
 		std::cout << "Name: " << t.first << std::endl;
@@ -776,11 +802,12 @@ void SymbolTable::Print2(int level) {
 Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
 	Json::Value json_structure;
 
-	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();;
-	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();;
-	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();;
+	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();
+	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();
+	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();
 	json_structure["contains"] = structure->GetContains().GetJsonSymbolTable();
-	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();;
+	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();
+	json_structure["src_info"] = GetJsonSourceInfo(structure);
 
 	return json_structure;
 }
@@ -804,6 +831,9 @@ Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
 	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
 	json_method["literals"] = method->GetLiterals();
 	json_method["statements"] = method->GetStatements();
+	json_method["branches"] = method->GetBranches();
+	json_method["loops"] = method->GetLoops();
+	json_method["src_info"] = GetJsonSourceInfo(method);
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 	return json_method;
