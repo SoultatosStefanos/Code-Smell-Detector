@@ -15,6 +15,7 @@ static void PrintMainArgInfo(void) {
 	std::cout << "argv[3]: (file path) path/to/ignoredFilePaths\n";
 	std::cout << "argv[4]: (file path) path/to/ignoredNamespaces\n";
 	std::cout << "argv[5]: (file path) path/to/output\n";
+	std::cout << "argv[6]: (file path) path/to/ST-output\n";
 }
 
 int main(int argc, const char** argv) {
@@ -46,6 +47,7 @@ int main(int argc, const char** argv) {
 	std::string fullPath = std::string(__FILE__);
 	std::size_t found = fullPath.find_last_of("/\\");
 	std::string jsonPath = (argc >= 6) ? argv[5] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
+	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../ST.json";
 	
 	/*std::vector<std::string> srcs;
 	srcs.push_back(path + "\\classes_simple.cpp");			
@@ -70,9 +72,12 @@ int main(int argc, const char** argv) {
 
 
 	//graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
-	Json::Value jsonObj = structuresTable.GetJsonSymbolTable();
+	Json::Value jsonObj;
+	jsonObj["structures"] = structuresTable.GetJsonSymbolTable();
 	std::cout << jsonObj << std::endl;
-
+	std::ofstream jsonSTFile(jsonSTPath);
+	jsonSTFile << jsonObj;
+	jsonSTFile.close();
 	//std::string json = graphToJson::GetJson(graph);
 
 	//std::ofstream jsonFile;
