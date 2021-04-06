@@ -1,0 +1,39 @@
+{
+	"folder": "D:\\Thesis\\CodeSmellDetector\\Smells",
+	"smells": 
+	[
+		{
+			"name": "Too many parameters",
+			"file": "Method_argc.js",
+			"args": 
+			{
+				"max_argc": 5
+			}
+		},
+		{
+			"name": "Too many function literals",
+			"file": "Method_literals.js",
+			"args": 
+			{
+				"max_literals": 7
+			}
+		},
+		{
+			"name": "Long function",
+			"file": "Long_function.js",
+			"args": 
+			{
+				"max_statements": 100
+			}
+		},
+		{
+			"name": "Cyclomatic complexity",
+			"file": "Cyclo_complex.js",
+			"args":
+			{
+				"max_loops": 6,
+				"max_branches": 15
+			}
+		}
+	]
+}
