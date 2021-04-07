@@ -189,7 +189,17 @@ std::string GraphToJsonVisitor::GetJsonAsString() const {
 	return json.toStyledString();
 }
 
-std::string graphToJson::GetJson(const Graph& graph) {
+Json::Value GraphToJsonVisitor::GetJson() const {
+	return json;
+}
+
+Json::Value graphToJson::GetJson(const Graph& graph) {
+	GraphToJsonVisitor visitor;
+	graph.Accept(&visitor);
+	return visitor.GetJson();
+}
+
+std::string graphToJson::GetJsonString(const Graph& graph) {
 	GraphToJsonVisitor visitor;
 	graph.Accept(&visitor);
 	return visitor.GetJsonAsString();

@@ -18,6 +18,20 @@ static void PrintMainArgInfo(void) {
 	std::cout << "argv[6]: (file path) path/to/ST-output\n";
 }
 
+static void SetDepedenciesToST(const Json::Value& graph, Json::Value& ST) {
+	const Json::Value& all_dependencies = graph["edges"];
+	Json::Value& structures = ST["structures"];
+	for (const auto& dependencies : all_dependencies) {
+		Json::Value& struct_from = structures[dependencies["from"].asString()];
+		
+		Json::Value dependency_pack;
+		dependency_pack["types"] = dependencies["dependencies"];
+		dependency_pack["to"] = dependencies["to"];
+
+		struct_from["dependencies"].append(dependency_pack);
+	}
+}
+
 int main(int argc, const char** argv) {
 	if (argc < 2) {
 		PrintMainArgInfo();
@@ -72,20 +86,23 @@ int main(int argc, const char** argv) {
 
 
 	
-	Json::Value jsonObj;
-	structuresTable.AddJsonSymbolTable(jsonObj["structures"]);
-	std::cout << jsonObj << std::endl;
+	Json::Value json_ST;
+	structuresTable.AddJsonSymbolTable(json_ST["structures"]);
+	std::cout << json_ST << std::endl;
 	std::ofstream jsonSTFile(jsonSTPath);
-	jsonSTFile << jsonObj;
+	
+	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
+	auto g = graphToJson::GetJson(graph);
+	SetDepedenciesToST(g, json_ST);
+	jsonSTFile << json_ST;
 	jsonSTFile.close();
 	// --------- Phiv ends here -------------------
-	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
-	std::string json = graphToJson::GetJson(graph);
-
+	std::string json_graph_str = graphToJson::GetJsonString(graph);
+	
 	std::ofstream jsonFile;
 
 	jsonFile.open(jsonPath);
-	jsonFile << json;
+	jsonFile << json_graph_str;
  	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 }

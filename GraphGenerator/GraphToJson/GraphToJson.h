@@ -21,8 +21,10 @@ namespace graphToJson {
 
 		virtual void VisitNode(Node* node);
 		virtual void VisitEdge(Edge* edge);
-		std::string GetJsonAsString() const; 
+		std::string GetJsonAsString() const;
+		Json::Value GetJson() const;
 	};
 
-	std::string GetJson(const Graph& graph);
+	std::string GetJsonString(const Graph& graph);
+	Json::Value GetJson(const Graph& graph);
 }
