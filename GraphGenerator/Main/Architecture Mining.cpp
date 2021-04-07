@@ -71,19 +71,21 @@ int main(int argc, const char** argv) {
 	
 
 
-	//graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
+	
 	Json::Value jsonObj;
 	jsonObj["structures"] = structuresTable.GetJsonSymbolTable();
 	std::cout << jsonObj << std::endl;
 	std::ofstream jsonSTFile(jsonSTPath);
 	jsonSTFile << jsonObj;
 	jsonSTFile.close();
-	//std::string json = graphToJson::GetJson(graph);
+	// --------- Phiv ends here -------------------
+	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
+	std::string json = graphToJson::GetJson(graph);
 
-	//std::ofstream jsonFile;
+	std::ofstream jsonFile;
 
-	//jsonFile.open(jsonPath);
-	//jsonFile << json;
- 	//jsonFile.close();
+	jsonFile.open(jsonPath);
+	jsonFile << json;
+ 	jsonFile.close();
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 }

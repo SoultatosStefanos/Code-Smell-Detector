@@ -100,9 +100,11 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	currDepType = ClassField_dep_t;
 	for (auto& it : s->GetFields()) {
 		auto* field = it.second;
-		if (!((Definition*)field)->GetType()->IsUndefined()) {
-			VisitDefinition(static_cast<Definition*>(field));
-			fieldsObj.Set(it.first, innerObj);
+		if(((Definition*)field)->isStructure()){
+			if (!((Definition*)field)->GetType()->IsUndefined()) {
+				VisitDefinition(static_cast<Definition*>(field));
+				fieldsObj.Set(it.first, innerObj);
+			}
 		}
 	}
 	nodeData.Set("fields", fieldsObj);
@@ -159,9 +161,11 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	currDepType = MethodArg_dep_t;
 	for (auto& it : s->GetArguments()) {
 		auto* arg = it.second;
-		if (!((Definition*)arg)->GetType()->IsUndefined()) {
-			VisitDefinition(static_cast<Definition*>(arg));
-			argsObj.Set(it.first, innerObj);
+		if (((Definition*)arg)->isStructure()) {
+			if (!((Definition*)arg)->GetType()->IsUndefined()) {
+				VisitDefinition(static_cast<Definition*>(arg));
+				argsObj.Set(it.first, innerObj);
+			}
 		}
 	}
 	data.Set("arguments", argsObj);
@@ -170,9 +174,11 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	currDepType = MethodDefinition_dep_t;
 	for (auto& it : s->GetDefinitions()) {
 		auto* def = it.second;
-		if (!((Definition*)def)->GetType()->IsUndefined()) {
-			VisitDefinition(static_cast<Definition*>(def));
-			defsObj.Set(it.first, innerObj);
+		if (((Definition*)def)->isStructure()) {
+			if (!((Definition*)def)->GetType()->IsUndefined()) {
+				VisitDefinition(static_cast<Definition*>(def));
+				defsObj.Set(it.first, innerObj);
+			}
 		}
 	}
 	data.Set("definitions", defsObj);
