@@ -73,7 +73,7 @@ int main(int argc, const char** argv) {
 
 	
 	Json::Value jsonObj;
-	jsonObj["structures"] = structuresTable.GetJsonSymbolTable();
+	structuresTable.AddJsonSymbolTable(jsonObj["structures"]);
 	std::cout << jsonObj << std::endl;
 	std::ofstream jsonSTFile(jsonSTPath);
 	jsonSTFile << jsonObj;

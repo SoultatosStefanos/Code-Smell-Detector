@@ -802,6 +802,7 @@ void SymbolTable::Print2(int level) {
 Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
 	Json::Value json_structure;
 
+
 	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();
 	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();
 	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();
@@ -854,7 +855,7 @@ Json::Value SymbolTable::GetJsonSymbolTable(void) {
 
 	for (auto& t : byID) {
 		Json::Value new_obj;
-		
+
 		if (t.second->GetClassType() == ClassType::Structure) {
 			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
 		}
@@ -876,6 +877,75 @@ Json::Value SymbolTable::GetJsonSymbolTable(void) {
 	return vec;
 }
 
+void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
+	//Json::Value json_structure;
+
+
+	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
+	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
+	structure->GetBases().AddJsonSymbolTable(json_structure["bases"]);
+	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
+	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]);
+	json_structure["src_info"] = GetJsonSourceInfo(structure);
+}
+
+void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) {
+	//Json::Value json_method;
+
+	/*auto iss = method->GetMemberExpr();
+	std::cout << iss.size() << std::endl;
+	for (auto is : iss) {
+		std::cout << is.first << std::endl;
+	}*/
+	auto* ret_type = method->GetReturnType();
+#pragma warning ("FIX ME!!!!")
+	if (!ret_type)
+		json_method["ret_type"] = "void";
+	else
+		json_method["ret_type"] = ret_type->GetID();
+	method->GetArguments().AddJsonSymbolTable(json_method["args"]);
+	method->GetDefinitions().AddJsonSymbolTable(json_method["definitions"]);
+	method->GetTemplateArguments().AddJsonSymbolTable(json_method["template_args"]);
+	json_method["literals"] = method->GetLiterals();
+	json_method["statements"] = method->GetStatements();
+	json_method["branches"] = method->GetBranches();
+	json_method["loops"] = method->GetLoops();
+	json_method["src_info"] = GetJsonSourceInfo(method);
+
+#pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
+}
+
+void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) {
+	if (definition->isStructure())
+		json_definition["type"] = definition->GetType()->GetID();
+	else // is fundamental
+		json_definition["type"] = definition->GetFundamental();
+
+}
+
+void SymbolTable::AddJsonSymbolTable(Json::Value& st) {
+
+	for (auto& t : byID) {
+		Json::Value new_obj;
+
+		if (t.second->GetClassType() == ClassType::Structure) {
+			 AddJsonStructure((dependenciesMining::Structure*)t.second, new_obj);
+		}
+		else if (t.second->GetClassType() == ClassType::Definition) {
+			 AddJsonDefinition((dependenciesMining::Definition*)t.second, new_obj);
+		}
+		else if (t.second->GetClassType() == ClassType::Method) {
+			 AddJsonMethod((dependenciesMining::Method*)t.second, new_obj);
+		}
+		else if (t.second->GetClassType() == ClassType::Undefined) {
+			// new_obj = ...
+		}
+		else
+			assert(0);
+
+		st[t.second->GetID()] = new_obj;
+	}
+}
 
 
 void SymbolTable::Accept(STVisitor* visitor) {
