@@ -1,8 +1,10 @@
 module.exports = {
     callback: function(ST, args){
         var report = [];
-        for(const structure of ST.structures){
-            for(const method of structure.methods){
+        for(const structure_id in ST.structures){
+            const structure = ST.structures[structure_id];
+            for(const method_id in structure.methods){
+                const method = structure.methods[method_id];
                 var statements = method.statements;
                 if(statements > args.max_statements){
                     var incident = {
@@ -11,7 +13,7 @@ module.exports = {
                             line: method.src_info.line,
                             col: method.src_info.column
                         },
-                        msg: `Method: "${method.id}" has ${statements} statements.`
+                        msg: `Method: "${method_id}" has ${statements} statements.`
                     }
                     report.push(incident);
                 }

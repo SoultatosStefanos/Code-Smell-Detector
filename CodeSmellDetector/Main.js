@@ -48,3 +48,4 @@ function print_reports(smells){
 var smells = get_smells(smells_config);
 run_smells(smells, ST);
 print_reports(smells);
+
