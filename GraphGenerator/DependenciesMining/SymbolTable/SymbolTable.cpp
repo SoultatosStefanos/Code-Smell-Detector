@@ -883,7 +883,11 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
 	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
-	structure->GetBases().AddJsonSymbolTable(json_structure["bases"]); // FIXME need only id
+	const auto bases = structure->GetBases();
+	for (const auto& base : bases) {
+		json_structure["bases"].append(base.second->GetID());
+	}
+	//structure->GetBases().AddJsonSymbolTable(json_structure["bases"]); // FIXME need only id
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
 	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]);
 	json_structure["src_info"] = GetJsonSourceInfo(structure);
