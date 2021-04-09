@@ -1,3 +1,5 @@
+var Util = require("../Utility.js");
+
 module.exports = {
     callback: function(ST, args){
         var report = [];
@@ -7,15 +9,7 @@ module.exports = {
                 const method = structure.methods[method_id];
                 var statements = method.statements;
                 if(statements > args.max_statements){
-                    var incident = {
-                        src: {
-                            file: method.src_info.file,
-                            line: method.src_info.line,
-                            col: method.src_info.column
-                        },
-                        msg: `Method: "${method_id}" has ${statements} statements.`
-                    }
-                    report.push(incident);
+                    Util.add_incident(report, method.src_info, `Method: "${method_id}" has ${statements} statements.`);
                 }
             }
         }

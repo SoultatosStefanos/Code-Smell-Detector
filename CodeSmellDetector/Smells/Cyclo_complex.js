@@ -1,3 +1,5 @@
+var Util = require("../Utility.js");
+
 module.exports = {
     callback: function(ST, args){
         var report = [];
@@ -8,26 +10,10 @@ module.exports = {
                 var branches = method.branches;
                 var loops = method.loops;
                 if(branches > args.max_branches){
-                    var incident = {
-                        src: {
-                            file: method.src_info.file,
-                            line: method.src_info.line,
-                            col: method.src_info.column
-                        },
-                        msg: `Method: "${method_id}" has ${branches} branching statements.`
-                    }
-                    report.push(incident);
+                    Util.add_incident(report, method.src_info, `Method: "${method_id}" has ${branches} branching statements.`);
                 }
                 if(loops > args.max_loops){
-                    var incident = {
-                        src: {
-                            file: method.src_info.file,
-                            line: method.src_info.line,
-                            col: method.src_info.column
-                        },
-                        msg: `Method: "${method.constructor.name}" has ${loops} loop statements.`
-                    }
-                    report.push(incident);
+                    Util.add_incident(report, method.src_info, `Method: "${method.constructor.name}" has ${loops} loop statements.`);
                 }
             }
         }

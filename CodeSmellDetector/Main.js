@@ -38,7 +38,7 @@ function print_reports(smells){
         var counter = 1;
         for(const incident of smell.report){
             console.log(`Incident ${counter++}`);
-            console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.col}`);
+            console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.column}`);
             console.log(`Message: ${incident.msg}\n`);
         }
     }
