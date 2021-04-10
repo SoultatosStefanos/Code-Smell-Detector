@@ -26,9 +26,18 @@ static void SetDepedenciesToST(const Json::Value& graph, Json::Value& ST) {
 		
 		Json::Value dependency_pack;
 		dependency_pack["types"] = dependencies["dependencies"];
-		dependency_pack["to"] = dependencies["to"];
+		//dependency_pack["to"] = dependencies["to"];
 
-		struct_from["dependencies"].append(dependency_pack);
+		struct_from["dependencies"][dependencies["to"].asString()] = dependency_pack;
+	}
+}
+
+static void SetCodeFilesToST(Json::Value& ST, const std::vector<std::string>& srcs, const std::vector<std::string>& headers) {
+	for (const auto& path : srcs) {
+		ST["sources"].append(path);
+	}
+	for (const auto& path : headers) {
+		ST["headers"].append(path);
 	}
 }
 
@@ -41,6 +50,7 @@ int main(int argc, const char** argv) {
 	std::string option2 = "--cmp-db";
 	const char* cmpDBPath = nullptr;
 	std::vector<std::string> srcs;
+	std::vector<std::string> headers;
 	if (option1 == argv[1]) { // --src
 		sourceLoader::SourceLoader srcLoader(argv[2]);
 		srcLoader.LoadSources();
@@ -81,21 +91,22 @@ int main(int argc, const char** argv) {
 	srcs.push_back(path + "\\include2.h");*/
 				
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-	int result = dependenciesMining::CreateClangTool(cmpDBPath, srcs, ignoredFilePaths, ignoredNamespaces);
+	int result = dependenciesMining::CreateClangTool(cmpDBPath, srcs, headers, ignoredFilePaths, ignoredNamespaces);
 	
 
 
 	
 	Json::Value json_ST;
 	structuresTable.AddJsonSymbolTable(json_ST["structures"]);
-	std::cout << json_ST << std::endl;
 	std::ofstream jsonSTFile(jsonSTPath);
 	
 	graph::Graph graph = graphGeneration::GenetareDependenciesGraph(dependenciesMining::structuresTable);
 	auto g = graphToJson::GetJson(graph);
 	SetDepedenciesToST(g, json_ST);
+	SetCodeFilesToST(json_ST, srcs, headers);
 	jsonSTFile << json_ST;
 	jsonSTFile.close();
+	std::cout << json_ST << std::endl;
 	// --------- Phiv ends here -------------------
 	std::string json_graph_str = graphToJson::GetJsonString(graph);
 	

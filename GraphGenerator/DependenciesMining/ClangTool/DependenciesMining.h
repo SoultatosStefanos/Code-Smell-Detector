@@ -63,6 +63,7 @@ namespace dependenciesMining {
 	// ----------------------------------------------------------------------------------
 
 	std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char*);
-	int CreateClangTool(const char* cmpDBPath, std::vector<std::string> srcs, const char* ignoredFilePaths, const char* ignoredNamespaces);
+	void SetFiles(ClangTool* tool, std::vector<std::string>& srcs, std::vector<std::string>& headers);
+	int CreateClangTool(const char* cmpDBPath, std::vector<std::string>& srcs, std::vector<std::string>& headers, const char* ignoredFilePaths, const char* ignoredNamespaces);
 
 }

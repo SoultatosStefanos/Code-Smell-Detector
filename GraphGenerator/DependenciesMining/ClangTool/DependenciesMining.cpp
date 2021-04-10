@@ -562,11 +562,6 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 				MethodDeclsCallback::literal_count++;
 		}
 	}
-	
-	std::cout << class_name << std::endl;
-	
-
-
 	RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(stmt);
 	return true;
 }
@@ -809,6 +804,39 @@ std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase
 	return cmpDB;
 }
 
+// returns true only if str ends with ending
+static inline bool hasEnding(std::string const& str, std::string const& ending) {
+	if (str.length() >= ending.length())
+		return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
+	return false;
+}
+
+/*
+	Clears srcs and headers vectors.
+	Fills srcs and headers vectors with paths extracted from the ClangTool
+*/
+void dependenciesMining::SetFiles(ClangTool* Tool, std::vector<std::string>& srcs, std::vector<std::string>& headers) {
+	srcs.clear();
+	headers.clear();
+
+	std::string path;
+	auto& file_manager = Tool->getFiles();
+	SmallVector<const FileEntry* > files;
+	file_manager.GetUniqueIDMapping(files);
+	for (auto file : files) {
+		path = file->getName().str();
+		if (hasEnding(path, ".h")) {
+			headers.push_back(path);
+		}
+		else if (hasEnding(path, ".cpp")) {
+			srcs.push_back(path);
+		}
+		else {
+			std::cerr << "Unexpected code file\n";
+		}
+	}
+}
+
 /*
 	Clang Tool Creation
 */
@@ -816,7 +844,7 @@ static llvm::cl::OptionCategory MyToolCategory("my-tool options");
 static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
 static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string> srcs, const char* ignoredFilePaths, const char* ignoredNamespaces) {
+int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string>& srcs, std::vector<std::string>& headers, const char* ignoredFilePaths, const char* ignoredNamespaces) {
 	ClangTool* Tool;
 	std::unique_ptr<CompilationDatabase> cmpDB;
 	CommonOptionsParser *OptionsParser = nullptr;
@@ -854,6 +882,9 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
 	int result = Tool->run(newFrontendActionFactory(&Finder).get());
+
+	SetFiles(Tool, srcs, headers);
+	
 	delete Tool;
 	if (OptionsParser)
 		delete OptionsParser;
