@@ -527,8 +527,10 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		currentMethod->SetBranches(branch_count);
 		currentMethod->SetLoops(loop_count);
 		currentMethod->SetMaxScopeDepth(scope_max_depth);
+		currentMethod->SetLineCount(sm->getExpansionLineNumber(body->getEndLoc()) - sm->getExpansionLineNumber(body->getBeginLoc()));
 		currentMethod = nullptr;
 
+		
 	}
 }
 
