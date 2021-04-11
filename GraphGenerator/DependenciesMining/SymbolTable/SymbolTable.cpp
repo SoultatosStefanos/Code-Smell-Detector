@@ -132,6 +132,10 @@ const char* Symbol::GetAccessTypeStr() const {
 	}
 }
 
+AccessType Symbol::GetAccessType() const {
+	return access_type;
+}
+
 void Symbol::SetID(const ID_T& id) {
 	this->id = id;
 }
@@ -792,126 +796,126 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 
 	return json_src_info;
 }
-
-void SymbolTable::Print() {
-	for (auto& t : byName) {
-		std::cout << "Name: " << t.first << std::endl;
-		std::cout << "--------------------------------------------\n";
-	}
-}
-
-// Testing purpose.
-void SymbolTable::Print2(int level) {
-	for (auto& t : byID) {
-		std::cout << "level " << level << ", Name: " << t.first << std::endl;
-		//std::cout << "--------------------------------------------\n";
-		if (t.second->GetClassType() == ClassType::Structure) {
-			Structure* structure = (Structure*)t.second;
-			structure->GetMethods().Print2(level + 1);
-			structure->GetFields().Print2(level + 1);
-			structure->GetBases().Print2(level + 1);
-			structure->GetContains().Print2(level + 1);
-			structure->GetFriends().Print2(level + 1);
-		}
-		else if (t.second->GetClassType() == ClassType::Method) {
-			Method* method = (Method*)t.second;
-			std::cout << "args: ---------\n";
-			method->GetArguments().Print2(level + 1);
-			std::cout << "end : ---------\n";
-			method->GetDefinitions().Print2(level + 1);
-			method->GetTemplateArguments().Print2(level + 1);
-			const auto& member_expr = method->GetMemberExpr();
-			for (auto& i : member_expr) {
-				std::cout << "Member EXPR: " << i.first << std::endl;
-				for (auto& it : i.second.GetMembers()) {
-					std::cout << "Member: " << it.GetName() << std::endl;
-				}
-			}
-
-		}
-	}
-}
-
-Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
-	Json::Value json_structure;
-
-
-	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();
-	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();
-	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();
-	json_structure["contains"] = structure->GetContains().GetJsonSymbolTable();
-	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();
-	json_structure["src_info"] = GetJsonSourceInfo(structure);
-
-	return json_structure;
-}
-
-Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
-	Json::Value json_method;
-
-	/*auto iss = method->GetMemberExpr();
-	std::cout << iss.size() << std::endl;
-	for (auto is : iss) {
-		std::cout << is.first << std::endl;
-	}*/
-	auto* ret_type = method->GetReturnType();
-#pragma warning ("FIX ME!!!!")
-	if (!ret_type)
-		json_method["ret_type"] = "void";
-	else
-		json_method["ret_type"] = ret_type->GetID();
-	json_method["args"] = method->GetArguments().GetJsonSymbolTable();
-	json_method["definitions"] = method->GetDefinitions().GetJsonSymbolTable();
-	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
-	json_method["literals"] = method->GetLiterals();
-	json_method["statements"] = method->GetStatements();
-	json_method["branches"] = method->GetBranches();
-	json_method["loops"] = method->GetLoops();
-	json_method["src_info"] = GetJsonSourceInfo(method);
-	json_method["max_scope"] = method->GetMaxScopeDepth();
-	json_method["lines"] = method->GetLineCount();
-	json_method["access"] = method->GetAccessTypeStr();
-
-#pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
-	return json_method;
-}
-
-Json::Value SymbolTable::GetJsonDefinition(dependenciesMining::Definition* definition) {
-	Json::Value json_definition;
-	if (definition->isStructure())
-		json_definition["type"] = definition->GetType()->GetID();
-	else // is fundamental
-		json_definition["type"] = definition->GetFundamental();
-
-	return json_definition;
-}
-
-Json::Value SymbolTable::GetJsonSymbolTable(void) {
-	Json::Value vec(Json::arrayValue);
-
-	for (auto& t : byID) {
-		Json::Value new_obj;
-
-		if (t.second->GetClassType() == ClassType::Structure) {
-			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
-		}
-		else if (t.second->GetClassType() == ClassType::Definition) {
-			new_obj = GetJsonDefinition((dependenciesMining::Definition*)t.second);
-		}
-		else if (t.second->GetClassType() == ClassType::Method) {
-			new_obj = GetJsonMethod(((dependenciesMining::Method*)t.second));
-		}
-		else if (t.second->GetClassType() == ClassType::Undefined) {
-			// new_obj = ...
-		}
-		else
-			assert(0);
-		new_obj["id"] = t.second->GetID();
-		vec.append(new_obj);
-	}
-
-	return vec;
-}
+//
+//void SymbolTable::Print() {
+//	for (auto& t : byName) {
+//		std::cout << "Name: " << t.first << std::endl;
+//		std::cout << "--------------------------------------------\n";
+//	}
+//}
+//
+//// Testing purpose.
+//void SymbolTable::Print2(int level) {
+//	for (auto& t : byID) {
+//		std::cout << "level " << level << ", Name: " << t.first << std::endl;
+//		//std::cout << "--------------------------------------------\n";
+//		if (t.second->GetClassType() == ClassType::Structure) {
+//			Structure* structure = (Structure*)t.second;
+//			structure->GetMethods().Print2(level + 1);
+//			structure->GetFields().Print2(level + 1);
+//			structure->GetBases().Print2(level + 1);
+//			structure->GetContains().Print2(level + 1);
+//			structure->GetFriends().Print2(level + 1);
+//		}
+//		else if (t.second->GetClassType() == ClassType::Method) {
+//			Method* method = (Method*)t.second;
+//			std::cout << "args: ---------\n";
+//			method->GetArguments().Print2(level + 1);
+//			std::cout << "end : ---------\n";
+//			method->GetDefinitions().Print2(level + 1);
+//			method->GetTemplateArguments().Print2(level + 1);
+//			const auto& member_expr = method->GetMemberExpr();
+//			for (auto& i : member_expr) {
+//				std::cout << "Member EXPR: " << i.first << std::endl;
+//				for (auto& it : i.second.GetMembers()) {
+//					std::cout << "Member: " << it.GetName() << std::endl;
+//				}
+//			}
+//
+//		}
+//	}
+//}
+//
+//Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
+//	Json::Value json_structure;
+//
+//
+//	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();
+//	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();
+//	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();
+//	json_structure["contains"] = structure->GetContains().GetJsonSymbolTable();
+//	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();
+//	json_structure["src_info"] = GetJsonSourceInfo(structure);
+//
+//	return json_structure;
+//}
+//
+//Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
+//	Json::Value json_method;
+//
+//	/*auto iss = method->GetMemberExpr();
+//	std::cout << iss.size() << std::endl;
+//	for (auto is : iss) {
+//		std::cout << is.first << std::endl;
+//	}*/
+//	auto* ret_type = method->GetReturnType();
+//#pragma warning ("FIX ME!!!!")
+//	if (!ret_type)
+//		json_method["ret_type"] = "void";
+//	else
+//		json_method["ret_type"] = ret_type->GetID();
+//	json_method["args"] = method->GetArguments().GetJsonSymbolTable();
+//	json_method["definitions"] = method->GetDefinitions().GetJsonSymbolTable();
+//	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
+//	json_method["literals"] = method->GetLiterals();
+//	json_method["statements"] = method->GetStatements();
+//	json_method["branches"] = method->GetBranches();
+//	json_method["loops"] = method->GetLoops();
+//	json_method["src_info"] = GetJsonSourceInfo(method);
+//	json_method["max_scope"] = method->GetMaxScopeDepth();
+//	json_method["lines"] = method->GetLineCount();
+//	json_method["access"] = method->GetAccessTypeStr();
+//
+//#pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
+//	return json_method;
+//}
+//
+//Json::Value SymbolTable::GetJsonDefinition(dependenciesMining::Definition* definition) {
+//	Json::Value json_definition;
+//	if (definition->isStructure())
+//		json_definition["type"] = definition->GetType()->GetID();
+//	else // is fundamental
+//		json_definition["type"] = definition->GetFundamental();
+//
+//	return json_definition;
+//}
+//
+//Json::Value SymbolTable::GetJsonSymbolTable(void) {
+//	Json::Value vec(Json::arrayValue);
+//
+//	for (auto& t : byID) {
+//		Json::Value new_obj;
+//
+//		if (t.second->GetClassType() == ClassType::Structure) {
+//			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
+//		}
+//		else if (t.second->GetClassType() == ClassType::Definition) {
+//			new_obj = GetJsonDefinition((dependenciesMining::Definition*)t.second);
+//		}
+//		else if (t.second->GetClassType() == ClassType::Method) {
+//			new_obj = GetJsonMethod(((dependenciesMining::Method*)t.second));
+//		}
+//		else if (t.second->GetClassType() == ClassType::Undefined) {
+//			// new_obj = ...
+//		}
+//		else
+//			assert(0);
+//		new_obj["id"] = t.second->GetID();
+//		vec.append(new_obj);
+//	}
+//
+//	return vec;
+//}
 
 void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
 	//Json::Value json_structure;
@@ -964,6 +968,8 @@ void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, 
 		json_definition["type"] = definition->GetType()->GetID();
 	else // is fundamental
 		json_definition["type"] = definition->GetFundamental();
+	if (definition->GetAccessType() != AccessType::unknown)
+		json_definition["access"] = definition->GetAccessTypeStr();
 
 }
 

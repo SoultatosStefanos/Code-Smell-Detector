@@ -105,6 +105,7 @@ namespace dependenciesMining {
 		virtual const SourceInfo& GetSourceInfo() const;
 		virtual std::string GetNamespace() const;
 		const char* GetAccessTypeStr() const;
+		AccessType GetAccessType() const;
 
 		virtual void SetID(const ID_T& id);
 		virtual void SetName(const std::string& name);

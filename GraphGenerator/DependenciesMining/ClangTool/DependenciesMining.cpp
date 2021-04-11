@@ -292,8 +292,8 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
 		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 		field.SetFundamental(typeName);
-		parentStructure->InstallField(fieldID, field);
-
+		auto* _field = parentStructure->InstallField(fieldID, field);
+		_field->SetAccessType((AccessType)d->getAccess());
 	}
 }
 
@@ -350,7 +350,8 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			//assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-			parentStructure->InstallField(fieldID, field);
+			auto* _field = parentStructure->InstallField(fieldID, field);
+			_field->SetAccessType((AccessType)d->getAccess());
 		}
 	}
 }
@@ -524,8 +525,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		visitor.TraverseStmt(body);
 
 		//std::cout << d->getAccess() << std::endl;
-		AccessType access_type = (AccessType)d->getAccess();
-		currentMethod->SetAccessType(access_type);
+		currentMethod->SetAccessType((AccessType)d->getAccess());
 		currentMethod->SetLiterals(literal_count);
 		currentMethod->SetStatements(statement_count);
 		currentMethod->SetBranches(branch_count);
