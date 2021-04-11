@@ -119,6 +119,19 @@ std::string Symbol::GetNamespace() const {
 	return nameSpace;
 }
 
+const char* Symbol::GetAccessTypeStr() const {
+	switch (access_type) {
+	case AccessType::_public:
+		return "public";
+	case AccessType::_protected:
+		return "protected";
+	case AccessType::_private:
+		return "private";
+	default:
+		return "unknown";
+	}
+}
+
 void Symbol::SetID(const ID_T& id) {
 	this->id = id;
 }
@@ -141,6 +154,10 @@ void Symbol::SetSourceInfo(const std::string& fileName, int line, int column) {
 
 void Symbol::SetNamespace(const std::string& nameSpace) {
 	this->nameSpace = nameSpace;
+}
+
+void Symbol::SetAccessType(const AccessType& access_type) {
+	this->access_type = access_type;
 }
 
 
@@ -853,6 +870,7 @@ Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
 	json_method["src_info"] = GetJsonSourceInfo(method);
 	json_method["max_scope"] = method->GetMaxScopeDepth();
 	json_method["lines"] = method->GetLineCount();
+	json_method["access"] = method->GetAccessTypeStr();
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 	return json_method;
@@ -935,6 +953,8 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 	json_method["src_info"] = GetJsonSourceInfo(method);
 	json_method["max_scope"] = method->GetMaxScopeDepth();
 	json_method["lines"] = method->GetLineCount();
+	json_method["access"] = method->GetAccessTypeStr();
+
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }

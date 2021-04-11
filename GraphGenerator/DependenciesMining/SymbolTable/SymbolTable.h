@@ -50,6 +50,12 @@ namespace dependenciesMining {
 		Definition
 	};
 
+	enum class AccessType {
+		unknown = -1,
+		_public,
+		_protected,
+		_private
+	};
 
 	class SourceInfo {
 	private:
@@ -84,6 +90,7 @@ namespace dependenciesMining {
 		std::string nameSpace = "";
 		SourceInfo srcInfo;
 		ClassType classType = ClassType::Undefined;
+		AccessType access_type = AccessType::unknown;
 
 	public:
 		Symbol() = default; 
@@ -97,6 +104,7 @@ namespace dependenciesMining {
 		virtual std::string GetClassTypeAsString() const;
 		virtual const SourceInfo& GetSourceInfo() const;
 		virtual std::string GetNamespace() const;
+		const char* GetAccessTypeStr() const;
 
 		virtual void SetID(const ID_T& id);
 		virtual void SetName(const std::string& name);
@@ -104,6 +112,8 @@ namespace dependenciesMining {
 		virtual void SetSourceInfo(const SourceInfo& info);
 		virtual void SetSourceInfo(const std::string& fileName, int line, int column);
 		virtual void SetNamespace(const std::string& nameSpace);
+		void SetAccessType(const AccessType& access_type);
+		
 	};
 
 	// ----------------------------------------------------------------------------------------

@@ -367,6 +367,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		//assert(parentID);
 		//assert(methodID);
 
+
 		if(!(d->isThisDeclarationADefinition())){
 			return;
 		}
@@ -522,6 +523,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		visitor.TraverseStmt(body);
 
+		//std::cout << d->getAccess() << std::endl;
+		AccessType access_type = (AccessType)d->getAccess();
+		currentMethod->SetAccessType(access_type);
 		currentMethod->SetLiterals(literal_count);
 		currentMethod->SetStatements(statement_count);
 		currentMethod->SetBranches(branch_count);
