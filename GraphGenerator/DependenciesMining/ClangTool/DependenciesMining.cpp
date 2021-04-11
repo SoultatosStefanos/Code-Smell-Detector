@@ -517,15 +517,17 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		statement_count = 0;
 		branch_count = 0;
 		loop_count = 0;
+		scope_depth = -1;
+		scope_max_depth = 0;
+
 		visitor.TraverseStmt(body);
 
 		currentMethod->SetLiterals(literal_count);
 		currentMethod->SetStatements(statement_count);
 		currentMethod->SetBranches(branch_count);
 		currentMethod->SetLoops(loop_count);
-
+		currentMethod->SetMaxScopeDepth(scope_max_depth);
 		currentMethod = nullptr;
-
 
 	}
 }
@@ -541,6 +543,9 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 	switch (stmt->getStmtClass()) {
 		case Stmt::StmtClass::CompoundStmtClass:
 			MethodDeclsCallback::statement_count += std::distance(stmt->child_begin(), stmt->child_end());
+			scope_depth++;
+			if (scope_max_depth < scope_depth)
+				scope_max_depth = scope_depth;
 			break;
 
 		case Stmt::StmtClass::IfStmtClass:
@@ -563,6 +568,8 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 		}
 	}
 	RecursiveASTVisitor<FindMemberExprVisitor>::TraverseStmt(stmt);
+	if (stmt->getStmtClass() == Stmt::StmtClass::CompoundStmtClass)
+		scope_depth--;
 	return true;
 }
 

@@ -263,6 +263,10 @@ int Method::GetLoops() const {
 	return loops;
 }
 
+int Method::GetMaxScopeDepth() const {
+	return max_scope_depth;
+}
+
 void Method::SetMethodType(const MethodType& type) {
 	methodType = type;
 }
@@ -289,6 +293,10 @@ void Method::SetBranches(int branches) {
 
 void Method::SetLoops(int loops) {
 	this->loops = loops;
+}
+
+void Method::SetMaxScopeDepth(int max_scope_depth) {
+	this->max_scope_depth = max_scope_depth;
 }
 
 void Method::InstallArg(const ID_T& id, const Definition& definition) {
@@ -835,6 +843,7 @@ Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
 	json_method["branches"] = method->GetBranches();
 	json_method["loops"] = method->GetLoops();
 	json_method["src_info"] = GetJsonSourceInfo(method);
+	json_method["max_scope"] = method->GetMaxScopeDepth();
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 	return json_method;
@@ -915,6 +924,7 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 	json_method["branches"] = method->GetBranches();
 	json_method["loops"] = method->GetLoops();
 	json_method["src_info"] = GetJsonSourceInfo(method);
+	json_method["max_scope"] = method->GetMaxScopeDepth();
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }

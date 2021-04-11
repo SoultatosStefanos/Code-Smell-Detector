@@ -53,6 +53,8 @@ namespace dependenciesMining {
 		inline static int statement_count;
 		inline static int loop_count;
 		inline static int branch_count;
+		inline static int scope_depth;
+		inline static int scope_max_depth;
 	};
 
 	class MethodVarsCallback : public MatchFinder::MatchCallback {

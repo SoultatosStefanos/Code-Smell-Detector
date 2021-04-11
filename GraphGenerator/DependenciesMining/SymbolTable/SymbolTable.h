@@ -244,6 +244,7 @@ namespace dependenciesMining {
 		int statements = 0;
 		int branches = 0;
 		int loops = 0;
+		int max_scope_depth = 0;
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
@@ -262,6 +263,7 @@ namespace dependenciesMining {
 		int GetStatements() const;
 		int GetBranches() const;
 		int GetLoops() const;
+		int GetMaxScopeDepth() const;
 
 		void SetMethodType(const MethodType& type);
 		void SetReturnType(Structure* structure);
@@ -270,6 +272,7 @@ namespace dependenciesMining {
 		void SetStatements(int statements);
 		void SetBranches(int branches);
 		void SetLoops(int loops);
+		void SetMaxScopeDepth(int max_scope_depth);
 
 		void InstallArg(const ID_T& id, const Definition& definition);
 		void InstallDefinition(const ID_T& id, const Definition& definition);
