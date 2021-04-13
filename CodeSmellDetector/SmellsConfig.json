@@ -23,7 +23,8 @@
 			"file": "Long_function.js",
 			"args": 
 			{
-				"max_statements": 100
+				"max_statements": 100,
+				"max_lines": 50
 			}
 		},
 		{
@@ -41,6 +42,13 @@
 			"args":
 			{
 				"max_id_len":  20
+			}
+		},
+		{
+			"name": "Excessively long line of code (God Line)",
+			"file": "God_line.js",
+			"args":{
+				"max_line_len": 120
 			}
 		}
 	]
