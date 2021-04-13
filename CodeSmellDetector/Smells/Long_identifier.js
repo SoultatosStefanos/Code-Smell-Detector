@@ -1,7 +1,7 @@
 var Util = require("../Utility.js");
 
 module.exports = {
-    callback: function(ST, args){
+    callback: async function(ST, args){
         var report = [];
         var id_len;
         for(const structure_id in ST.structures){

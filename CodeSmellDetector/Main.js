@@ -22,21 +22,29 @@ function get_smells(smells_config){
     return smells; 
 }
 
-function run_smells(smells, ST){
+async function run_smells(smells, ST){
+    var promises = [];
     for(const smell of smells){
         console.log(`\nRunning smell detector: "${smell.name}"`);
-        smell.report = smell.callback(ST, smell.args);
+        promises.push(smell.callback(ST, smell.args));
+    }
+    var reports = await Promise.all(promises);
+    var i = 0;
+    for(const smell of smells){
+        smell.report = reports[i++];
     }
 }
 
 function print_reports(smells){
     for(const smell of smells){
-
+        //smell.report = await smell.report;
+        //console.log(smell.report);
         console.log("------------------------------");
         console.log(`Smell: ${smell.name}`);
         console.log(`Incidents count: ${smell.report.length}\n`);
         var counter = 1;
-        for(const incident of smell.report){
+        
+        for (const incident of smell.report){
             console.log(`Incident ${counter++}`);
             console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.column}`);
             console.log(`Message: ${incident.msg}\n`);
@@ -45,7 +53,12 @@ function print_reports(smells){
 }
 
 
-var smells = get_smells(smells_config);
-run_smells(smells, ST);
-print_reports(smells);
 
+
+async function main(){
+    var smells = get_smells(smells_config);
+    await run_smells(smells, ST);
+    print_reports(smells);
+}
+
+main();

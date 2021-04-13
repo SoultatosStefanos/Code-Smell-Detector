@@ -135,7 +135,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		//Template Arguments		
 		auto* temp = (ClassTemplateSpecializationDecl*)d;
 		for (unsigned i = 0; i < temp->getTemplateArgs().size(); ++i) {
-			auto templateArg = temp->getTemplateArgs()[i];
+			const auto& templateArg = temp->getTemplateArgs()[i];
 			TemplateArgsVisit(templateArg, [](TemplateArgument templateArg, Structure *structure) {
 					RecordDecl* d = nullptr;
 					if (templateArg.getKind() == TemplateArgument::Template) {
