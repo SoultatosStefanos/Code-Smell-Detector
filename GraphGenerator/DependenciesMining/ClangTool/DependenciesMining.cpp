@@ -291,7 +291,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		//assert(fieldID);
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
 		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-		field.SetFundamental(typeName);
+		field.SetFullType(typeName);
 		auto* _field = parentStructure->InstallField(fieldID, field);
 		_field->SetAccessType((AccessType)d->getAccess());
 	}
@@ -350,6 +350,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			//assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+			field.SetFullType(d->getType().getAsString());
 			auto* _field = parentStructure->InstallField(fieldID, field);
 			_field->SetAccessType((AccessType)d->getAccess());
 		}
@@ -775,7 +776,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				typeName = d->getType().getAsString();
 				def = new Definition (defID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
 				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-				def->SetFundamental(typeName);
+				def->SetFullType(typeName);
 			}
 
 

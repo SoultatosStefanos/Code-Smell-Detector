@@ -182,7 +182,7 @@ namespace dependenciesMining {
 	class Definition : public Symbol {
 	private:
 		Structure* type = nullptr;
-		std::string fundamental = "";
+		std::string full_type = "";
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
@@ -193,9 +193,9 @@ namespace dependenciesMining {
 
 		bool isStructure() const;
 		const Structure* GetType() const;
-		std::string GetFundamental() const;
+		std::string GetFullType() const;
 		void SetType(Structure* structure);
-		void SetFundamental(const std::string& type);
+		void SetFullType(const std::string& type);
 	};
 
 	#define Value_mem_t "Value"

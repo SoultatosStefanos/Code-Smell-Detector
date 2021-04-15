@@ -193,16 +193,16 @@ const Structure* Definition::GetType() const {
 	return type;
 }
 
-std::string Definition::GetFundamental() const {
-	return fundamental;
+std::string Definition::GetFullType() const {
+	return full_type;
 }
 
 void Definition::SetType(Structure* structure) {
 	type = structure;
 }
 
-void Definition::SetFundamental(const std::string& type) {
-	fundamental = type;
+void Definition::SetFullType(const std::string& type) {
+	full_type = type;
 }
 
 // Method
@@ -964,10 +964,7 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 }
 
 void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) {
-	if (definition->isStructure())
-		json_definition["type"] = definition->GetType()->GetID();
-	else // is fundamental
-		json_definition["type"] = definition->GetFundamental();
+	json_definition["type"] = definition->GetFullType();
 	if (definition->GetAccessType() != AccessType::unknown)
 		json_definition["access"] = definition->GetAccessTypeStr();
 
