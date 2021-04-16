@@ -161,7 +161,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	
 
 	// Bases
-	for(auto it : d->bases()){
+	for(const auto& it : d->bases()){
 		auto* baseRecord = it.getType()->getAsCXXRecordDecl();	
 		if (baseRecord == nullptr)										// otan base einai template or partial specialization Ignored
 			continue;
@@ -251,7 +251,20 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 	structuresTable.Install(structure.GetID(), structure);
+	/*FindFieldStmt visitor;
+	visitor.TraverseAST(d->getASTContext());
+	auto fields = d->fields();
+	for (auto field : fields) {
+		std::cout << field-> << std::endl;
+	}*/
 }
+
+//bool ClassDeclsCallback::FindFieldStmt::TraverseAST(clang::ASTContext& ast) {
+//	//ast
+//	//std::cout << ast. << std::endl;
+//	//FindFieldStmt::TraverseAST(ast);
+//	return true;
+//}
 
 // ----------------------------------------------------------------------------------------------
 // Hanlde all the Fields in classes/structs (non structure fields)
@@ -302,6 +315,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 // Hanlde all the Fields in classes/structs (structure fields)
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
+
 		auto* parent = d->getParent();
 
 		// Ignored
@@ -587,6 +601,8 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 	auto type = memberExpr->getType();
 	auto* base = memberExpr->getBase();
 
+
+
 	if (base) {
 		base = base->IgnoreUnlessSpelledInSource();				// clean all the invisble AST nodes that may surround this stmt
 
@@ -839,15 +855,18 @@ void dependenciesMining::SetFiles(ClangTool* Tool, std::vector<std::string>& src
 	file_manager.GetUniqueIDMapping(files);
 	for (auto file : files) {
 		path = file->getName().str();
+		if (ignored["filePaths"]->isIgnored(path))
+			continue;
+
 		if (hasEnding(path, ".h")) {
 			headers.push_back(path);
 		}
 		else if (hasEnding(path, ".cpp")) {
 			srcs.push_back(path);
 		}
-		else {
-			std::cerr << "Unexpected code file\n";
-		}
+		//else {
+		//	std::cerr << "Unexpected code file: '" << path << "'\n";
+		//}
 	}
 }
 

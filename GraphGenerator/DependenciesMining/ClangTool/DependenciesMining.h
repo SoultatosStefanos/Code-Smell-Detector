@@ -27,6 +27,10 @@ namespace dependenciesMining {
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
+		/*class FindFieldStmt : public RecursiveASTVisitor<FindFieldStmt> {
+		public:
+			bool TraverseAST(clang::ASTContext& ast);
+		};*/
 	};
 
 	class FeildDeclsCallback : public MatchFinder::MatchCallback {

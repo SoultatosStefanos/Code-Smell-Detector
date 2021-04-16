@@ -106,7 +106,7 @@ int main(int argc, const char** argv) {
 	SetCodeFilesToST(json_ST, srcs, headers);
 	jsonSTFile << json_ST;
 	jsonSTFile.close();
-	std::cout << json_ST << std::endl;
+	//std::cout << json_ST << std::endl;
 	// --------- Phiv ends here -------------------
 	std::string json_graph_str = graphToJson::GetJsonString(graph);
 	
