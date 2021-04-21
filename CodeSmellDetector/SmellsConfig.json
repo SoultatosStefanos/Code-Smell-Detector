@@ -7,7 +7,11 @@
 			"file": "Method_argc.js",
 			"args": 
 			{
-				"max_argc": 5
+				"max_argc":
+				{
+					"min": 4,
+					"max": 7
+				}
 			}
 		},
 		{
@@ -15,7 +19,11 @@
 			"file": "Method_literals.js",
 			"args": 
 			{
-				"max_literals": 7
+				"max_literals":
+				{
+					"min": 7,
+					"max": 12
+				}
 			}
 		},
 		{
@@ -23,8 +31,16 @@
 			"file": "Long_function.js",
 			"args": 
 			{
-				"max_statements": 100,
-				"max_lines": 50
+				"max_statements": 
+				{
+					"min": 70,
+					"max": 120
+				},
+				"max_lines":
+				{
+					"min": 40,
+					"max": 80
+				}
 			}
 		},
 		{
@@ -32,8 +48,16 @@
 			"file": "Cyclo_complex.js",
 			"args":
 			{
-				"max_loops": 6,
-				"max_branches": 15
+				"max_loops": 
+				{
+					"min": 5,
+					"max": 10
+				},
+				"max_branches":
+				{
+					"min": 15,
+					"max" : 25
+				}
 			}
 		},
 		{
@@ -41,14 +65,71 @@
 			"file": "Long_identifier.js",
 			"args":
 			{
-				"max_id_len":  20
+				"max_id_len":
+				{
+					"min": 17,
+					"max": 25
+				}
 			}
 		},
 		{
 			"name": "Excessively long line of code (God Line)",
 			"file": "God_line.js",
-			"args":{
-				"max_line_len": 120
+			"args":
+			{
+				"max_line_len":
+				{
+					"min": 90,
+					"max": 125
+				}
+			}
+		},
+		{
+			"name": "Naming conventions",
+			"file": "Name_conventions.js",
+			"args":
+			{
+				"options":
+				{
+					"UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
+					"lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
+					"snake_case": "([a-z]*_?[a-z]*)*",
+					"none": "*",
+					"custom0": "regex4"
+				},
+				"class_names": "UpperCamelCase",
+				"method_names": "UpperCamelCase",
+				"var_names": "snake_case",
+				"use_id_len_as_score": false,
+				"max_chars_ignored":
+				{
+					"min": 24,
+					"max": 34
+				}
+			}
+		},
+		{
+			"name": "Nested scopes",
+			"file": "Nested_scopes.js",
+			"args":
+			{
+				"max_nested_scopes":
+				{
+					"min": 3,
+					"max": 6
+				}
+			}
+		},
+		{
+			"name": "Circular dependency",
+			"file": "dependency_circle.js",
+			"args":
+			{
+				"max_structs_in_circle":
+				{
+					"min": 2,
+					"max": 5
+				}
 			}
 		}
 	]

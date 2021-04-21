@@ -52,6 +52,9 @@ function un_commented_strlen(str, comment_open){
 
 async function iterate_file(file_path, max_line_len){
     var file_report = [];
+    var msg;
+    var src;
+    var smell_level;
     const file_stream = fs.createReadStream(file_path);
 
     const rl = readline.createInterface({
@@ -71,11 +74,11 @@ async function iterate_file(file_path, max_line_len){
             info = un_commented_strlen(line);
         }
         in_comment = info.comment_open;
-        if(info.len > max_line_len){
-            add_incident(
-                file_report,
-                {file:file_path, line:line_counter, column:0},
-                `Line ${line_counter} of ${file_path} has an un-commented length of ${info.len} characters`);
+        smell_level = Util.get_smell_lvl(max_line_len.min, max_line_len.max, info.len);
+        if(smell_level > 0){
+            msg = `Line ${line_counter} of ${file_path} has an un-commented length of ${info.len} characters`;
+            src = Util.get_src_obj(file_path, line_counter);
+            file_report.push(Util.get_incident_obj(src, msg, smell_level));
         }
     }
     return file_report;

@@ -19,7 +19,7 @@ function get_smells(smells_config){
         smells.push(new_smell);
         console.log(`Loaded smell "${smell.name}" from "${smell_path}".`);
     }
-    return smells; 
+    return smells;
 }
 
 async function run_smells(smells, ST){
@@ -46,8 +46,9 @@ function print_reports(smells){
         
         for (const incident of smell.report){
             console.log(`Incident ${counter++}`);
-            console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.column}`);
-            console.log(`Message: ${incident.msg}\n`);
+            console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.col}`);
+            console.log(`Message: ${incident.msg}`);
+            console.log(`Smell level: ${incident.lvl}\n`);
         }
     }
 }

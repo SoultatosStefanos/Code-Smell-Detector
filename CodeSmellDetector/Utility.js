@@ -5,29 +5,42 @@ module.exports = {
      * Returns id without namespaces and brackets
      */
      get_clean_identifier: (id) => {
-        var namespace_ends = id.lastIndexOf(":");
         var func_starts = id.indexOf("(");
-        if(func_starts == -1){
-            func_starts = id.length;
-        }
-        return id.substring(namespace_ends+1, func_starts);
+        if(func_starts !== -1)
+            id = id.slice(0, func_starts);
+        var namespace_ends = id.lastIndexOf(":");
+        return id.substring(namespace_ends+1, id.length);
     },
 
     /**
-     * Adds new incident to a report.
+     * @returns parameters as an object
      */
-    add_incident: (report, src_info, msg) => {
-        report.push({
-            src: src_info,
-            msg: msg
-        });
+     get_src_obj: (file, line, col = 0, struct = null, method = null) => {
+        return {
+            file: file,
+            line: line,
+            col: col,
+            struct: struct,
+            method: method
+        };
+    },
+
+    /**
+     *  @returns parameters as an object
+     */
+    get_incident_obj: (src, msg, lvl) => {
+       return {
+           msg: msg,
+           src: src,
+           lvl: lvl
+       };
     },
 
     /**
      * Given the scale and level of a smell, returns the level of a smell on the scale 1-10.
      * Returns 0 if minimal_level is not reached.
      */
-    normalize_smell_lvl: (minimal_level, maximal_level, actual_level) => {
+    get_smell_lvl: (minimal_level, maximal_level, actual_level) => {
         assert(maximal_level >= minimal_level, `maximal_level can never be larger than minimal_level.`);
         if(actual_level < minimal_level) return 0;
         if(actual_level >= maximal_level) return 10;
@@ -36,5 +49,20 @@ module.exports = {
         var reduced = actual_level - (minimal_level - 1);
        
         return Math.floor((reduced / max) * 10);
+    },
+
+
+    /**
+     * 
+     * @returns true if a method is constructor / destructor / etc..
+     */
+    is_standard_class_func: (method_id, class_id) =>{
+        if(method_id === class_id) return true;
+        if(method_id === "~" + class_id) return true;
+        return false;
     }
+
+
 }
+
+console.log(module.exports.get_clean_identifier("UnitTest3::LoadSpriteList(std::vector<std::string> &, const class AnimationFilm *, const std::string &, const std::string &)"));
