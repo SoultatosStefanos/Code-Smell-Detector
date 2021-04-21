@@ -122,10 +122,10 @@
 		},
 		{
 			"name": "Circular dependency",
-			"file": "dependency_circle.js",
+			"file": "Dependency_circle.js",
 			"args":
 			{
-				"max_structs_in_circle":
+				"max_circle_len":
 				{
 					"min": 2,
 					"max": 5
