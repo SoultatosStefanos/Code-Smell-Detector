@@ -20,15 +20,15 @@ static void PrintMainArgInfo(void) {
 
 static void SetDepedenciesToST(const Json::Value& graph, Json::Value& ST) {
 	const Json::Value& all_dependencies = graph["edges"];
-	Json::Value& structures = ST["structures"];
+	auto& st_dependencies = ST["dependencies"];
 	for (const auto& dependencies : all_dependencies) {
-		Json::Value& struct_from = structures[dependencies["from"].asString()];
 		
 		Json::Value dependency_pack;
 		dependency_pack["types"] = dependencies["dependencies"];
-		//dependency_pack["to"] = dependencies["to"];
+		dependency_pack["from"] = dependencies["from"];
+		dependency_pack["to"] = dependencies["to"];
 
-		struct_from["dependencies"][dependencies["to"].asString()] = dependency_pack;
+		st_dependencies.append(dependency_pack);
 	}
 }
 

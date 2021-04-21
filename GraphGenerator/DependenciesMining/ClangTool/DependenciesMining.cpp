@@ -528,6 +528,10 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		
 		// Body - MemberExpr
 		auto* body = d->getBody();
+		if (body == nullptr) {
+			currentMethod = nullptr;
+			return;
+		}
 		FindMemberExprVisitor visitor; 
 
 		literal_count = 0;
@@ -582,6 +586,16 @@ bool MethodDeclsCallback::FindMemberExprVisitor::TraverseStmt(Stmt* stmt) {
 		case Stmt::StmtClass::WhileStmtClass:
 			MethodDeclsCallback::loop_count++;
 			break;
+		/*case Stmt::StmtClass::CStyleCastExprClass: {
+			std::cout << ((CStyleCastExpr*)stmt)->getType().getAsString() << std::endl;
+			auto children = stmt->children();
+			for (auto child : children) {
+				
+				std::cout << ((ImplicitCastExpr*)child)->getCastKindName() << std::endl;
+			}
+			break;
+		}*/
+
 
 		default: {
 			if (class_name.find("Literal") != std::string::npos)

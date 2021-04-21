@@ -792,7 +792,7 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 	auto src_info = symbol->GetSourceInfo();
 	json_src_info["file"] = src_info.GetFileName();
 	json_src_info["line"] = src_info.GetLine();
-	json_src_info["column"] = src_info.GetColumn();
+	json_src_info["col"] = src_info.GetColumn();
 
 	return json_src_info;
 }
