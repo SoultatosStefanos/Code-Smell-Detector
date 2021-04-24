@@ -1,8 +1,6 @@
-
 var Util = require("../Utility.js");
 var fs = require("fs");
 const readline = require("readline");
-const { add_incident } = require("../Utility.js");
 
 module.exports = {
     callback: async function(ST, args){
