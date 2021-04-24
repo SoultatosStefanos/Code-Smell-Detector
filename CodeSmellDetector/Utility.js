@@ -1,6 +1,16 @@
 const assert = require('assert');
 
 module.exports = {
+
+    execute_smell_callback: async (smell_callback, ST, args) => {
+        var report = new Object();
+        const startTime = Date.now();
+        report.incidents = await smell_callback(ST, args);
+        report.time = (Date.now() - startTime) / 1000;
+        return report;
+    },
+
+
     /**
      * Returns id without namespaces and brackets
      */

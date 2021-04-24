@@ -1,5 +1,6 @@
 const fs = require("fs");
 const path = require("path");
+const Util = require("./Utility");
 var ST = require("../ST.json"); // loads json ST.
 var smells_config = require("./SmellsConfig.json");
 
@@ -19,15 +20,18 @@ function get_smells(smells_config){
         smells.push(new_smell);
         console.log(`Loaded smell "${smell.name}" from "${smell_path}".`);
     }
+    console.log();
     return smells;
 }
 
 async function run_smells(smells, ST){
     var promises = [];
     for(const smell of smells){
-        console.log(`\nRunning smell detector: "${smell.name}"`);
-        promises.push(smell.callback(ST, smell.args));
+        console.log(`Running smell detector: "${smell.name}"`);
+        var promise = Util.execute_smell_callback(smell.callback, ST, smell.args);
+        promises.push(promise);
     }
+    console.log();
     var reports = await Promise.all(promises);
     var i = 0;
     for(const smell of smells){
@@ -41,10 +45,10 @@ function print_reports(smells){
         //console.log(smell.report);
         console.log("------------------------------");
         console.log(`Smell: ${smell.name}`);
-        console.log(`Incidents count: ${smell.report.length}\n`);
+        console.log(`Incidents count: ${smell.report.incidents.length}\n`);
         var counter = 1;
         
-        for (const incident of smell.report){
+        for (const incident of smell.report.incidents){
             console.log(`Incident ${counter++}`);
             console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.col}`);
             console.log(`Message: ${incident.msg}`);
@@ -53,13 +57,20 @@ function print_reports(smells){
     }
 }
 
-
+function print_stats(smells){
+    for(const smell of smells){
+        console.log(`Smell: ${smell.name}`);
+        console.log(`Incidents count: ${smell.report.incidents.length}`);
+        console.log(`Execution time: ${smell.report.time}\n`);
+    }
+}
 
 
 async function main(){
     var smells = get_smells(smells_config);
     await run_smells(smells, ST);
-    print_reports(smells);
+    //print_reports(smells);
+    print_stats(smells);
 }
 
 main();
