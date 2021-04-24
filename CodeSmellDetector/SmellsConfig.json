@@ -186,8 +186,8 @@
 			{
 				"max_member_expr":
 				{
-					"min": 30,
-					"max": 60
+					"min": 2,
+					"max": 4
 				}
 			}
 		}

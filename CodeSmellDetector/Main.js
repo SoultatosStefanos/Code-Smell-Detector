@@ -69,7 +69,7 @@ function print_stats(smells){
 async function main(){
     var smells = get_smells(smells_config);
     await run_smells(smells, ST);
-    //print_reports(smells);
+    print_reports(smells);
     print_stats(smells);
 }
 
