@@ -5,6 +5,7 @@
 		{
 			"name": "Too many parameters",
 			"file": "Method_argc.js",
+			"description": "",
 			"args": 
 			{
 				"max_argc":
@@ -17,6 +18,7 @@
 		{
 			"name": "Too many function literals",
 			"file": "Method_literals.js",
+			"description": "",
 			"args": 
 			{
 				"max_literals":
@@ -29,6 +31,7 @@
 		{
 			"name": "Long function",
 			"file": "Long_function.js",
+			"description": "",
 			"args": 
 			{
 				"max_statements": 
@@ -46,6 +49,7 @@
 		{
 			"name": "Cyclomatic complexity",
 			"file": "Cyclo_complex.js",
+			"description": "",
 			"args":
 			{
 				"max_loops": 
@@ -63,6 +67,7 @@
 		{
 			"name": "Excessively long identifier",
 			"file": "Long_identifier.js",
+			"description": "",
 			"args":
 			{
 				"max_id_len":
@@ -75,6 +80,7 @@
 		{
 			"name": "Excessively long line of code (God Line)",
 			"file": "God_line.js",
+			"description": "",
 			"args":
 			{
 				"max_line_len":
@@ -87,6 +93,7 @@
 		{
 			"name": "Naming conventions",
 			"file": "Name_conventions.js",
+			"description": "",
 			"args":
 			{
 				"options":
@@ -111,6 +118,7 @@
 		{
 			"name": "Nested scopes",
 			"file": "Nested_scopes.js",
+			"description": "",
 			"args":
 			{
 				"max_nested_scopes":
@@ -123,12 +131,63 @@
 		{
 			"name": "Circular dependency",
 			"file": "Dependency_circle.js",
+			"description": "",
 			"args":
 			{
 				"max_circle_len":
 				{
 					"min": 2,
 					"max": 5
+				}
+			}
+		},
+		{
+			"name": "Large Class",
+			"file": "Large_class.js",
+			"description": "",
+			"args":
+			{
+				"max_methods":
+				{
+					"min": 15,
+					"max": 30
+				},
+				"max_fields":
+				{
+					"min": 15,
+					"max": 30
+				},
+				"public_only": false
+			}
+		},
+		{
+			"name": "Large File",
+			"file": "Large_file.js",
+			"description": "",
+			"args":
+			{
+				"max_src_lines":
+				{
+					"min": 1000,
+					"max": 1700
+				},
+				"max_header_lines":
+				{
+					"min": 400,
+					"max": 800
+				}
+			}
+		},
+		{
+			"name": "Inappropriate Intimacy",
+			"file": "Inappropriate_intimacy.js",
+			"description": "@argument max_member_expr: Max count of member expr from one class to any other class.",
+			"args":
+			{
+				"max_member_expr":
+				{
+					"min": 30,
+					"max": 60
 				}
 			}
 		}
