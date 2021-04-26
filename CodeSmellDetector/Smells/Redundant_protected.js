@@ -13,6 +13,7 @@ module.exports = {
         for(const structure_id in ST.structures){
             // if structure is not base
             if(base_classes_ids.indexOf(structure_id) > -1) continue;
+            
 
             const structure = ST.structures[structure_id];
             let protected_members = 0;
@@ -22,10 +23,11 @@ module.exports = {
                     protected_members++;
             }
             for(const field_id in structure.fields){
-                const field = structure.fields;
+                const field = structure.fields[field_id];
                 if(field.access === "protected")
                     protected_members++;
             }
+
 
             smell_level = Util.get_smell_lvl(args.max_unneeded_protected.min, args.max_unneeded_protected.max, protected_members);
             if(smell_level > 0){
