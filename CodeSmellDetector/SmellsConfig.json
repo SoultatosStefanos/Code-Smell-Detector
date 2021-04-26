@@ -190,6 +190,25 @@
 					"max": 4
 				}
 			}
-		}
+		},
+        {
+            "name": "Non virtual base destructor",
+            "file": "Virtual_destructor.js",
+            "description": "Flags destructors of base classes that are not virtual.",
+            "args":{}
+        },
+        {
+            "name": "Redundant protected access",
+            "file": "Redundant_protected.js",
+            "description": "Detects protected member functions or variables declared in classes that are not inherited from.",
+            "args":
+            {
+                "max_unneeded_protected":
+                {
+                    "min": 1,
+                    "max": 5
+                }
+            }
+        }
 	]
 }
