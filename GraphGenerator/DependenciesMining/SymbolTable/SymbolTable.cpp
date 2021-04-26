@@ -328,6 +328,10 @@ void Method::SetLineCount(int line_count) {
 	this->line_count = line_count;
 }
 
+void Method::SetVirtual(bool is_virtual) {
+	this->is_virtual = is_virtual;
+}
+
 void Method::InstallArg(const ID_T& id, const Definition& definition) {
 	arguments.Install(id, definition);
 }
@@ -416,6 +420,10 @@ bool Method::IsTrivial() const {
 		return true;
 	}
 	return false;
+}
+
+bool Method::IsVirtual() const {
+	return is_virtual;
 }
 
 // Member
@@ -958,7 +966,7 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 	json_method["max_scope"] = method->GetMaxScopeDepth();
 	json_method["lines"] = method->GetLineCount();
 	json_method["access"] = method->GetAccessTypeStr();
-
+	json_method["virtual"] = method->IsVirtual();
 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }

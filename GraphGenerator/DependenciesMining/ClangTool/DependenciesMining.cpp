@@ -542,6 +542,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		scope_max_depth = 0;
 
 		visitor.TraverseStmt(body);
+		
 
 		//std::cout << d->getAccess() << std::endl;
 		currentMethod->SetAccessType((AccessType)d->getAccess());
@@ -551,6 +552,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		currentMethod->SetLoops(loop_count);
 		currentMethod->SetMaxScopeDepth(scope_max_depth);
 		currentMethod->SetLineCount(sm->getExpansionLineNumber(body->getEndLoc()) - sm->getExpansionLineNumber(body->getBeginLoc()));
+		currentMethod->SetVirtual(d->isVirtual());
 		currentMethod = nullptr;
 
 		

@@ -257,6 +257,7 @@ namespace dependenciesMining {
 		int loops = 0;
 		int max_scope_depth = 0;
 		int line_count = 0;
+		bool is_virtual;
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
@@ -287,6 +288,7 @@ namespace dependenciesMining {
 		void SetLoops(int loops);
 		void SetMaxScopeDepth(int max_scope_depth);
 		void SetLineCount(int line_count);
+		void SetVirtual(bool is_virtual);
 
 		void InstallArg(const ID_T& id, const Definition& definition);
 		void InstallDefinition(const ID_T& id, const Definition& definition);
@@ -302,7 +304,8 @@ namespace dependenciesMining {
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;
 		bool IsTemplateInstantiationSpecialization() const;
-		bool IsTrivial() const; 
+		bool IsTrivial() const;
+		bool IsVirtual() const;
 	};
 
 	// ----------------------------------------------------------------------------------------
