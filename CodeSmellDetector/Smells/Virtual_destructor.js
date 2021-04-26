@@ -8,7 +8,7 @@ module.exports = {
         //     const structure = ST.structures[structure_id];
             
         // }
-        let base_classes_ids = get_all_base_structures(ST);
+        let base_classes_ids = Util.get_all_base_structures(ST);
         for(const base_class_id of base_classes_ids){
             let method_id = get_non_virtual_destructor(base_class_id, ST);
             if(method_id !== null){
@@ -21,7 +21,6 @@ module.exports = {
             }
                 
         }
-        console.log(base_classes);
         return report;
     }
 }
@@ -46,17 +45,4 @@ function get_non_virtual_destructor(structure_id, ST){
         }
     }
     return null;
-}
-
-/**
- * returns a list of the names of all base classes. 
- */
-function get_all_base_structures(ST){
-    base_classes = new Object();
-    for(const dependency of ST.dependencies){
-        if(dependency.types["Inherit"] !== undefined){
-            base_classes[dependency.to] = true;
-        }
-    }
-    return Object.keys(base_classes);
 }

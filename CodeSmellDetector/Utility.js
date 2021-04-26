@@ -70,9 +70,18 @@ module.exports = {
         if(method_id === class_id) return true;
         if(method_id === "~" + class_id) return true;
         return false;
+    },
+
+    /**
+     * @returns a list of the names of all base classes. 
+     */
+    get_all_base_structures: (ST) => {
+        base_classes = new Object();
+        for(const dependency of ST.dependencies){
+            if(dependency.types["Inherit"] !== undefined){
+                base_classes[dependency.to] = true;
+            }
+        }
+        return Object.keys(base_classes);
     }
-
-
 }
-
-console.log(module.exports.get_clean_identifier("UnitTest3::LoadSpriteList(std::vector<std::string> &, const class AnimationFilm *, const std::string &, const std::string &)"));
