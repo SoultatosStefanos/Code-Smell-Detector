@@ -1,11 +1,10 @@
-var Util = require("../Utility.js");
+const Util = require("../Utility.js");
 const assert = require('assert');
 
 module.exports = {
     callback: async function(ST, args){
         assert(args.use_id_len_as_score === false); // TODO
-        var report = [];
-        var msg, src, smell_level, non_matching;
+        let msg, src, smell_level, non_matching, report = [];
         const struct_regex = RegExp(args.options[args.class_names], "g");
         const method_regex = RegExp(args.options[args.method_names], "g");
         const var_regex = RegExp(args.options[args.var_names], "g");
@@ -79,7 +78,7 @@ function regex_non_matching_chars(str, regex){
     const matches = str.match(regex);
     if(matches === null) 
         return str.length;
-    var longest_match_len = 0;
+    let longest_match_len = 0;
 
     for(const match of matches){
         if(match.length > longest_match_len) 

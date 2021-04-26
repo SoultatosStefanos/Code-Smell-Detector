@@ -3,7 +3,7 @@ const assert = require('assert');
 module.exports = {
 
     execute_smell_callback: async (smell_callback, ST, args) => {
-        var report = new Object();
+        let report = new Object();
         const startTime = Date.now();
         report.incidents = await smell_callback(ST, args);
         report.time = (Date.now() - startTime) / 1000;
@@ -15,10 +15,10 @@ module.exports = {
      * Returns id without namespaces and brackets
      */
      get_clean_identifier: (id) => {
-        var func_starts = id.indexOf("(");
+        let func_starts = id.indexOf("(");
         if(func_starts !== -1)
             id = id.slice(0, func_starts);
-        var namespace_ends = id.lastIndexOf(":");
+        let namespace_ends = id.lastIndexOf(":");
         return id.substring(namespace_ends+1, id.length);
     },
 
@@ -55,8 +55,8 @@ module.exports = {
         if(actual_level < minimal_level) return 0;
         if(actual_level >= maximal_level) return 10;
 
-        var max = maximal_level - (minimal_level - 1);
-        var reduced = actual_level - (minimal_level - 1);
+        let max = maximal_level - (minimal_level - 1);
+        let reduced = actual_level - (minimal_level - 1);
        
         return Math.floor((reduced / max) * 10);
     },

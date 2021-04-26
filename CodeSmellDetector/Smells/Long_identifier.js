@@ -1,12 +1,8 @@
-var Util = require("../Utility.js");
+const Util = require("../Utility.js");
 
 module.exports = {
     callback: async function(ST, args){
-        var report = [];
-        var msg;
-        var src;
-        var smell_level;
-        var id_len;
+        let id_len, msg, src, smell_level, report = [];
         for(const structure_id in ST.structures){
             const structure = ST.structures[structure_id];
             id_len = Util.get_clean_identifier(structure_id).length;

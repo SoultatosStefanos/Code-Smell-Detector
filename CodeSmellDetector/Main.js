@@ -1,12 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 const Util = require("./Utility");
-var ST = require("../ST.json"); // loads json ST.
-var smells_config = require("./SmellsConfig.json");
 
 // dir: relative path to dir where smells.js are found
 function get_smells(smells_config){
-    var smells = [];
+    let smells = [];
     for(const smell of smells_config.smells){
         try {
             var smell_path = path.join(smells_config.folder, smell.file);
@@ -25,15 +23,15 @@ function get_smells(smells_config){
 }
 
 async function run_smells(smells, ST){
-    var promises = [];
+    let promises = [];
     for(const smell of smells){
         console.log(`Running smell detector: "${smell.name}"`);
-        var promise = Util.execute_smell_callback(smell.callback, ST, smell.args);
+        let promise = Util.execute_smell_callback(smell.callback, ST, smell.args);
         promises.push(promise);
     }
     console.log();
-    var reports = await Promise.all(promises);
-    var i = 0;
+    let reports = await Promise.all(promises);
+    let i = 0;
     for(const smell of smells){
         smell.report = reports[i++];
     }
@@ -46,7 +44,7 @@ function print_reports(smells){
         console.log("------------------------------");
         console.log(`Smell: ${smell.name}`);
         console.log(`Incidents count: ${smell.report.incidents.length}\n`);
-        var counter = 1;
+        let counter = 1;
         
         for (const incident of smell.report.incidents){
             console.log(`Incident ${counter++}`);
@@ -67,10 +65,25 @@ function print_stats(smells){
 
 
 async function main(){
-    var smells = get_smells(smells_config);
+    const st_path = "../ST.json";
+    const smells_cfg_path = "./SmellsConfig.json";
+    let ST = require(st_path); // loads json ST.
+    let smells_config = require(smells_cfg_path);
+
+    let smells = get_smells(smells_config);
     await run_smells(smells, ST);
     print_reports(smells);
     print_stats(smells);
+
+
+    try {
+        const st_stats = fs.statSync(st_path);
+        console.log(`ST last modified: ${st_stats.mtime}`);
+    } catch (error) {
+        console.log(error);
+    }
+
+
 }
 
 main();

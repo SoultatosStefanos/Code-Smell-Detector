@@ -1,12 +1,8 @@
-var Util = require("../Utility.js");
+const Util = require("../Utility.js");
 
 module.exports = {
     callback: async function(ST, args){
-        var report = [];
-        var msg;
-        var src;
-        var smell_level;
-        var field_count, method_count;
+        let field_count, method_count, msg, src, smell_level, report = []; 
         for(const structure_id in ST.structures){
             const structure = ST.structures[structure_id];
             field_count = get_structure_field_count(structure, args.public_only);
@@ -40,8 +36,8 @@ function get_structure_method_count(structure, public_only){
     if(!public_only){
         return Object.keys(structure.methods).length;
     }
-    var methods = Object.keys(structure.methods);
-    var count = 0;
+    let methods = Object.keys(structure.methods);
+    let count = 0;
     for(const method of methods){
         if(method.access === "public"){
             count++;
@@ -55,8 +51,8 @@ function get_structure_field_count(structure, public_only){
     if(public_only === false){
         return Object.keys(structure.fields).length;
     }
-    var fields = Object.keys(structure.fields);
-    var count = 0;
+    let fields = Object.keys(structure.fields);
+    let count = 0;
     for(const field of fields){
         if(field.access === "public"){
             count++;

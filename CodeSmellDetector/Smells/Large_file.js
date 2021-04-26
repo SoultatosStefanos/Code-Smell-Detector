@@ -1,14 +1,10 @@
-var Util = require("../Utility.js");
-var fs = require("fs");
+const Util = require("../Utility.js");
+const fs = require("fs");
 const readline = require("readline");
 
 module.exports = {
     callback: async function(ST, args){
-        var report = [];
-        var smell_level;
-        var lines;
-        var msg;
-        var src;
+        let lines, msg, src, smell_level, report = [];
         for(const header of ST.headers){
             lines = await get_file_line_count(header);
             smell_level = Util.get_smell_lvl(args.max_header_lines.min, args.max_header_lines.max, lines);
@@ -39,7 +35,7 @@ async function get_file_line_count(file_path){
         input: file_stream,
         crlfDelay: Infinity
     });
-    var line_counter = 0;
+    let line_counter = 0;
 
     for await(const line of rl){
         line_counter++;
