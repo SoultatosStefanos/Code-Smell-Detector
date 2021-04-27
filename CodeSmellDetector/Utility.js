@@ -63,7 +63,7 @@ module.exports = {
 
 
     /**
-     * 
+     * @argument method_id: clean id.
      * @returns true if a method is constructor / destructor / etc..
      */
     is_standard_class_func: (method_id, class_id) =>{

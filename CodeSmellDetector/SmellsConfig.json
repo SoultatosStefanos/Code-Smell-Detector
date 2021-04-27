@@ -222,6 +222,19 @@
                     "max": 5
                 }
             }
+        },
+        {
+            "name": "Excessive function overloading",
+            "file": "Function_overload.js",
+            "description": "Detects functions that are overloaded too many times.",
+            "args":
+            {
+                "max_overload":
+                {
+                    "min": 1,
+                    "max": 6
+                }
+            }
         }
 	]
 }
