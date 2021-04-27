@@ -28,6 +28,19 @@
 				}
 			}
 		},
+        {
+            "name": "Too many locals",
+            "file": "Method_locals.js",
+            "description": "",
+            "args":
+            {
+                "max_locals":
+                {
+                    "min": 8,
+                    "max": 16
+                }
+            }
+        },
 		{
 			"name": "Long function",
 			"file": "Long_function.js",
@@ -101,7 +114,7 @@
 					"UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
 					"lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
 					"snake_case": "([a-z]*_?[a-z]*)*",
-					"none": "*",
+					"any": "*",
 					"custom0": "regex4"
 				},
 				"class_names": "UpperCamelCase",
