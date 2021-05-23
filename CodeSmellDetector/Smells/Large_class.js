@@ -5,10 +5,10 @@ module.exports = {
         let field_count, method_count, msg, src, smell_level, report = []; 
         for(const structure_id in ST.structures){
             const structure = ST.structures[structure_id];
-            field_count = get_structure_field_count(structure, args.public_only);
+            field_count = get_structure_field_count(structure, args.public_only.val);
             smell_level = Util.get_smell_lvl(args.max_fields.min, args.max_fields.max, field_count);
             if(smell_level > 0){
-                if(args.public_only)
+                if(args.public_only.val === true)
                     msg = `Structure: "${structure_id}" has ${field_count} public fields.`;
                 else
                     msg = `Structure: "${structure_id}" has ${field_count} fields.`;
@@ -16,10 +16,10 @@ module.exports = {
                 report.push(Util.get_incident_obj(src, msg, smell_level));
             }
 
-            method_count = get_structure_method_count(structure, args.public_only);
+            method_count = get_structure_method_count(structure, args.public_only.val);
             smell_level = Util.get_smell_lvl(args.max_methods.min, args.max_methods.max, method_count);
             if(smell_level > 0){
-                if(args.public_only)
+                if(args.public_only.val === true)
                     msg = `Structure: "${structure_id}" has ${method_count} public methods.`;
                 else
                     msg = `Structure: "${structure_id}" has ${method_count} methods.`;

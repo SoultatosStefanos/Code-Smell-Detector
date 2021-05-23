@@ -40,3 +40,5 @@ compille_commands.json
 IgnoredFilePaths.txt
 IngoredNamespaces.txt
 compile_commands.json
+CodeSmellDetector/node_modules
+CodeSmellDetector/code-smell-detector-GUI/node_modules/*

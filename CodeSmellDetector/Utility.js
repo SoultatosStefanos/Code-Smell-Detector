@@ -2,10 +2,15 @@ const assert = require('assert');
 
 module.exports = {
 
-    execute_smell_callback: async (smell_callback, ST, args) => {
+    execute_smell_callback: async (smell_detector, ST) => {
         let report = new Object();
         const startTime = Date.now();
-        report.incidents = await smell_callback(ST, args);
+        report.detector = smell_detector.name;
+        report.incidents = await smell_detector.callback(ST, smell_detector.args);
+        for(let incident of report.incidents){
+            incident.detector = smell_detector.name;
+        }
+
         report.time = (Date.now() - startTime) / 1000;
         return report;
     },

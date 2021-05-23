@@ -1,5 +1,4 @@
 const Util = require("../Utility.js");
-const assert = require('assert');
 
 module.exports = {
     callback: async function(ST, args){

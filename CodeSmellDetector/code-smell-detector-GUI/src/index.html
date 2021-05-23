@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="description" content="Code Smell Detector - Smells Display">
+    <meta name="author" content="Phivos Papapanagiotakis">
+    <title>Smells Detector</title>
+    <!-- Insert this above script imports  -->
+    <script>
+    if (typeof module === 'object') {
+        window.module = module; 
+        module = undefined;
+    }
+    </script>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+    <!-- Insert this after script imports -->
+    <script>
+    if (window.module) 
+        module = window.module;
+    </script>
+    
+    <link rel="stylesheet" href="jquery-ui.css">
+    <link rel="stylesheet" href="index.css">
+    <script defer src="../../Main.js"></script>
+    
+  </head>
+  <body>
+    <h1>Code Smell Detector 🖥️</h1>
+    <button id="b_compute_code_smells" class="main_button">Compute Code Smells</button>
+    <button id="b_code_smell_config" class="main_button">Code Smell Config</button>
+    <div id="main_container">
+        <div id="smells_display">
+            <div id="smells_display_header">
+                <div id="sort_by">
+                    <button id="b_sort_by">Sort By</button>
+                    <div id="sort_by_dropdown_content">
+                        <button id="b_sort_by_intensity" class="dropdown_b">Intensity</button>
+                        <button id="b_sort_by_type" class="dropdown_b">Type</button>
+                        <button id="b_sort_by_file" class="dropdown_b">File</button>
+                        <button id="b_sort_by_class" class="dropdown_b">Class</button>
+                    </div> 
+                </div>
+                <div id="order">
+                    <button id="b_order">Order</button>
+                    <div id="order_dropdown_content">
+                        <button id="b_order_incr" class="dropdown_b">Increasing</button>
+                        <button id="b_order_decr" class="dropdown_b">Decreasing</button>
+                    </div> 
+                </div>
+            </div>
+            <div id="smell_display_body">
+                <table id="smell_table">
+
+                </table>
+            </div>
+        </div>
+        <div id="smells_config">
+            smells configuration here
+        </div>
+        
+    </div>
+    <div id="smell_detectors_container">
+            
+    </div>
+    
+  </body>
+</html>
