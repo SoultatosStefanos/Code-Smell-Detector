@@ -4,24 +4,43 @@ const Util = require("D:/Thesis/CodeSmellDetector/Utility");
 const SmellRenderer = require("D:/Thesis/CodeSmellDetector/Smell_renderer.js");
 const DetectorRenderer = require("D:/Thesis/CodeSmellDetector/Detector_renderer.js");
 const st_path = "D:/Thesis/ST.json";
+let st_last_edit = null;
 const smells_cfg_path = "D:/Thesis/CodeSmellDetector/SmellsConfig.json";
+const smell_reports_save = "D:/Thesis/CodeSmellDetector/SmellReports.json"
 
-let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list, smell_renderer;
+let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = null, smell_renderer;
 
 async function initialize(){
-    await init_backend();
+    smells_list = await init_backend();
     await init_frontend();
 }
 
+/**
+ * @returns previous smell reports if the st matches the one that was used last time. Otherwise null
+ */
 async function init_backend(){
     ST = require(st_path); // loads json ST.
+    st_last_edit = fs.statSync(st_path).mtime; // saves last edit time of st.
+    st_last_edit = st_last_edit.toString();
     smells_config = require(smells_cfg_path);
     smell_detectors = get_smell_detectors(smells_config);
+
+
+    return get_smells_from_cache(st_path, st_last_edit, smell_reports_save);
+
+    
 }
 
 async function init_frontend(){
     let smell_display_div = document.getElementById("smell_table");
     smell_renderer = new SmellRenderer(smell_table, SmellRenderer.EnumPreferences.sort_by.Intensity, SmellRenderer.EnumPreferences.order.decreasing);
+
+
+    if(smells_list !== null){
+        smell_renderer.render(smells_list);
+    }
+
+
 
     document.getElementById("b_compute_code_smells").onclick = async () => {
         smell_detectors_reports = await run_smell_detectors(smell_detectors, ST);
@@ -32,6 +51,7 @@ async function init_frontend(){
             }
         }
         smell_renderer.render(smells_list);
+        save_smell_reports(smells_list);
     };
 
     document.getElementById("b_code_smell_config").onclick = async () => {
@@ -86,6 +106,16 @@ async function init_frontend(){
     detector_renderer.render(smells_config);
 }
 
+/**
+ * @returns previous smell reports if the st matches the one that was used last time. Otherwise null
+ */
+function get_smells_from_cache(st_path, st_last_edit, smell_reports_save){
+    const previous_smells = require(smell_reports_save);
+    if(previous_smells.computed_for.file === st_path && previous_smells.computed_for.last_edit === st_last_edit)
+        return previous_smells.smells;
+    return null;
+}
+
 // dir: relative path to dir where smells.js are found
 function get_smell_detectors(smells_config){
     let smells = [];
@@ -113,6 +143,20 @@ async function run_smell_detectors(smell_detectors, ST){
         smell_reports.push(promise);
     }
     return await Promise.all(smell_reports);
+}
+
+async function save_smell_reports(smell_reports){
+    let json = new Object();
+    let computed_for = new Object();
+    computed_for.file = st_path;
+    computed_for.last_edit = st_last_edit;
+    json.computed_for = computed_for;
+    json.smells = smell_reports;
+
+    json = JSON.stringify(json, null, 4);
+    fs.writeFile(smell_reports_save, json, "utf8", (error) => {
+        if(error) throw error;
+    });
 }
 
 function print_reports(smell_reports){
@@ -151,12 +195,7 @@ async function main(){
     print_stats(smells);
 
 
-    try {
-        const st_stats = fs.statSync(st_path);
-        console.log(`ST last modified: ${st_stats.mtime}`);
-    } catch (error) {
-        console.log(error);
-    }
+
 
 
 }

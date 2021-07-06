@@ -10,6 +10,7 @@
 			{
 				"max_argc":
 				{
+                    "formal_name": "Maximum method arguments",
 					"min": 4,
 					"max": 7,
                     "option": 
@@ -29,6 +30,7 @@
 			{
 				"max_literals":
 				{
+                    "formal_name": "Maximum method literals",
 					"min": 9,
 					"max": 15,
                     "option": 
@@ -48,6 +50,7 @@
             {
                 "max_locals":
                 {
+                    "formal_name": "Maximum method locals",
                     "min": 8,
                     "max": 16,
                     "option": 
@@ -67,6 +70,7 @@
 			{
 				"max_statements": 
 				{
+                    "formal_name": "Maximum method statement count",
 					"min": 70,
 					"max": 120,
                     "option": 
@@ -77,6 +81,7 @@
 				},
 				"max_lines":
 				{
+                    "formal_name": "Maximum Method line count",
 					"min": 40,
 					"max": 80,
                     "option": 
@@ -96,6 +101,7 @@
 			{
 				"max_loops": 
 				{
+                    "formal_name": "Maximum method loops",
 					"min": 5,
 					"max": 10,
                     "option": 
@@ -106,6 +112,7 @@
 				},
 				"max_branches":
 				{
+                    "formal_name": "Maximum method branching statements",
 					"min": 15,
 					"max" : 25,
                     "option": 
@@ -125,6 +132,7 @@
 			{
 				"max_id_len":
 				{
+                    "formal_name": "Maximum length of an identifier",
 					"min": 17,
 					"max": 25,
                     "option": 
@@ -144,6 +152,7 @@
 			{
 				"max_line_len":
 				{
+                    "formal_name": "Maximum length of a line",
 					"min": 90,
 					"max": 125,
                     "option": 
@@ -159,18 +168,19 @@
 			"name": "Naming conventions",
 			"file": "Name_conventions.js",
 			"description": "Detects identifiers that do not follow naming conventions",
-			"dict1":
-            {
-                "UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
-                "lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
-                "snake_case": "([a-z]*_?[a-z]*)*",
-                "any": "(.*?)",
-                "custom0": "regex4"
-            },
             "args":
 			{
+                "dict1":
+                {
+                    "UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
+                    "lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
+                    "snake_case": "([a-z]*_?[a-z]*)*",
+                    "any": "(.*?)",
+                    "custom0": "regex4"
+                },
                 "class_names":
                 {
+                    "formal_name": "Class names",
                     "val": "any",
                     "option":
                     {
@@ -180,6 +190,7 @@
                 },
 				"method_names":
                 {
+                    "formal_name": "Method names",
                     "val": "any",
                     "option":
                     {
@@ -189,6 +200,7 @@
                 },
 				"var_names":
                 {
+                    "formal_name": "Variable names",
                     "val": "any",
                     "option":
                     {
@@ -199,6 +211,7 @@
 				"use_id_len_as_score": false,
 				"max_chars_ignored":
 				{
+                    "formal_name": "Maximum characters ignored",
 					"min": 24,
 					"max": 34,
                     "option":
@@ -218,6 +231,7 @@
 			{
 				"max_nested_scopes":
 				{
+                    "formal_name": "Maximum depth of nested blocks",
 					"min": 3,
 					"max": 6,
                     "option": 
@@ -237,6 +251,7 @@
 			{
 				"max_circle_len":
 				{
+                    "formal_name": "Maximum circle length",
 					"min": 2,
 					"max": 5,
                     "option": 
@@ -256,6 +271,7 @@
 			{
 				"max_methods":
 				{
+                    "formal_name": "Maximum count of methods",
 					"min": 15,
 					"max": 30,
                     "option": 
@@ -266,6 +282,7 @@
 				},
 				"max_fields":
 				{
+                    "formal_name": "Maximum count of fields",
 					"min": 15,
 					"max": 30,
                     "option": 
@@ -275,6 +292,7 @@
                     }
 				},
 				"public_only": {
+                    "formal_name": "Public only",
                     "val": false,
                     "option":
                     {
@@ -292,6 +310,7 @@
 			{
 				"max_src_lines":
 				{
+                    "formal_name": "Maximum source file lines",
 					"min": 1000,
 					"max": 1700,
                     "option": 
@@ -302,6 +321,7 @@
 				},
 				"max_header_lines":
 				{
+                    "formal_name": "Maximum header file lines",
 					"min": 400,
 					"max": 800,
                     "option": 
@@ -321,6 +341,7 @@
 			{
 				"max_member_expr":
 				{
+                    "formal_name": "Maximum member expressions",
 					"min": 25,
 					"max": 50,
                     "option": 
@@ -346,6 +367,7 @@
             {
                 "max_unneeded_protected":
                 {
+                    "formal_name": "Maximum unnecessary protected",
                     "min": 1,
                     "max": 5,
                     "option": 
@@ -365,6 +387,7 @@
             {
                 "max_overload":
                 {
+                    "formal_name": "Maximum overloads of a function",
                     "min": 3,
                     "max": 6,
                     "option": 
@@ -384,6 +407,7 @@
             {
                 "max_direct_dependencies":
                 {
+                    "formal_name": "Maximum direct dependencies",
                     "min": 15,
                     "max": 25,
                     "option": 

@@ -60,19 +60,47 @@ module.exports = class SmellRenderer{
         }
     }
 
+    get_table_header(){
+        let icon;
+        if(this.order === SmellRenderer.EnumPreferences.order.decreasing){
+            icon = "<i class='arrow arr_down'></i>"
+        }
+        else{
+            icon = "<i class='arrow arr_up'></i>"
+        }
+
+        switch(this.sort_by){
+            case SmellRenderer.EnumPreferences.sort_by.Intensity: {
+                return `<tr><th>Detector</th><th>Intensity ${icon}</th><th>Location</th><th>Structure</th><th>Message</th><th>Note</th></tr>`;
+            }
+            case SmellRenderer.EnumPreferences.sort_by.Type: {
+                return `<tr><th>Detector ${icon}</th><th>Intensity</th><th>Location</th><th>Structure</th><th>Message</th><th>Note</th></tr>`;
+            }
+            case SmellRenderer.EnumPreferences.sort_by.File: {
+                return `<tr><th>Detector</th><th>Intensity</th><th>Location ${icon}</th><th>Structure</th><th>Message</th><th>Note</th></tr>`;
+            }
+            case SmellRenderer.EnumPreferences.sort_by.Class: {
+                return `<tr><th>Detector</th><th>Intensity</th><th>Location</th><th>Structure ${icon}</th><th>Message</th><th>Note</th></tr>`;
+            }
+            default:
+                assert(false, "Unhandled smell sort option.");
+                
+        }
+    }
+
     render(smells){
         smells.sort(this.get_smell_sort_func());
 
-
+        let html_str = this.get_table_header();
 
         //this.hmtl_smell_table.innerHTML = "";
-        let html_str = "<tr><th>Detector</th>" +
-        "<th>Intensity</th><th>Location</th><th>Structure</th><th>Message</th></tr>";
+        // let html_str = "<tr><th>Detector</th>" +
+        // "<th>Intensity</th><th>Location</th><th>Structure</th><th>Message</th></tr>";
         for(const smell of smells){
             let green = 255 - 25.5 * smell.lvl;
             html_str += `<tr style='background-color:rgba(255, ${green}, 0, 0.6)'><td>${smell.detector}</td>` +
             `<td>${smell.lvl}</td><td><div class='l'>${smell.src.file}:${smell.src.line}:${smell.src.col}</div></td>` +
-            `<td>${smell.src.struct}</td><td><div class='l'>${smell.msg}</div></td></tr>`;
+            `<td>${smell.src.struct != null ? smell.src.struct : ""}</td><td><div class='l'>${smell.msg}</div></td><td><i class='icon_add_note'></i></td></tr>`;
         }
         this.html_smell_table.innerHTML = html_str;
     }

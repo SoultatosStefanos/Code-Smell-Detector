@@ -103,7 +103,7 @@ td, th{
     top:0;
     left:0;
     max-width:600px;
-    width: 600px;
+    width: auto;
     min-height: 25px;
     height: auto;
     background-color:#c0c0c0;
@@ -143,4 +143,53 @@ ul {
 li {
     width: 100%;
     display: inline-block;
+}
+
+.arrow {
+    border: solid rgb(0, 0, 0);
+    border-width: 0 3px 3px 0;
+    display: inline-block;
+    padding: 3px;
+}
+
+.arr_up {
+    transform: rotate(-135deg);
+    -webkit-transform: rotate(-135deg);
+    border-color: green;
+}
+  
+.arr_down {
+    transform: rotate(45deg);
+    -webkit-transform: rotate(45deg);
+    border-color: red;
+}
+
+
+
+.icon_add_note {
+    background: url('../icons/AddNote.png');
+    display: block;
+    height: 39px;
+    width: 36px;
+    margin-left: auto;
+    margin-right: auto;
+    /* Other styles here */
+}
+
+.icon_add_note:hover {
+    transform: scale(1.2);
+}
+
+.icon_edit_note {
+    background: url('../icons/EditNote.png');
+    display: block;
+    height: 36px;
+    width: 38px;
+    margin-left: auto;
+    margin-right: auto;
+    /* Other styles here */
+}
+
+.icon_edit_note:hover {
+    transform: scale(1.2);
 }

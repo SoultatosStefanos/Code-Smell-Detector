@@ -39,14 +39,14 @@ module.exports = class DetectorRenderer{
                         slider.values_label = "lbl" + (slider_id);
                         slider.div = "slider" + (slider_id++);
                         slider.arg_obj = arg;
-                        html += `<span>${arg_name}  <label id="${slider.values_label}"></label></span>`;
+                        html += `<span>${arg.formal_name}  <label id="${slider.values_label}"></label></span>`;
                         html += `<div id="${slider.div}" class="dbl-slider"></div>`;
                         sliders.push(slider);
                         break;
                     }
                         
                     case "boolean":{
-                        html += `${arg_name}` + `<input type="checkbox" ${this.get_checked(arg.val)}><br>`;
+                        html += `${arg.formal_name}` + `<input type="checkbox" ${this.get_checked(arg.val)}><br>`;
                         break;
                     }
                         
@@ -56,7 +56,7 @@ module.exports = class DetectorRenderer{
                         dropdown.div = "dropdown" + (dropdown_id++);
                         dropdown.arg_obj = arg;
                         dropdown.detector = detector;
-                        html += `<span>${arg_name}  <label id="${dropdown.div}"></label></span><br>`;
+                        html += `<span>${arg.formal_name}  <label id="${dropdown.div}"></label></span><br>`;
                         dropdowns.push(dropdown);
                         break;
                     }
@@ -90,7 +90,7 @@ module.exports = class DetectorRenderer{
             select.name = "select" + dropdown.id;
             select.id = "select" + dropdown.id;
             
-            for(const val of Object.keys(dropdown.detector[dropdown.arg_obj.option.dict])){
+            for(const val of Object.keys(dropdown.detector.args[dropdown.arg_obj.option.dict])){
                 let option = document.createElement("option");
                 option.value = val;
                 option.text = val;

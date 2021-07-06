@@ -60,10 +60,14 @@ module.exports = {
         if(actual_level < minimal_level) return 0;
         if(actual_level >= maximal_level) return 10;
 
-        let max = maximal_level - (minimal_level - 1);
-        let reduced = actual_level - (minimal_level - 1);
+        let range = maximal_level - minimal_level;
+        let reduced = actual_level - minimal_level;
+        return Math.round((reduced / range) * 1000) / 100;
+
+        // let max = maximal_level - (minimal_level - 1);
+        // let reduced = actual_level - (minimal_level - 1);
        
-        return Math.floor((reduced / max) * 10);
+        // return Math.floor((reduced / max) * 10);
     },
 
 
