@@ -193,3 +193,81 @@ li {
 .icon_edit_note:hover {
     transform: scale(1.2);
 }
+
+#overlay {
+    position: fixed; 
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    opacity: 0.5;
+    filter: alpha(opacity=50);
+}
+
+#modal {
+    position:absolute;
+    background:rgba(0,0,0,0.2);
+    border-radius:14px;
+    padding:8px;
+}
+
+#content {
+    border-radius:8px;
+    background:bisque;
+    padding:20px;
+}
+
+#close {
+    position:absolute;
+    background:url(../icons/close.png) 0 0 no-repeat;
+    width:24px;
+    height:27px;
+    display:block;
+    text-indent:-9999px;
+    top:-7px;
+    right:-7px;
+}
+
+#save {
+    position:absolute;
+    background:url(../icons/save.png) 0 0 no-repeat;
+    width:24px;
+    height:23px;
+    display:block;
+    text-indent:-9999px;
+    top:-7px;
+    right: 18px;
+    border-radius: 6px;
+}
+
+#delete {
+    position:absolute;
+    background:url(../icons/delete.png) 0 0 no-repeat;
+    width:23px;
+    height:24px;
+    display:block;
+    text-indent:-9999px;
+    top:-7px;
+    right: 43px;
+    border-radius: 6px;
+}
+
+#close:hover {
+    transform: scale(1.2);
+}
+
+#save:hover {
+    transform: scale(1.2);
+}
+
+#delete:hover {
+    transform: scale(1.2);
+}
+
+#note_textfield {
+    min-width: 400px;
+    min-height: 100px;
+    border: 2px solid rgb(114, 114, 114);
+    border-radius: 4px;
+}

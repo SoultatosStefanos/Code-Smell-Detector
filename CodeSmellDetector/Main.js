@@ -89,6 +89,11 @@ async function init_frontend(){
         smell_renderer.render(smells_list);
     };
 
+    document.getElementById("b_sort_by_note").onclick = async () => {
+        smell_renderer.set_sort_by_pref(SmellRenderer.EnumPreferences.sort_by.Note);
+        smell_renderer.render(smells_list);
+    }
+
     document.getElementById("b_order_incr").onclick = async () => {
         smell_renderer.set_order_pref(SmellRenderer.EnumPreferences.order.increasing);
         smell_renderer.render(smells_list);
