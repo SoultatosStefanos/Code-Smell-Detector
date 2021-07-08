@@ -1,6 +1,9 @@
 const assert = require('assert');
 
 module.exports = {
+    st_path: "D:/Thesis/ST.json",
+    st_last_edit: null,
+    smell_reports_save: "D:/Thesis/CodeSmellDetector/SmellReports.json",
 
     execute_smell_callback: async (smell_detector, ST) => {
         let report = new Object();
@@ -92,5 +95,30 @@ module.exports = {
             }
         }
         return Object.keys(base_classes);
+    },
+
+
+    /**
+     * @returns previous smell reports if the st matches the one that was used last time. Otherwise null
+     */
+    get_smells_from_cache: () => {
+        const previous_smells = require(module.exports.smell_reports_save);
+        if(previous_smells.computed_for.file === module.exports.st_path && previous_smells.computed_for.last_edit === module.exports.st_last_edit)
+            return previous_smells.smells;
+        return null;
+    },
+
+    save_smell_reports: async (smell_reports) => {
+        let json = new Object();
+        let computed_for = new Object();
+        computed_for.file = module.exports.st_path;
+        computed_for.last_edit = module.exports.st_last_edit;
+        json.computed_for = computed_for;
+        json.smells = smell_reports;
+    
+        json = JSON.stringify(json, null, 4);
+        fs.writeFile(module.exports.smell_reports_save, json, "utf8", (error) => {
+            if(error) throw error;
+        });
     }
 }

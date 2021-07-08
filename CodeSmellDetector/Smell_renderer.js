@@ -1,4 +1,5 @@
 const assert = require('assert');
+const Util = require("D:/Thesis/CodeSmellDetector/Utility");
 
 module.exports = class SmellRenderer{
     static EnumPreferences = {
@@ -89,6 +90,7 @@ module.exports = class SmellRenderer{
             };
 
             method.save = function(){
+                
                 smell_ref.note = document.getElementById('note_textfield').value;
                 $modal.hide();
                 $overlay.hide();
@@ -102,11 +104,12 @@ module.exports = class SmellRenderer{
                 else {
                     note_holder.outerHTML = `<i id='note_holder${smell_num}' class='icon_edit_note' onclick='SmellRenderer.edit_note(${smell_num})'></i>`;
                 }
-                    
+                Util.save_smell_reports(SmellRenderer.smells_ref);
             }
 
             method.delete = function(){
                 smell_ref.note = undefined;
+                Util.save_smell_reports(SmellRenderer.smells_ref);
                 $modal.hide();
                 $overlay.hide();
                 $content.empty();
