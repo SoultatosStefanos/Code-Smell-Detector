@@ -1,379 +1,374 @@
 {
-	"folder": "D:\\Thesis\\CodeSmellDetector\\Smells",
-	"smells": 
-	[
-		{
-			"name": "Too many parameters",
-			"file": "Method_argc.js",
-			"description": "Detects excessive method parameter count",
-			"args": 
-			{
-				"max_argc":
-				{
-                    "formal_name": "Maximum method arguments",
-					"min": 4,
-					"max": 7,
-                    "option": 
-                    {
-                        "type": "min-max-slider",
-                        "range": [2, 15]
-                    }
-				}
-			},
-            "hidden": true
-		},
-		{
-			"name": "Too many function literals",
-			"file": "Method_literals.js",
-			"description": "Detects excessive method literal count",
-			"args": 
-			{
-				"max_literals":
-				{
-                    "formal_name": "Maximum method literals",
-					"min": 9,
-					"max": 15,
-                    "option": 
-                    {
-                        "type": "min-max-slider",
-                        "range": [1, 50]
-                    }
-				}
-			},
-            "hidden": false
-		},
+    "folder": "D:\\Thesis\\CodeSmellDetector\\Smells",
+    "smells": [
         {
-            "name": "Too many locals",
-            "file": "Method_locals.js",
-            "description": "Detects excessive method local variable declarations",
-            "args":
-            {
-                "max_locals":
-                {
-                    "formal_name": "Maximum method locals",
-                    "min": 8,
-                    "max": 16,
-                    "option": 
-                    {
+            "name": "Too many parameters",
+            "file": "Method_argc.js",
+            "description": "Detects excessive method parameter count",
+            "args": {
+                "max_argc": {
+                    "formal_name": "Maximum method arguments",
+                    "min": 5,
+                    "max": 8,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [1, 30]
+                        "range": [
+                            2,
+                            15
+                        ]
+                    }
+                }
+            },
+            "hidden": true
+        },
+        {
+            "name": "Too many function literals",
+            "file": "Method_literals.js",
+            "description": "Detects excessive method literal count",
+            "args": {
+                "max_literals": {
+                    "formal_name": "Maximum method literals",
+                    "min": 9,
+                    "max": 15,
+                    "option": {
+                        "type": "min-max-slider",
+                        "range": [
+                            1,
+                            50
+                        ]
                     }
                 }
             },
             "hidden": false
         },
-		{
-			"name": "Long function",
-			"file": "Long_function.js",
-			"description": "Detects methods with too many statemets or too many lines",
-			"args": 
-			{
-				"max_statements": 
-				{
+        {
+            "name": "Too many locals",
+            "file": "Method_locals.js",
+            "description": "Detects excessive method local variable declarations",
+            "args": {
+                "max_locals": {
+                    "formal_name": "Maximum method locals",
+                    "min": 8,
+                    "max": 16,
+                    "option": {
+                        "type": "min-max-slider",
+                        "range": [
+                            1,
+                            30
+                        ]
+                    }
+                }
+            },
+            "hidden": false
+        },
+        {
+            "name": "Long function",
+            "file": "Long_function.js",
+            "description": "Detects methods with too many statemets or too many lines",
+            "args": {
+                "max_statements": {
                     "formal_name": "Maximum method statement count",
-					"min": 70,
-					"max": 120,
-                    "option": 
-                    {
+                    "min": 70,
+                    "max": 120,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [20, 200]
+                        "range": [
+                            20,
+                            200
+                        ]
                     }
-				},
-				"max_lines":
-				{
+                },
+                "max_lines": {
                     "formal_name": "Maximum Method line count",
-					"min": 40,
-					"max": 80,
-                    "option": 
-                    {
+                    "min": 40,
+                    "max": 80,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [5, 200]
+                        "range": [
+                            5,
+                            200
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Cyclomatic complexity",
-			"file": "Cyclo_complex.js",
-			"description": "Detects methods with excessive branches (if, switch, while, for, conintue, break, return)",
-			"args":
-			{
-				"max_loops": 
-				{
+        },
+        {
+            "name": "Cyclomatic complexity",
+            "file": "Cyclo_complex.js",
+            "description": "Detects methods with excessive branches (if, switch, while, for, conintue, break, return)",
+            "args": {
+                "max_loops": {
                     "formal_name": "Maximum method loops",
-					"min": 5,
-					"max": 10,
-                    "option": 
-                    {
+                    "min": 5,
+                    "max": 10,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [1, 30]
+                        "range": [
+                            1,
+                            30
+                        ]
                     }
-				},
-				"max_branches":
-				{
+                },
+                "max_branches": {
                     "formal_name": "Maximum method branching statements",
-					"min": 15,
-					"max" : 25,
-                    "option": 
-                    {
+                    "min": 15,
+                    "max": 25,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [1, 60]
+                        "range": [
+                            1,
+                            60
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Excessively long identifier",
-			"file": "Long_identifier.js",
-			"description": "Detects identifiers with too many characters",
-			"args":
-			{
-				"max_id_len":
-				{
+        },
+        {
+            "name": "Excessively long identifier",
+            "file": "Long_identifier.js",
+            "description": "Detects identifiers with too many characters",
+            "args": {
+                "max_id_len": {
                     "formal_name": "Maximum length of an identifier",
-					"min": 17,
-					"max": 25,
-                    "option": 
-                    {
+                    "min": 17,
+                    "max": 25,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [5, 100]
+                        "range": [
+                            5,
+                            100
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Excessively long line of code",
-			"file": "God_line.js",
-			"description": "Detects too long lines of un-commented code",
-			"args":
-			{
-				"max_line_len":
-				{
+        },
+        {
+            "name": "Excessively long line of code",
+            "file": "God_line.js",
+            "description": "Detects too long lines of un-commented code",
+            "args": {
+                "max_line_len": {
                     "formal_name": "Maximum length of a line",
-					"min": 90,
-					"max": 125,
-                    "option": 
-                    {
+                    "min": 90,
+                    "max": 125,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [40, 200]
+                        "range": [
+                            40,
+                            200
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Naming conventions",
-			"file": "Name_conventions.js",
-			"description": "Detects identifiers that do not follow naming conventions",
-            "args":
-			{
-                "dict1":
-                {
+        },
+        {
+            "name": "Naming conventions",
+            "file": "Name_conventions.js",
+            "description": "Detects identifiers that do not follow naming conventions",
+            "args": {
+                "dict1": {
                     "UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "snake_case": "([a-z]*_?[a-z]*)*",
                     "any": "(.*?)",
                     "custom0": "regex4"
                 },
-                "class_names":
-                {
+                "class_names": {
                     "formal_name": "Class names",
                     "val": "any",
-                    "option":
-                    {
+                    "option": {
                         "type": "dict_item",
-                        "dict": "dict1" 
+                        "dict": "dict1"
                     }
                 },
-				"method_names":
-                {
+                "method_names": {
                     "formal_name": "Method names",
                     "val": "any",
-                    "option":
-                    {
+                    "option": {
                         "type": "dict_item",
                         "dict": "dict1"
                     }
                 },
-				"var_names":
-                {
+                "var_names": {
                     "formal_name": "Variable names",
                     "val": "any",
-                    "option":
-                    {
+                    "option": {
                         "type": "dict_item",
                         "dict": "dict1"
                     }
                 },
-				"use_id_len_as_score": false,
-				"max_chars_ignored":
-				{
+                "use_id_len_as_score": false,
+                "max_chars_ignored": {
                     "formal_name": "Maximum characters ignored",
-					"min": 24,
-					"max": 34,
-                    "option":
-                    {
-                        "type": "min-max-slider" ,
-                        "range": [0, 60]                       
+                    "min": 24,
+                    "max": 34,
+                    "option": {
+                        "type": "min-max-slider",
+                        "range": [
+                            0,
+                            60
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Nested scopes",
-			"file": "Nested_scopes.js",
-			"description": "Detects methods that nest scopes too deep",
-			"args":
-			{
-				"max_nested_scopes":
-				{
+        },
+        {
+            "name": "Nested scopes",
+            "file": "Nested_scopes.js",
+            "description": "Detects methods that nest scopes too deep",
+            "args": {
+                "max_nested_scopes": {
                     "formal_name": "Maximum depth of nested blocks",
-					"min": 3,
-					"max": 6,
-                    "option": 
-                    {
+                    "min": 3,
+                    "max": 6,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [2, 12]
+                        "range": [
+                            2,
+                            12
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Circular dependency",
-			"file": "Dependency_circle.js",
-			"description": "Detects circlular dependency between structures",
-			"args":
-			{
-				"max_circle_len":
-				{
+        },
+        {
+            "name": "Circular dependency",
+            "file": "Dependency_circle.js",
+            "description": "Detects circlular dependency between structures",
+            "args": {
+                "max_circle_len": {
                     "formal_name": "Maximum circle length",
-					"min": 2,
-					"max": 5,
-                    "option": 
-                    {
+                    "min": 10,
+                    "max": 18,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [2, 20]
+                        "range": [
+                            2,
+                            20
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Large Class",
-			"file": "Large_class.js",
-			"description": "Detects structures with too many methods or fields",
-			"args":
-			{
-				"max_methods":
-				{
+        },
+        {
+            "name": "Large Class",
+            "file": "Large_class.js",
+            "description": "Detects structures with too many methods or fields",
+            "args": {
+                "max_methods": {
                     "formal_name": "Maximum count of methods",
-					"min": 15,
-					"max": 30,
-                    "option": 
-                    {
+                    "min": 45,
+                    "max": 60,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [5, 60]
+                        "range": [
+                            5,
+                            60
+                        ]
                     }
-				},
-				"max_fields":
-				{
+                },
+                "max_fields": {
                     "formal_name": "Maximum count of fields",
-					"min": 15,
-					"max": 30,
-                    "option": 
-                    {
+                    "min": 15,
+                    "max": 30,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [5, 40]
+                        "range": [
+                            5,
+                            40
+                        ]
                     }
-				},
-				"public_only": {
+                },
+                "public_only": {
                     "formal_name": "Public only",
                     "val": false,
-                    "option":
-                    {
+                    "option": {
                         "type": "boolean"
                     }
                 }
-			},
+            },
             "hidden": false
-		},
-		{
-			"name": "Large File",
-			"file": "Large_file.js",
-			"description": "Detects code files with too many lines",
-			"args":
-			{
-				"max_src_lines":
-				{
+        },
+        {
+            "name": "Large File",
+            "file": "Large_file.js",
+            "description": "Detects code files with too many lines",
+            "args": {
+                "max_src_lines": {
                     "formal_name": "Maximum source file lines",
-					"min": 1000,
-					"max": 1700,
-                    "option": 
-                    {
+                    "min": 1000,
+                    "max": 1700,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [200, 1200]
+                        "range": [
+                            200,
+                            1200
+                        ]
                     }
-				},
-				"max_header_lines":
-				{
+                },
+                "max_header_lines": {
                     "formal_name": "Maximum header file lines",
-					"min": 400,
-					"max": 800,
-                    "option": 
-                    {
+                    "min": 400,
+                    "max": 800,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [100, 800]
+                        "range": [
+                            100,
+                            800
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
-		{
-			"name": "Inappropriate Intimacy",
-			"file": "Inappropriate_intimacy.js",
-			"description": "@argument max_member_expr: Max count of member expr from one class to any other class.",
-			"args":
-			{
-				"max_member_expr":
-				{
+        },
+        {
+            "name": "Inappropriate Intimacy",
+            "file": "Inappropriate_intimacy.js",
+            "description": "@argument max_member_expr: Max count of member expr from one class to any other class.",
+            "args": {
+                "max_member_expr": {
                     "formal_name": "Maximum member expressions",
-					"min": 25,
-					"max": 50,
-                    "option": 
-                    {
+                    "min": 25,
+                    "max": 50,
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [20, 200]
+                        "range": [
+                            20,
+                            200
+                        ]
                     }
-				}
-			},
+                }
+            },
             "hidden": false
-		},
+        },
         {
             "name": "Non virtual base destructor",
             "file": "Virtual_destructor.js",
             "description": "Flags destructors of base classes that are not virtual.",
-            "args":{}
+            "args": {}
         },
         {
             "name": "Redundant protected access",
             "file": "Redundant_protected.js",
             "description": "Detects protected member functions or variables declared in classes that are not inherited from.",
-            "args":
-            {
-                "max_unneeded_protected":
-                {
+            "args": {
+                "max_unneeded_protected": {
                     "formal_name": "Maximum unnecessary protected",
                     "min": 1,
                     "max": 5,
-                    "option": 
-                    {
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [1, 20]
+                        "range": [
+                            1,
+                            20
+                        ]
                     }
                 }
             },
@@ -383,17 +378,17 @@
             "name": "Excessive function overloading",
             "file": "Function_overload.js",
             "description": "Detects functions that are overloaded too many times.",
-            "args":
-            {
-                "max_overload":
-                {
+            "args": {
+                "max_overload": {
                     "formal_name": "Maximum overloads of a function",
                     "min": 3,
                     "max": 6,
-                    "option": 
-                    {
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [2, 20]
+                        "range": [
+                            2,
+                            20
+                        ]
                     }
                 }
             },
@@ -403,21 +398,21 @@
             "name": "Many dependencies",
             "file": "Dependency_count.js",
             "description": "Detects structures that directly depend upon too many other structures. Indirect dependencies are not counted.",
-            "args":
-            {
-                "max_direct_dependencies":
-                {
+            "args": {
+                "max_direct_dependencies": {
                     "formal_name": "Maximum direct dependencies",
                     "min": 15,
                     "max": 25,
-                    "option": 
-                    {
+                    "option": {
                         "type": "min-max-slider",
-                        "range": [4, 40]
+                        "range": [
+                            4,
+                            40
+                        ]
                     }
                 }
             },
             "hidden": false
         }
-	]
+    ]
 }

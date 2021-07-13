@@ -19,8 +19,13 @@ module.exports = {
             const dep = dependencies_map[dep_str];
             smell_level = Util.get_smell_lvl(args.max_direct_dependencies.min, args.max_direct_dependencies.max, dep.length);
             if(smell_level > 0){
+                let dep_names = "";
+                for(let i=0; i<dep.length - 1; i++)
+                    dep_names += dep[i] + ", ";
+                dep_names += dep[dep.length - 1] + "\n";
+
                 const structure = ST.structures[dep_str];
-                msg = `Structure: "${dep_str}" directly depends upon ${dep.length} other classes. These are: ${dep}`;
+                msg = `Structure: "${dep_str}" directly depends upon ${dep.length} other classes. These are: ${dep_names}`;
                 src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, dep_str);
                 report.push(Util.get_incident_obj(src, msg, smell_level));
             }

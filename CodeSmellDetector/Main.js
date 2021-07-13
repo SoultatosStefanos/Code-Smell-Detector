@@ -70,7 +70,8 @@ async function init_frontend(){
             }
         }
         smell_renderer.render(smells_list);
-        Util.save_smell_reports(smells_list);
+        await Util.save_smell_reports(smells_list);
+        save_smell_config();
     };
 
     document.getElementById("b_code_smell_config").onclick = async () => {
@@ -186,22 +187,29 @@ function print_stats(smells){
     }
 }
 
-
-async function main(){
-    
-    let ST = require(st_path); // loads json ST.
-    let smells_config = require(smells_cfg_path);
-
-    let smells = get_smell_detectors(smells_config);
-    await run_smell_detectors(smells, ST);
-    //print_reports(smells);
-    print_stats(smells);
-
-
-
-
-
+function save_smell_config(){ 
+    let json = JSON.stringify(smells_config, null, 4);
+    fs.writeFile(smells_cfg_path, json, "utf8", (error) => {
+        if(error) throw error;
+    });
 }
+
+
+// async function main(){
+    
+//     let ST = require(st_path); // loads json ST.
+//     let smells_config = require(smells_cfg_path);
+
+//     let smells = get_smell_detectors(smells_config);
+//     await run_smell_detectors(smells, ST);
+//     //print_reports(smells);
+//     print_stats(smells);
+
+
+
+
+
+// }
 
 //main(); 
 initialize();
