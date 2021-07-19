@@ -9,7 +9,7 @@
                 "max_argc": {
                     "formal_name": "Maximum method arguments",
                     "min": 5,
-                    "max": 8,
+                    "max": 9,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -49,7 +49,7 @@
                 "max_locals": {
                     "formal_name": "Maximum method locals",
                     "min": 8,
-                    "max": 16,
+                    "max": 17,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -68,8 +68,8 @@
             "args": {
                 "max_statements": {
                     "formal_name": "Maximum method statement count",
-                    "min": 70,
-                    "max": 120,
+                    "min": 50,
+                    "max": 105,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -80,8 +80,8 @@
                 },
                 "max_lines": {
                     "formal_name": "Maximum Method line count",
-                    "min": 40,
-                    "max": 80,
+                    "min": 45,
+                    "max": 120,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -100,8 +100,8 @@
             "args": {
                 "max_loops": {
                     "formal_name": "Maximum method loops",
-                    "min": 5,
-                    "max": 10,
+                    "min": 7,
+                    "max": 15,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -132,8 +132,8 @@
             "args": {
                 "max_id_len": {
                     "formal_name": "Maximum length of an identifier",
-                    "min": 17,
-                    "max": 25,
+                    "min": 14,
+                    "max": 40,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -152,8 +152,8 @@
             "args": {
                 "max_line_len": {
                     "formal_name": "Maximum length of a line",
-                    "min": 90,
-                    "max": 125,
+                    "min": 115,
+                    "max": 160,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -244,12 +244,12 @@
             "args": {
                 "max_circle_len": {
                     "formal_name": "Maximum circle length",
-                    "min": 10,
-                    "max": 18,
+                    "min": 2,
+                    "max": 5,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
-                            2,
+                            1,
                             20
                         ]
                     }
@@ -303,8 +303,8 @@
             "args": {
                 "max_src_lines": {
                     "formal_name": "Maximum source file lines",
-                    "min": 1000,
-                    "max": 1700,
+                    "min": 602,
+                    "max": 1200,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -315,8 +315,8 @@
                 },
                 "max_header_lines": {
                     "formal_name": "Maximum header file lines",
-                    "min": 400,
-                    "max": 800,
+                    "min": 352,
+                    "max": 554,
                     "option": {
                         "type": "min-max-slider",
                         "range": [

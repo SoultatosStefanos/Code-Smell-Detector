@@ -15,12 +15,22 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script src="../src/loader.js"></script>
+    <script>
+        // Load the Visualization API and the corechart package.
+        google.charts.load('current', {'packages':['corechart']});
+        var google_charts_loaded = false;
+        google.charts.setOnLoadCallback(function (){ 
+            google_charts_loaded = true;
+        });
+    </script>
     
     <!-- Insert this after script imports -->
     <script>
     if (window.module) 
         module = window.module;
     </script>
+    
     
     <link rel="stylesheet" href="jquery-ui.css">
     <link rel="stylesheet" href="index.css">
@@ -38,8 +48,10 @@
 
 
     <h1>Code Smell Detector </h1>
-    <button id="b_compute_code_smells" class="main_button">Compute Code Smells</button>
-    <button id="b_code_smell_config" class="main_button">Code Smell Config</button>
+    <button id="b_compute_code_smells">Compute Smells</button>
+    <button id="b_code_smell_list" class="main_button">Display List</button>
+    <button id="b_code_smell_config" class="main_button">Configuration</button>
+    <button id="b_code_smell_stats" class="main_button">Statistics</button>
     <div id="main_container">
         <div id="smells_display">
             <div id="smells_display_header">
@@ -68,13 +80,48 @@
             </div>
         </div>
         <div id="smells_config">
-            smells configuration here
+            
+        </div>
+        <div id="smells_stats">
+            Show
+            <button id="b_stats_overall">Overview</button>
+            <button id="b_stats_structures">By Structure</button>
+            <button id="b_stats_files">By File</button>
+            <br><br>
+            <div id="stats_overview">
+                <table>
+                    <tr>
+                        <td>Smell Count</td>
+                        <td id="stats_overview_sc">1000</td>
+                    </tr>
+                    <tr>
+                        <td>Total Intensity</td>
+                        <td id="stats_overview_ti">1000</td>
+                    </tr>
+                    <tr>
+                        <td>Average Intensity</td>
+                        <td id="stats_overview_ai">9</td>
+                    </tr>
+                    <tr>
+                        <td>Files with Smells</td>
+                        <td id="stats_overview_fws">50</td>
+                    </tr>
+                    <tr>
+                        <td>Structures with Smells</td>
+                        <td id="stats_overview_sws">50</td>
+                    </tr>
+                </table>
+            </div>
+            <div id="stats_by_class">
+
+            </div>
+            <div id="stats_by_file">
+
+            </div>
         </div>
         
     </div>
-    <div id="smell_detectors_container">
-            
-    </div>
+    
     
   </body>
 </html>

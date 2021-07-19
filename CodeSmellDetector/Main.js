@@ -3,12 +3,14 @@ const path = require("path");
 const Util = require("D:/Thesis/CodeSmellDetector/Utility");
 const SmellRenderer = require("D:/Thesis/CodeSmellDetector/Smell_renderer.js");
 const DetectorRenderer = require("D:/Thesis/CodeSmellDetector/Detector_renderer.js");
+const StatsRenderer = require("D:/Thesis/CodeSmellDetector/Stats_renderer.js");
+
 //const st_path = "D:/Thesis/ST.json";
 //let st_last_edit = null;
 const smells_cfg_path = "D:/Thesis/CodeSmellDetector/SmellsConfig.json";
 
 
-let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = null, smell_renderer;
+let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = null, smell_renderer, stat_renderer;
 
 
 
@@ -52,11 +54,15 @@ async function init_backend(){
 
 async function init_frontend(){
     let smell_display_div = document.getElementById("smell_table");
-    smell_renderer = new SmellRenderer(smell_table, SmellRenderer.EnumPreferences.sort_by.Intensity, SmellRenderer.EnumPreferences.order.decreasing);
-
+    smell_renderer = new SmellRenderer(smell_display_div, SmellRenderer.EnumPreferences.sort_by.Intensity, SmellRenderer.EnumPreferences.order.decreasing);
+    
+    // next args are div ids directly from index.html
+    stat_renderer = new StatsRenderer(stats_overview, stats_by_class, stats_by_file);
+    
 
     if(smells_list !== null){
         smell_renderer.render(smells_list);
+        stat_renderer.compute_stats(smells_list);
     }
 
 
@@ -70,24 +76,55 @@ async function init_frontend(){
             }
         }
         smell_renderer.render(smells_list);
+        stat_renderer.compute_stats(smells_list);
         await Util.save_smell_reports(smells_list);
         save_smell_config();
     };
+    document.getElementById("b_code_smell_list").style.border = "3px solid black";
 
-    document.getElementById("b_code_smell_config").onclick = async () => {
-        if(document.getElementById("smells_display").style.display !== "none"){
-            document.getElementById("b_code_smell_config").innerHTML = "Smells Display";
-            document.getElementById("smells_display").style.display = "none";
-            document.getElementById("smells_config").style.display = "block";
+    document.getElementById("b_code_smell_list").onclick = () => {
+        document.getElementById("smells_display").style.display = "block";
+        document.getElementById("smells_config").style.display = "none";
+        document.getElementById("smells_stats").style.display = "none";
+        let main_buttons = document.getElementsByClassName("main_button");
+        for(let i=0; i<main_buttons.length; i++){
+            main_buttons[i].style.border = "initial";
         }
-        else {
-            document.getElementById("b_code_smell_config").innerHTML = "Code Smell Config";
-            document.getElementById("smells_display").style.display = "block";
-            document.getElementById("smells_config").style.display = "none";
-        }
-        
+        document.getElementById("b_code_smell_list").style.border = "3px solid black";
+    }
 
+    document.getElementById("b_code_smell_config").onclick = () => {
+        document.getElementById("smells_display").style.display = "none";
+        document.getElementById("smells_config").style.display = "block";
+        document.getElementById("smells_stats").style.display = "none";
+        let main_buttons = document.getElementsByClassName("main_button");
+        for(let i=0; i<main_buttons.length; i++){
+            main_buttons[i].style.border = "initial";
+        }
+        document.getElementById("b_code_smell_config").style.border = "3px solid black";
+
+        // if(document.getElementById("smells_display").style.display !== "none"){
+        //     document.getElementById("b_code_smell_config").innerHTML = "Smells Display";
+        //     document.getElementById("smells_display").style.display = "none";
+        //     document.getElementById("smells_config").style.display = "block";
+        // }
+        // else {
+        //     document.getElementById("b_code_smell_config").innerHTML = "Code Smell Config";
+        //     document.getElementById("smells_display").style.display = "block";
+        //     document.getElementById("smells_config").style.display = "none";
+        // }
     };
+
+    document.getElementById("b_code_smell_stats").onclick = () => {
+        document.getElementById("smells_display").style.display = "none";
+        document.getElementById("smells_config").style.display = "none";
+        document.getElementById("smells_stats").style.display = "block";
+        let main_buttons = document.getElementsByClassName("main_button");
+        for(let i=0; i<main_buttons.length; i++){
+            main_buttons[i].style.border = "#769292";
+        }
+        document.getElementById("b_code_smell_stats").style.border = "3px solid black";
+    }
 
     document.getElementById("b_sort_by_intensity").onclick = async () => {
         smell_renderer.set_sort_by_pref(SmellRenderer.EnumPreferences.sort_by.Intensity);
@@ -125,6 +162,20 @@ async function init_frontend(){
     };
 
     
+    document.getElementById("b_stats_overall").onclick = () => {
+        stat_renderer.hide_all();
+        document.getElementById("stats_overview").style.display = "block";
+    }
+
+    document.getElementById("b_stats_structures").onclick = () => {
+        stat_renderer.hide_all();
+        document.getElementById("stats_by_class").style.display = "block";
+    }
+
+    document.getElementById("b_stats_files").onclick = () => {
+        stat_renderer.hide_all();
+        document.getElementById("stats_by_file").style.display = "block";
+    }
 
 
     let detector_renderer = new DetectorRenderer(document.getElementById("smells_config"));

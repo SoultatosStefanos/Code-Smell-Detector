@@ -6,8 +6,26 @@ body {
   padding: 20px;
 }
 
+button:focus { outline: none; }
+
+#b_compute_code_smells{
+    background-color: #3fbd49;
+    border-width: 0;
+    color: white;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+#b_compute_code_smells:hover {
+    background-color: #2c8533;
+}
+
+#b_compute_code_smells:active {
+    background-color: rgb(0, 0, 0);
+}
+
 .main_button{
-    background-color: rgb(118, 146, 146);
+    background-color: #769292;
     border-width: 0;
     color: white;
     padding: 8px;
@@ -21,6 +39,8 @@ body {
 .main_button:active{
     background-color: rgb(0, 0, 0);
 }
+
+
 
 #main_container{
     margin-top: 40px;
@@ -104,7 +124,7 @@ td, th{
     left:0;
     max-width:600px;
     width: auto;
-    min-height: 25px;
+    min-height: 49px;
     height: auto;
     background-color:#c0c0c0;
     border:1px solid #000000; 
@@ -270,4 +290,25 @@ li {
     min-height: 100px;
     border: 2px solid rgb(114, 114, 114);
     border-radius: 4px;
+}
+
+.icon_link {
+    position:absolute;
+    top: 2px;
+    left: 2px;
+    background: url('../icons/link.png');
+    display: block;
+    height: 24px;
+    width: 24px;
+    /* Other styles here */
+}
+
+.icon_link:hover {
+    transform: scale(1.15);
+}
+
+.path_txt {
+    display: block;
+    margin-top: 0px;
+    margin-left: 26px;
 }

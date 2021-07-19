@@ -1,5 +1,7 @@
 const assert = require('assert');
+const { exec } = require('child_process');
 const Util = require("D:/Thesis/CodeSmellDetector/Utility");
+const text_editor_call = "code -g";
 
 module.exports = class SmellRenderer{
     static EnumPreferences = {
@@ -232,6 +234,34 @@ module.exports = class SmellRenderer{
 
     }
 
+
+    static open_in_text_editor(){
+        let sibling_divs = this.parentElement.childNodes;
+        Array.from(sibling_divs).forEach(function(element) {
+            if(element.classList.contains("path_txt")){
+                let path_to_open = element.innerHTML;
+                exec(text_editor_call + " " + path_to_open, (err, stdout, stderr) => {
+                    if (err) {
+                        alert("Could not open in text editor");
+                        return;
+                    }
+                });
+                return;
+            }
+        });
+        // console.log(this.parentElement.childNodes);
+        // return;
+        
+    }
+
+    set_text_editor_on_path_click(){
+        let path_elements = document.getElementsByClassName("icon_link");
+
+        Array.from(path_elements).forEach(function(element) {
+            element.addEventListener('click', SmellRenderer.open_in_text_editor);
+        });
+    }
+
     render(smells){
         
         smells.sort(this.get_smell_sort_func());
@@ -245,7 +275,7 @@ module.exports = class SmellRenderer{
         for(const smell of smells){
             let green = 255 - 25.5 * smell.lvl;
             html_str += `<tr style='background-color:rgba(255, ${green}, 0, 0.6)'><td>${smell.detector}</td>` +
-            `<td>${smell.lvl}</td><td><div class='l'>${smell.src.file}:${smell.src.line}:${smell.src.col}</div></td>` +
+            `<td>${smell.lvl}</td><td><div class='l'><i class='icon_link'></i><div class='path_txt'>${smell.src.file}:${smell.src.line}:${smell.src.col}</div></div></td>` +
             `<td>${smell.src.struct != null ? smell.src.struct : ""}</td><td><div class='l'>${smell.msg}</div></td><td>`;
             if(smell.note === undefined){
                 html_str += `<i id='note_holder${smell_num}' class='icon_add_note' onclick='SmellRenderer.edit_note(${smell_num})'></i></td></tr>`;
@@ -258,6 +288,6 @@ module.exports = class SmellRenderer{
         }
         this.html_smell_table.innerHTML = html_str;
         SmellRenderer.smells_ref = smells;
-
+        this.set_text_editor_on_path_click();
     }
 };
