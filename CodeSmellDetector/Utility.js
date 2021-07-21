@@ -120,5 +120,9 @@ module.exports = {
         fs.writeFile(module.exports.smell_reports_save, json, "utf8", (error) => {
             if(error) throw error;
         });
+    },
+
+    get_file_name_from_path: (path) => {
+        return path.replace(/^.*[\\\/]/, '');
     }
 }

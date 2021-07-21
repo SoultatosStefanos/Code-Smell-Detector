@@ -177,11 +177,13 @@ module.exports = class SmellRenderer{
             case SmellRenderer.EnumPreferences.sort_by.Note: {
                 return (smell1, smell2) => {
                     if(smell1.note !== undefined){
-                        if(smell2.note === undefined) return -this.order;
+                        if(smell2.note === undefined) 
+                            return -this.order;
                         return this.order;
                     }
                     else {
-                        if(smell2.note === undefined) return this.order;
+                        if(smell2.note === undefined) 
+                            return this.order;
                         return -this.order;
                     }
                 }

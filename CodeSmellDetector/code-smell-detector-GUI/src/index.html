@@ -15,6 +15,15 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    
+   
+    <!-- <script src="../../Stats_renderer.js"></script> -->
+    <!-- Insert this after script imports -->
+    <script>
+    if (window.module) 
+        module = window.module;
+    </script>
+    
     <script src="../src/loader.js"></script>
     <script>
         // Load the Visualization API and the corechart package.
@@ -24,28 +33,12 @@
             google_charts_loaded = true;
         });
     </script>
-    
-    <!-- Insert this after script imports -->
-    <script>
-    if (window.module) 
-        module = window.module;
-    </script>
-    
-    
     <link rel="stylesheet" href="jquery-ui.css">
     <link rel="stylesheet" href="index.css">
     <script defer src="../../Main.js"></script>
     
   </head>
   <body>
-
-
-    <!-- <div id='overlay'></div>
-    <div id='modal'>
-        <div id='content'>No JavaScript Yet!</div>
-        <a href='#' id='close'>close</a>
-    </div> -->
-
 
     <h1>Code Smell Detector </h1>
     <button id="b_compute_code_smells">Compute Smells</button>
@@ -84,9 +77,9 @@
         </div>
         <div id="smells_stats">
             Show
-            <button id="b_stats_overall">Overview</button>
-            <button id="b_stats_structures">By Structure</button>
-            <button id="b_stats_files">By File</button>
+            <button id="b_stats_overall" class="b_stats_tab">Overview</button>
+            <button id="b_stats_structures" class="b_stats_tab">By Structure</button>
+            <button id="b_stats_files" class="b_stats_tab">By File</button>
             <br><br>
             <div id="stats_overview">
                 <table>
@@ -103,6 +96,10 @@
                         <td id="stats_overview_ai">9</td>
                     </tr>
                     <tr>
+                        <td>Maximum Intensity</td>
+                        <td id="stats_overview_mi">9</td>
+                    </tr>
+                    <tr>
                         <td>Files with Smells</td>
                         <td id="stats_overview_fws">50</td>
                     </tr>
@@ -110,13 +107,19 @@
                         <td>Structures with Smells</td>
                         <td id="stats_overview_sws">50</td>
                     </tr>
+                    <tr>
+                        <td>Methods with Smells</td>
+                        <td id="stats_overview_mws">50</td>
+                    </tr>
                 </table>
             </div>
             <div id="stats_by_class">
-
+                <!-- <div id="by_class_graph" style="background-color: green; display: block;"></div>
+                <div id="by_class_table"></div> -->
             </div>
             <div id="stats_by_file">
-
+                <!-- <div id="by_file_graph"></div>
+                <div id="by_file_table"></div>                 -->
             </div>
         </div>
         

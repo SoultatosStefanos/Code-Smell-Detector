@@ -312,3 +312,61 @@ li {
     margin-top: 0px;
     margin-left: 26px;
 }
+
+#smells_stats{
+    display: none;
+}
+
+.b_stats_tab{
+    background-color: #4e9292;
+    border-width: 0;
+    color: white;
+    padding: 5px;
+    border-radius: 6px;
+}
+
+.b_stats_tab:hover{
+    background-color: #2c5252;
+}
+
+.b_stats_tab:active{
+    background-color: #000000;
+}
+
+#yes {
+    position: absolute;
+    width: 50px;
+    height: 35px;
+    display: block;
+    bottom: -7px;
+    right: 90px;
+    border-radius: 6px;
+    background-color: rgb(123, 218, 123);
+}
+
+#yes:hover {
+    background-color: rgb(51, 153, 51);
+}
+
+#no {
+    position: absolute;
+    width: 50px;
+    height: 35px;
+    display: block;
+    bottom: -7px;
+    right: 20px;
+    border-radius: 6px;
+    background-color: rgb(212, 95, 95);
+}
+
+#no:hover {
+    background-color: rgb(185, 35, 35);
+}
+
+/* #stats_by_class{
+    align-content: center;
+}
+
+#stats_by_file{
+    align-content: center;
+} */
