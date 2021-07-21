@@ -21,11 +21,14 @@ module.exports = class SmellRenderer{
     static smells_ref;
     static modal;
 
-    constructor(html_smell_table, sort_by, order){
+    constructor(html_smell_table, smell_detectors, sort_by, order){
         this.html_smell_table = html_smell_table;
+        this.smell_detectors = smell_detectors;
+        this.shown_detectors = [];
         this.sort_by = sort_by;
         this.order = order;
 
+        this.init_show_only();
 
         SmellRenderer.modal = (function(){
             var method = {}, $overlay, $modal, $content, $close, $save, $delete, smell_ref, smell_num;
@@ -138,6 +141,38 @@ module.exports = class SmellRenderer{
 
             return method;
         }());
+    }
+
+    shown_detectors_edit(re_render_smells = true){
+        this.shown_detectors = [];
+        let detectors_checkboxes = document.getElementsByClassName("shown_detectors");
+        for(let i=0; i<detectors_checkboxes.length; i++){
+            if(detectors_checkboxes[i].checked === true){
+                let parent_div = detectors_checkboxes[i].parentElement;
+                this.shown_detectors.push(parent_div.textContent);
+            }
+        }
+        if(re_render_smells)
+            this.render(SmellRenderer.smells_ref);
+        //console.log(this.shown_detectors);
+    }
+
+    init_show_only(){
+        let innerHTML_text = "";
+        for(const detector of this.smell_detectors){
+            if(detector.hidden === true)
+                innerHTML_text += `<div class="dropdown_b"><input type="checkbox" class="shown_detectors"/>${detector.name}</div>`;
+            else
+                innerHTML_text += `<div class="dropdown_b"><input type="checkbox" class="shown_detectors" checked/>${detector.name}</div>`;
+        }
+        document.getElementById("show_only_dropdown_content").innerHTML = innerHTML_text;
+        let detectors_checkboxes = document.getElementsByClassName("shown_detectors");
+        for(let i=0; i<detectors_checkboxes.length; i++){
+            detectors_checkboxes[i].onclick = () => {
+                this.shown_detectors_edit();
+            };
+        }
+        this.shown_detectors_edit(false);
     }
 
     set_sort_by_pref(sort_by){
@@ -273,8 +308,11 @@ module.exports = class SmellRenderer{
         //this.hmtl_smell_table.innerHTML = "";
         // let html_str = "<tr><th>Detector</th>" +
         // "<th>Intensity</th><th>Location</th><th>Structure</th><th>Message</th></tr>";
-        let smell_num = 0;
+        let smell_num = -1;
         for(const smell of smells){
+            smell_num++;
+            if(!this.shown_detectors.includes(smell.detector)) continue;
+
             let green = 255 - 25.5 * smell.lvl;
             html_str += `<tr style='background-color:rgba(255, ${green}, 0, 0.6)'><td>${smell.detector}</td>` +
             `<td>${smell.lvl}</td><td><div class='l'><i class='icon_link'></i><div class='path_txt'>${smell.src.file}:${smell.src.line}:${smell.src.col}</div></div></td>` +
@@ -285,8 +323,6 @@ module.exports = class SmellRenderer{
             else {
                 html_str += `<i id='note_holder${smell_num}' class='icon_edit_note' onclick='SmellRenderer.edit_note(${smell_num})'></i></td></tr>`;
             }
-
-            smell_num++;
         }
         this.html_smell_table.innerHTML = html_str;
         SmellRenderer.smells_ref = smells;

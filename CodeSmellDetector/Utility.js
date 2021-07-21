@@ -124,5 +124,25 @@ module.exports = {
 
     get_file_name_from_path: (path) => {
         return path.replace(/^.*[\\\/]/, '');
+    },
+
+    get_countof_files: (ST) => {
+        return ST.headers.length + ST.sources.length;
+    },
+
+    get_countof_structures: (ST) => {
+        if(ST.structures === null) return 0;
+        return Object.keys(ST.structures).length;
+    },
+
+    get_countof_methods: (ST) => {
+        if(ST.structures === null) return 0;
+        let countof_methods = 0;
+        for(const structure_id in ST.structures){
+            let structure = ST.structures[structure_id];
+            if(structure.methods !== null)
+                countof_methods += Object.keys(structure.methods).length;
+        }
+        return countof_methods;
     }
 }

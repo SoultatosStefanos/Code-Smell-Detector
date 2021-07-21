@@ -26,7 +26,7 @@ module.exports = class StatsRenderer{
         this.by_file_div.innerHTML = "";
     }
 
-    async compute_stats(smells){
+    async compute_stats(smells, ST){
         this.clear_all();
     
         let total_intensity = 0;
@@ -35,6 +35,7 @@ module.exports = class StatsRenderer{
         let structures_with_smells = new Object();
         let files_with_smells = new Object();
         let methods_with_smells = new Object();
+        let smell_count_per_detector = new Object();
 
 
         for(const smell of smells){
@@ -68,25 +69,70 @@ module.exports = class StatsRenderer{
                 else
                     methods_with_smells[smell.src.method].smell_lvls.push(smell.lvl);
             }
-        }
-        avg_intensity = total_intensity / smells.length;
 
-        avg_intensity = Math.round(avg_intensity*100) / 100;
+            if(smell_count_per_detector[smell.detector] === undefined)
+                smell_count_per_detector[smell.detector] = 1;
+            else
+                smell_count_per_detector[smell.detector]++;
+
+        }
+
+        if(smells.length !== 0){
+            avg_intensity = total_intensity / smells.length;
+            avg_intensity = Math.round(avg_intensity*100) / 100;
+        }
+        else
+            avg_intensity = "-------";
+        
         total_intensity = Math.round(total_intensity*100) / 100;
 
+        let most_smells_of_a_type = 0, detector_with_most_smells;
+        for (const [key, value] of Object.entries(smell_count_per_detector)){
+            if(value > most_smells_of_a_type){
+                most_smells_of_a_type = value;
+                detector_with_most_smells = key;
+            }
+        }
+
+        let countof_files_with_smells = Object.keys(files_with_smells).length;
+        let countof_structures_with_smells = Object.keys(structures_with_smells).length;
+        let countof_methods_with_smells = Object.keys(methods_with_smells).length;
+
+        let countof_files = Util.get_countof_files(ST);
+        let countof_structures = Util.get_countof_structures(ST);
+        let countof_methods = Util.get_countof_methods(ST);
+
+        let perc_of_smelly_files = "-------", perc_of_smelly_structures = "-------", perc_of_smelly_methods = "-------";
+        if(countof_files !== 0)
+            perc_of_smelly_files = `${Math.round(10000 * countof_files_with_smells / countof_files)/100} %`;
+        if(countof_structures !== 0)
+            perc_of_smelly_structures = `${Math.round(10000 * countof_structures_with_smells / countof_structures)/100} %`;
+        if(countof_methods !== 0)
+            perc_of_smelly_methods = `${Math.round(10000 * countof_methods_with_smells / countof_methods)/100} %`;
 
         document.getElementById("stats_overview_sc").innerHTML = smells.length;
         document.getElementById("stats_overview_ti").innerHTML = total_intensity;
         document.getElementById("stats_overview_ai").innerHTML = avg_intensity;
         document.getElementById("stats_overview_mi").innerHTML = max_intensity;
-        document.getElementById("stats_overview_fws").innerHTML = Object.keys(files_with_smells).length;
-        document.getElementById("stats_overview_sws").innerHTML = Object.keys(structures_with_smells).length;
-        document.getElementById("stats_overview_mws").innerHTML = Object.keys(methods_with_smells).length;
+        document.getElementById("stats_overview_fws").innerHTML = countof_files_with_smells;
+        document.getElementById("stats_overview_pofws").innerHTML = perc_of_smelly_files;
+        document.getElementById("stats_overview_sws").innerHTML = countof_structures_with_smells;
+        document.getElementById("stats_overview_posws").innerHTML = perc_of_smelly_structures;
+        document.getElementById("stats_overview_mws").innerHTML = countof_methods_with_smells;
+        document.getElementById("stats_overview_pomws").innerHTML = perc_of_smelly_methods;
+        
+        
+        if(most_smells_of_a_type !== 0)
+            document.getElementById("stats_overview_mcs").innerHTML = `${detector_with_most_smells} (${most_smells_of_a_type})`;
+        else
+            document.getElementById("stats_overview_mcs").innerHTML = "-------";
+
+
+
         
         
         this.compute_by_structure(structures_with_smells);
         this.compute_by_file(files_with_smells);
-
     }
 
 
@@ -200,7 +246,7 @@ module.exports = class StatsRenderer{
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_structure(structures_with_smells); }, 1600);
+            setTimeout(function() { self.compute_by_structure(structures_with_smells); }, 900);
         }
     }
 
@@ -312,7 +358,7 @@ module.exports = class StatsRenderer{
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_file(files_with_smells); }, 1300);
+            setTimeout(function() { self.compute_by_file(files_with_smells); }, 700);
         }
     }
 

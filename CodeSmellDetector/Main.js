@@ -56,7 +56,7 @@ async function init_backend(){
 
 async function init_frontend(){
     let smell_display_div = document.getElementById("smell_table");
-    smell_renderer = new SmellRenderer(smell_display_div, SmellRenderer.EnumPreferences.sort_by.Intensity, SmellRenderer.EnumPreferences.order.decreasing);
+    smell_renderer = new SmellRenderer(smell_display_div, smell_detectors, SmellRenderer.EnumPreferences.sort_by.Intensity, SmellRenderer.EnumPreferences.order.decreasing);
     
     // next args are div ids directly from index.html
     stat_renderer = new StatsRenderer();
@@ -64,7 +64,7 @@ async function init_frontend(){
 
     if(smells_list !== null){
         smell_renderer.render(smells_list);
-        stat_renderer.compute_stats(smells_list);
+        stat_renderer.compute_stats(smells_list, ST);
     }
 
 
@@ -301,33 +301,40 @@ async function compute_smells(){
         }
     }
     smell_renderer.render(smells_list);
-    stat_renderer.compute_stats(smells_list);
+    stat_renderer.compute_stats(smells_list, ST);
     await Util.save_smell_reports(smells_list);
     save_smell_config();
 }
 
 
 
-
+// function get_smell_detectors_names(_smell_detectors){
+//     let smell_detectors_names = [];
+//     for(let smell_detector of _smell_detectors){
+//         smell_detectors_names.push(smell_detector.name);
+//     }
+//     return smell_detectors_names;
+// }
 
 
 // dir: relative path to dir where smells.js are found
 function get_smell_detectors(smells_config){
-    let smells = [];
-    for(let smell of smells_config.smells){
+    let _smell_detectors = [];
+    for(let smell_detector of smells_config.smells){
         try {
-            var smell_path = path.join(smells_config.folder, smell.file);
-            var new_smell = require(smell_path);
+            var smell_path = path.join(smells_config.folder, smell_detector.file);
+            var new_smell_detector = require(smell_path);
         } catch (error) {
-            console.log(`Could not load smell "${smell.name}" from "${smell_path}". Skipped.`);
+            console.log(`Could not load smell detector "${smell_detector.name}" from "${smell_path}". Skipped.`);
             continue;
         }
-        new_smell.name = smell.name;
-        new_smell.args = smell.args;
-        smells.push(new_smell);
-        console.log(`Loaded smell "${smell.name}" from "${smell_path}".`);
+        new_smell_detector.name = smell_detector.name;
+        new_smell_detector.args = smell_detector.args;
+        new_smell_detector.hidden = smell_detector.hidden;
+        _smell_detectors.push(new_smell_detector);
+        console.log(`Loaded smell "${smell_detector.name}" from "${smell_path}".`);
     }
-    return smells;
+    return _smell_detectors;
 }
 
 async function run_smell_detectors(smell_detectors, ST){
