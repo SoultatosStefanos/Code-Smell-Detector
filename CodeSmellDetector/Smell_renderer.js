@@ -178,8 +178,8 @@ module.exports = class SmellRenderer{
                 return (smell1, smell2) => {
                     if(smell1.note !== undefined){
                         if(smell2.note === undefined) 
-                            return -this.order;
-                        return this.order;
+                            return this.order;
+                        return -this.order;
                     }
                     else {
                         if(smell2.note === undefined) 
