@@ -200,7 +200,7 @@ module.exports = class StatsRenderer{
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_structure(structures_with_smells); }, 800);
+            setTimeout(function() { self.compute_by_structure(structures_with_smells); }, 1600);
         }
     }
 
@@ -311,9 +311,8 @@ module.exports = class StatsRenderer{
             }
         }
         else {
-
             var self = this;
-            setTimeout(function() { self.compute_by_file(files_with_smells); }, 1000);
+            setTimeout(function() { self.compute_by_file(files_with_smells); }, 1300);
         }
     }
 

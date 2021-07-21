@@ -73,6 +73,9 @@ async function init_frontend(){
         try_compute_smells();
     };
     document.getElementById("b_code_smell_list").style.border = "3px solid black";
+    document.getElementById("smells_display").style.display = "block";
+    document.getElementById("smells_config").style.display = "none";
+    document.getElementById("smells_stats").style.display = "none";
 
     document.getElementById("b_code_smell_list").onclick = () => {
         document.getElementById("smells_display").style.display = "block";
