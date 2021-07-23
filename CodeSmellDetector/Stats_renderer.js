@@ -32,6 +32,7 @@ module.exports = class StatsRenderer{
         let total_intensity = 0;
         let avg_intensity;
         let max_intensity = 0;
+        //let smells_with_notes = 0;
         let structures_with_smells = new Object();
         let files_with_smells = new Object();
         let methods_with_smells = new Object();
@@ -42,6 +43,8 @@ module.exports = class StatsRenderer{
             if(smell.lvl > max_intensity)
                 max_intensity = smell.lvl;
             total_intensity += smell.lvl;
+            // if(smell.note !== undefined)
+            //     smells_with_notes++;
             if(smell.src.struct !== null){
                 if(structures_with_smells[smell.src.struct] === undefined){
                     //structures_with_smells[smell.src.struct] = [smell.lvl];
@@ -114,6 +117,7 @@ module.exports = class StatsRenderer{
         document.getElementById("stats_overview_ti").innerHTML = total_intensity;
         document.getElementById("stats_overview_ai").innerHTML = avg_intensity;
         document.getElementById("stats_overview_mi").innerHTML = max_intensity;
+        // document.getElementById("stats_overview_swn").innerHTML = smells_with_notes;
         document.getElementById("stats_overview_fws").innerHTML = countof_files_with_smells;
         document.getElementById("stats_overview_pofws").innerHTML = perc_of_smelly_files;
         document.getElementById("stats_overview_sws").innerHTML = countof_structures_with_smells;
@@ -214,8 +218,9 @@ module.exports = class StatsRenderer{
                 legend: { position: 'top', maxLines: 2 },
                 //bar: { groupWidth: '75%' },
                 isStacked: true,
-                width: 1600,
-                height: rows.length * 44,
+                chartArea:{left:250,top:100, width: 1200, height: rows.length * 34,},
+                width: 1400,
+                height: rows.length * 40,
                 colors: col_rgb_colors,
                 backgroundColor: '#F6FFEF'
             };
@@ -327,8 +332,9 @@ module.exports = class StatsRenderer{
                 legend: { position: 'top', maxLines: 2 },
                 //bar: { groupWidth: '75%' },
                 isStacked: true,
-                width: 1600,
-                height: rows.length * 44,
+                chartArea:{left:250,top:100, width: 1200, height: rows.length * 34},
+                width: 1400,
+                height: rows.length * 40,
                 colors: col_rgb_colors,
                 backgroundColor: '#F6FFEF'
             };

@@ -21,6 +21,14 @@ module.exports = class SmellRenderer{
     static smells_ref;
     static modal;
 
+    static delay(fn, ms) {
+        let timer = 0;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(fn.bind(this, ...args), ms || 0);
+        }
+    }
+
     constructor(html_smell_table, smell_detectors, sort_by, order){
         this.html_smell_table = html_smell_table;
         this.smell_detectors = smell_detectors;
@@ -29,6 +37,14 @@ module.exports = class SmellRenderer{
         this.order = order;
 
         this.init_show_only();
+
+        $("#seach_txtfield").keyup(SmellRenderer.delay(() => {
+            let text_field_contents = document.getElementById('seach_txtfield').value;
+            if(text_field_contents !== "")
+                this.render(SmellRenderer.smells_ref, text_field_contents);
+            else
+                this.render(SmellRenderer.smells_ref);
+        }, 500));
 
         SmellRenderer.modal = (function(){
             var method = {}, $overlay, $modal, $content, $close, $save, $delete, smell_ref, smell_num;
@@ -299,7 +315,28 @@ module.exports = class SmellRenderer{
         });
     }
 
-    render(smells){
+    static smell_contains_query(smell, query){
+        assert(query !== "");
+
+        let regex = new RegExp(query, "i");
+        if(regex.test(smell.detector))
+            return true;
+        if(regex.test(smell.lvl))
+            return true;
+        if(regex.test(smell.src.file))
+            return true;
+        if(regex.test(smell.src.structure))
+            return true;
+        if(regex.test(smell.src.method))
+            return true;
+        if(regex.test(smell.msg))
+            return true;
+        if(regex.test(smell.note))
+            return true;
+        return false;
+    }
+
+    async render(smells, filter=null){
         
         smells.sort(this.get_smell_sort_func());
 
@@ -312,6 +349,9 @@ module.exports = class SmellRenderer{
         for(const smell of smells){
             smell_num++;
             if(!this.shown_detectors.includes(smell.detector)) continue;
+            if(filter !== null){
+                if(!SmellRenderer.smell_contains_query(smell, filter)) continue;
+            }
 
             let green = 255 - 25.5 * smell.lvl;
             html_str += `<tr style='background-color:rgba(255, ${green}, 0, 0.6)'><td>${smell.detector}</td>` +

@@ -9,7 +9,7 @@
                 "max_argc": {
                     "formal_name": "Maximum method arguments",
                     "min": 5,
-                    "max": 10,
+                    "max": 12,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -19,7 +19,7 @@
                     }
                 }
             },
-            "hidden": true
+            "hidden": false
         },
         {
             "name": "Too many function literals",
@@ -48,8 +48,8 @@
             "args": {
                 "max_locals": {
                     "formal_name": "Maximum method locals",
-                    "min": 8,
-                    "max": 17,
+                    "min": 20,
+                    "max": 30,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -204,8 +204,8 @@
                 "use_id_len_as_score": false,
                 "max_chars_ignored": {
                     "formal_name": "Maximum characters ignored",
-                    "min": 24,
-                    "max": 34,
+                    "min": 18,
+                    "max": 45,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -264,8 +264,8 @@
             "args": {
                 "max_methods": {
                     "formal_name": "Maximum count of methods",
-                    "min": 5,
-                    "max": 20,
+                    "min": 18,
+                    "max": 33,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -276,8 +276,8 @@
                 },
                 "max_fields": {
                     "formal_name": "Maximum count of fields",
-                    "min": 15,
-                    "max": 30,
+                    "min": 30,
+                    "max": 40,
                     "option": {
                         "type": "min-max-slider",
                         "range": [

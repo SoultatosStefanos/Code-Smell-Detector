@@ -184,9 +184,9 @@ async function init_frontend(){
 
     
    
+//nav_html += `<button id='det_nav_b_${detector_id}' onclick='this.nav_button_clicked(${detector_id})'>${detector.name}</button>`
 
-
-    let detector_renderer = new DetectorRenderer(document.getElementById("smells_config"));
+    let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"));
     detector_renderer.render(smells_config);
 }
 

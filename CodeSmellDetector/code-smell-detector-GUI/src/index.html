@@ -70,6 +70,9 @@
                     <div id="show_only_dropdown_content">
                     </div>
                 </div>
+                <div id="search_div">
+                    <input type="text" id="seach_txtfield" placeholder="Search...">
+                </div>
             </div>
             <div id="smell_display_body">
                 <table id="smell_table">
@@ -78,15 +81,113 @@
             </div>
         </div>
         <div id="smells_config">
-            
+            <div id="detector_cfg_nav" class="side_nav_col">
+
+            </div>
+            <div id="detector_config_div">
+
+            </div>
         </div>
         <div id="smells_stats">
             <button id="b_stats_overall" class="b_stats_tab">Overview</button>
             <button id="b_stats_structures" class="b_stats_tab">By Structure</button>
             <button id="b_stats_files" class="b_stats_tab">By File</button>
             <br><br>
+            
             <div id="stats_overview">
-                <table>
+                <div id="stats_overview_general" class="stats_overview_category">
+                    <h1>General</h1>
+                    <table>
+                        <tr>
+                            <td>Smell Count</td>
+                            <td id="stats_overview_sc">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Total Intensity</td>
+                            <td id="stats_overview_ti">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Average Intensity</td>
+                            <td id="stats_overview_ai">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Maximum Intensity</td>
+                            <td id="stats_overview_mi">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Most Common Smell</td>
+                            <td id="stats_overview_mcs">MISSING</td>
+                        </tr>
+                        <!-- <tr>
+                            <td>Smells with notes</td>
+                            <td id="stats_overview_swn">MISSING</td>
+                        </tr> -->
+                    </table>
+                </div>
+                <div id="stats_overview_files" class="stats_overview_category">
+                    <h1>Files</h1>
+                    <table>
+                        <tr>
+                            <td>Files with Smells</td>
+                            <td id="stats_overview_fws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>% of files with smells</td>
+                            <td id="stats_overview_pofws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>File with higher smell intensity</td>
+                            <td id="stats_overview_fwhsi">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>File with most smells</td>
+                            <td id="stats_overview_fwms">MISSING</td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="stats_overview_structures" class="stats_overview_category">
+                    <h1>Structures</h1>
+                    <table>
+                        <tr>
+                            <td>Structures with smells</td>
+                            <td id="stats_overview_sws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>% of structures with smells</td>
+                            <td id="stats_overview_posws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Structure with higher smell intensity</td>
+                            <td id="stats_overview_swhsi">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Structure with most smells</td>
+                            <td id="stats_overview_swms">MISSING</td>
+                        </tr>
+                    </table>
+                </div>
+                <div id="stats_overview_methods" class="stats_overview_category">
+                    <h1>Methods</h1>
+                    <table>
+                        <tr>
+                            <td>Methods with smells</td>
+                            <td id="stats_overview_mws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>% of methods with smells</td>
+                            <td id="stats_overview_pomws">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Method with higher smell intensity</td>
+                            <td id="stats_overview_mwhsi">MISSING</td>
+                        </tr>
+                        <tr>
+                            <td>Method with most smells</td>
+                            <td id="stats_overview_mwms">MISSING</td>
+                        </tr>
+                    </table>
+                </div>
+                <!-- <table>
                     <tr>
                         <td>Smell Count</td>
                         <td id="stats_overview_sc">MISSING</td>
@@ -147,7 +248,7 @@
                     
                     
                     
-                </table>
+                </table> -->
             </div>
             <div id="stats_by_class">
                 <!-- <div id="by_class_graph" style="background-color: green; display: block;"></div>
