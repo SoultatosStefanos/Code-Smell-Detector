@@ -5,9 +5,14 @@ module.exports = {
     callback: async function(ST, args){
         assert(args.use_id_len_as_score === false); // TODO
         let msg, src, smell_level, non_matching, report = [];
-        const struct_regex = RegExp(args.dict1[args.class_names.val], "g");
-        const method_regex = RegExp(args.dict1[args.method_names.val], "g");
-        const var_regex = RegExp(args.dict1[args.var_names.val], "g");
+
+        const struct_regex = RegExp(args[args.class_names.option.dict][args.class_names.val], "g");
+        const method_regex = RegExp(args[args.method_names.option.dict][args.method_names.val], "g");
+        const var_regex = RegExp(args[args.var_names.option.dict][args.var_names.val], "g");
+
+        // const struct_regex = RegExp(args.class_names[args.class_names.val], "g");
+        // const method_regex = RegExp(args.dict1[args.method_names.val], "g");
+        // const var_regex = RegExp(args.dict1[args.var_names.val], "g");
 
 
         for(const structure_id in ST.structures){

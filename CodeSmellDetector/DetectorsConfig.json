@@ -152,8 +152,8 @@
             "args": {
                 "max_line_len": {
                     "formal_name": "Maximum length of a line",
-                    "min": 100,
-                    "max": 160,
+                    "min": 150,
+                    "max": 200,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -170,19 +170,19 @@
             "file": "Name_conventions.js",
             "description": "Detects identifiers that do not follow naming conventions",
             "args": {
-                "dict1": {
+                "dict0": {
                     "UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "snake_case": "([a-z]*_?[a-z]*)*",
-                    "any": "(.*?)",
+                    "any": "[\\s\\S]*",
                     "custom0": "regex4"
                 },
                 "class_names": {
                     "formal_name": "Class names",
-                    "val": "any",
+                    "val": "lowerCamelCase",
                     "option": {
                         "type": "dict_item",
-                        "dict": "dict1"
+                        "dict": "dict0"
                     }
                 },
                 "method_names": {
@@ -190,7 +190,7 @@
                     "val": "any",
                     "option": {
                         "type": "dict_item",
-                        "dict": "dict1"
+                        "dict": "dict0"
                     }
                 },
                 "var_names": {
@@ -198,14 +198,14 @@
                     "val": "any",
                     "option": {
                         "type": "dict_item",
-                        "dict": "dict1"
+                        "dict": "dict0"
                     }
                 },
                 "use_id_len_as_score": false,
                 "max_chars_ignored": {
                     "formal_name": "Maximum characters ignored",
-                    "min": 55,
-                    "max": 58,
+                    "min": 0,
+                    "max": 32,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
