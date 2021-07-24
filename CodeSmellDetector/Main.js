@@ -372,7 +372,7 @@ async function run_smell_detectors(smell_detectors, ST){
 
 function save_smell_config(){ 
     let json = JSON.stringify(smells_config, null, 4);
-    fs.writeFile(smells_cfg_path, json, "utf8", (error) => {
+    fs.writeFile(get_full_path(smells_cfg_path), json, "utf8", (error) => {
         if(error) throw error;
     });
 }

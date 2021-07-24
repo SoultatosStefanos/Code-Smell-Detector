@@ -8,7 +8,7 @@
             "args": {
                 "max_argc": {
                     "formal_name": "Maximum method arguments",
-                    "min": 5,
+                    "min": 4,
                     "max": 12,
                     "option": {
                         "type": "min-max-slider",
@@ -28,8 +28,8 @@
             "args": {
                 "max_literals": {
                     "formal_name": "Maximum method literals",
-                    "min": 7,
-                    "max": 15,
+                    "min": 12,
+                    "max": 24,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -48,8 +48,8 @@
             "args": {
                 "max_locals": {
                     "formal_name": "Maximum method locals",
-                    "min": 20,
-                    "max": 30,
+                    "min": 12,
+                    "max": 24,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -68,8 +68,8 @@
             "args": {
                 "max_statements": {
                     "formal_name": "Maximum method statement count",
-                    "min": 50,
-                    "max": 105,
+                    "min": 60,
+                    "max": 161,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -80,7 +80,7 @@
                 },
                 "max_lines": {
                     "formal_name": "Maximum Method line count",
-                    "min": 45,
+                    "min": 70,
                     "max": 120,
                     "option": {
                         "type": "min-max-slider",
@@ -100,8 +100,8 @@
             "args": {
                 "max_loops": {
                     "formal_name": "Maximum method loops",
-                    "min": 7,
-                    "max": 15,
+                    "min": 6,
+                    "max": 12,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -112,8 +112,8 @@
                 },
                 "max_branches": {
                     "formal_name": "Maximum method branching statements",
-                    "min": 15,
-                    "max": 25,
+                    "min": 16,
+                    "max": 28,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -132,8 +132,8 @@
             "args": {
                 "max_id_len": {
                     "formal_name": "Maximum length of an identifier",
-                    "min": 30,
-                    "max": 55,
+                    "min": 20,
+                    "max": 40,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -152,7 +152,7 @@
             "args": {
                 "max_line_len": {
                     "formal_name": "Maximum length of a line",
-                    "min": 115,
+                    "min": 100,
                     "max": 160,
                     "option": {
                         "type": "min-max-slider",
@@ -204,8 +204,8 @@
                 "use_id_len_as_score": false,
                 "max_chars_ignored": {
                     "formal_name": "Maximum characters ignored",
-                    "min": 18,
-                    "max": 45,
+                    "min": 55,
+                    "max": 58,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -224,8 +224,8 @@
             "args": {
                 "max_nested_scopes": {
                     "formal_name": "Maximum depth of nested blocks",
-                    "min": 3,
-                    "max": 6,
+                    "min": 4,
+                    "max": 7,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -245,7 +245,7 @@
                 "max_circle_len": {
                     "formal_name": "Maximum circle length",
                     "min": 2,
-                    "max": 5,
+                    "max": 6,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -264,31 +264,31 @@
             "args": {
                 "max_methods": {
                     "formal_name": "Maximum count of methods",
-                    "min": 18,
-                    "max": 33,
+                    "min": 6,
+                    "max": 17,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
-                            5,
-                            60
+                            2,
+                            40
                         ]
                     }
                 },
                 "max_fields": {
                     "formal_name": "Maximum count of fields",
-                    "min": 30,
-                    "max": 40,
+                    "min": 6,
+                    "max": 17,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
-                            5,
+                            2,
                             40
                         ]
                     }
                 },
                 "public_only": {
                     "formal_name": "Public only",
-                    "val": false,
+                    "val": true,
                     "option": {
                         "type": "boolean"
                     }
@@ -303,7 +303,7 @@
             "args": {
                 "max_src_lines": {
                     "formal_name": "Maximum source file lines",
-                    "min": 602,
+                    "min": 503,
                     "max": 1200,
                     "option": {
                         "type": "min-max-slider",
@@ -315,7 +315,7 @@
                 },
                 "max_header_lines": {
                     "formal_name": "Maximum header file lines",
-                    "min": 352,
+                    "min": 201,
                     "max": 554,
                     "option": {
                         "type": "min-max-slider",
@@ -335,8 +335,8 @@
             "args": {
                 "max_member_expr": {
                     "formal_name": "Maximum member expressions",
-                    "min": 25,
-                    "max": 50,
+                    "min": 50,
+                    "max": 120,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -362,7 +362,7 @@
                 "max_unneeded_protected": {
                     "formal_name": "Maximum unnecessary protected",
                     "min": 1,
-                    "max": 5,
+                    "max": 20,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -381,8 +381,8 @@
             "args": {
                 "max_overload": {
                     "formal_name": "Maximum overloads of a function",
-                    "min": 3,
-                    "max": 6,
+                    "min": 8,
+                    "max": 14,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
@@ -401,8 +401,8 @@
             "args": {
                 "max_direct_dependencies": {
                     "formal_name": "Maximum direct dependencies",
-                    "min": 15,
-                    "max": 25,
+                    "min": 8,
+                    "max": 16,
                     "option": {
                         "type": "min-max-slider",
                         "range": [
