@@ -1,39 +1,23 @@
+"use strict";
+
+/**
+     * @argument relative_path: relative path to Main.js || Main.js behaves as if under "./code-smell-detector-gui/src"
+     * @returns full path
+*/
+function get_full_path(relative_path){
+    return __dirname + "\\..\\..\\" + relative_path;
+}
+
 const fs = require("fs");
 const path = require("path");
-const Util = require("D:/Thesis/CodeSmellDetector/Utility");
-const SmellRenderer = require("D:/Thesis/CodeSmellDetector/Smell_renderer.js");
-const DetectorRenderer = require("D:/Thesis/CodeSmellDetector/Detector_renderer.js");
-const StatsRenderer = require("D:/Thesis/CodeSmellDetector/Stats_renderer.js");
+const Util = require(get_full_path("Utility.js"));
+const SmellRenderer = require(get_full_path("Smell_renderer.js"));
+const DetectorRenderer = require(get_full_path("Detector_renderer.js"));
+const StatsRenderer = require(get_full_path("Stats_renderer"));
+const smells_cfg_path = "DetectorsConfig.json";
 
-
-
-//const st_path = "D:/Thesis/ST.json";
-//let st_last_edit = null;
-const smells_cfg_path = "D:/Thesis/CodeSmellDetector/SmellsConfig.json";
-
-
+// JavaScript runs an event loop, thus, global objects are necessary
 let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = null, smell_renderer, stat_renderer;
-
-
-
-
-// async function save_smell_reports(smell_reports){
-//     let json = new Object();
-//     let computed_for = new Object();
-//     computed_for.file = st_path;
-//     computed_for.last_edit = st_last_edit;
-//     json.computed_for = computed_for;
-//     json.smells = smell_reports;
-
-//     json = JSON.stringify(json, null, 4);
-//     fs.writeFile(smell_reports_save, json, "utf8", (error) => {
-//         if(error) throw error;
-//     });
-// }
-
-
-
-
 
 
 async function initialize(){
@@ -48,7 +32,7 @@ async function init_backend(){
     ST = require(Util.st_path); // loads json ST.
     Util.st_last_edit = fs.statSync(Util.st_path).mtime; // saves last edit time of st.
     Util.st_last_edit = Util.st_last_edit.toString();
-    smells_config = require(smells_cfg_path);
+    smells_config = require(get_full_path(smells_cfg_path));
     smell_detectors = get_smell_detectors(smells_config);
 
     return Util.get_smells_from_cache();
@@ -67,11 +51,10 @@ async function init_frontend(){
         stat_renderer.compute_stats(smells_list, ST);
     }
 
-
-
     document.getElementById("b_compute_code_smells").onclick = async () => {
         try_compute_smells();
     };
+
     document.getElementById("b_code_smell_list").style.border = "3px solid black";
     document.getElementById("smells_display").style.display = "block";
     document.getElementById("smells_config").style.display = "none";
@@ -184,13 +167,14 @@ async function init_frontend(){
 
     
    
-//nav_html += `<button id='det_nav_b_${detector_id}' onclick='this.nav_button_clicked(${detector_id})'>${detector.name}</button>`
-
     let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"));
     detector_renderer.render(smells_config);
 }
 
-dialog_box = (function(){
+
+// statement below creates a dial_box used for recomputation confirmation.
+// standard confirm() (or alert()) implementation bugs electron.
+let dialog_box = (function(){
     var method = {}, $overlay, $modal, $content, $yes, $no;
     // HTML HERE
     $overlay = $('<div id="overlay"></div>');
@@ -224,9 +208,6 @@ dialog_box = (function(){
 
     method.open = function(settings){
         $content.empty().append(`<p>${settings.content}</p>`);
-
-        //smell_ref = settings.smell;
-        //smell_num = settings.smell_num;
 
         $modal.css({
             width: settings.width || 'auto', 
@@ -271,28 +252,34 @@ dialog_box = (function(){
     return method;
 }());
 
-
+/**
+     * @returns note count in smells_list.
+*/
 function get_note_count(){
+    if(smells_list === null)
+        return 0;
     let note_count = 0;
     for(const smell of smells_list){
-        if(smell.note !== undefined) note_count++;
+        if(smell.note !== undefined) 
+            note_count++;
     }
     return note_count;
 }
 
+/**
+    Confirms user re-computation request if notes are about to be deleted.
+*/
 function try_compute_smells(){
     let note_count = get_note_count();
     if(note_count === 0)
         compute_smells();
     else if(note_count === 1)
-        dialog_box.open({content: "Are you sure you want to re-compute smells deleting 1 note?"});
+        dialog_box.open({content: "Are you sure you want to re-compute smells and delete 1 note?"});
     else
-        dialog_box.open({content: `Are you sure you want to re-compute smells deleting ${note_count} notes?`});
+        dialog_box.open({content: `Are you sure you want to re-compute smells and delete ${note_count} notes?`});
 }
 
 async function compute_smells(){
-    // if(!approve_smell_recomputation(smells_list)) 
-    //         return;
     smell_detectors_reports = await run_smell_detectors(smell_detectors, ST);
     smells_list = [];
     for(let report of smell_detectors_reports){
@@ -337,6 +324,16 @@ function get_smell_detectors(smells_config){
     return _smell_detectors;
 }
 
+
+/**
+    * Runs asynchronously smell_detectors and wait for all to complete
+    * @returns a list of smell_reports (objects)
+    *   smell_reports (object) = {
+    *       detector: [detector name],
+    *       time: [time taken to run detector in seconds].
+    *       incidents: [the list of smells produced by the detector]
+    *   }
+*/
 async function run_smell_detectors(smell_detectors, ST){
     let smell_reports = [];
     for(const smell_detector of smell_detectors){
@@ -349,29 +346,29 @@ async function run_smell_detectors(smell_detectors, ST){
 
 
 
-function print_reports(smell_reports){
-    for(const smell_report of smell_reports){
-        console.log("------------------------------");
-        console.log(`Smell Detector: ${smell_report.detector}`);
-        console.log(`Incidents count: ${smell_report.incidents.length}\n`);
-        let counter = 1;
+// function print_reports(smell_reports){
+//     for(const smell_report of smell_reports){
+//         console.log("------------------------------");
+//         console.log(`Smell Detector: ${smell_report.detector}`);
+//         console.log(`Incidents count: ${smell_report.incidents.length}\n`);
+//         let counter = 1;
         
-        for (const incident of smell_report.incidents){
-            console.log(`Incident ${counter++}`);
-            console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.col}`);
-            console.log(`Message: ${incident.msg}`);
-            console.log(`Smell level: ${incident.lvl}\n`);
-        }
-    }
-}
+//         for (const incident of smell_report.incidents){
+//             console.log(`Incident ${counter++}`);
+//             console.log(`Location: ${incident.src.file}:${incident.src.line}:${incident.src.col}`);
+//             console.log(`Message: ${incident.msg}`);
+//             console.log(`Smell level: ${incident.lvl}\n`);
+//         }
+//     }
+// }
 
-function print_stats(smells){
-    for(const smell of smells){
-        console.log(`Smell: ${smell.name}`);
-        console.log(`Incidents count: ${smell.report.incidents.length}`);
-        console.log(`Execution time: ${smell.report.time}\n`);
-    }
-}
+// function print_stats(smells){
+//     for(const smell of smells){
+//         console.log(`Smell: ${smell.name}`);
+//         console.log(`Incidents count: ${smell.report.incidents.length}`);
+//         console.log(`Execution time: ${smell.report.time}\n`);
+//     }
+// }
 
 function save_smell_config(){ 
     let json = JSON.stringify(smells_config, null, 4);

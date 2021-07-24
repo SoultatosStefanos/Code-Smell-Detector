@@ -13,12 +13,8 @@ module.exports = class DetectorRenderer{
         this.detectors_nav = detectors_nav;
     }
 
-    get_checked(flag){
-        if(flag)
-            return "checked";
-        return "";
-    }
-
+    // when a nav button is clicked the view changes and a new nav button is hightlighted.
+    // init = true is used only for initialization
     static nav_button_clicked(button_num, init = false){
         if(init === true){
             DetectorRenderer.currently_selected_det_div = document.getElementById(DetectorRenderer.detector_div_ids[button_num]);
@@ -57,6 +53,8 @@ module.exports = class DetectorRenderer{
         let slider_id = 0;
         let dropdowns = [];
         let dropdown_id = 0;
+        let flags = [];
+        let flag_id = 0;
         
         for(let detector of smell_detectors){
             nav_html += `<button id='det_nav_b_${detector_id}' onclick='DetectorRenderer.nav_button_clicked(${detector_id})'>${detector.name}</button>`;
@@ -72,12 +70,11 @@ module.exports = class DetectorRenderer{
             `<h2>${detector.name}</h2>`;
             DetectorRenderer.detector_div_ids.push(`detector_${detector_id}`);
             
+            // loop below creates placeholders for each type of argument.
             for(let arg_name of Object.keys(detector.args)){
                 let arg = detector.args[arg_name];
-                if(arg.option === undefined){
-                    console.log("TODO");
+                if(arg.option === undefined) // skip args with no options
                     continue;
-                }
                 switch(arg.option.type){
                     case "min-max-slider":{
                         let slider = new Object();
@@ -91,7 +88,13 @@ module.exports = class DetectorRenderer{
                     }
                         
                     case "boolean":{
-                        holder_html += `${arg.formal_name}` + `<input type="checkbox" ${this.get_checked(arg.val)}><br>`;
+                        let flag = new Object();
+                        flag.id = flag_id;
+                        flag.div = "flag" + (flag_id++);
+                        flag.arg_obj = arg;
+                        flag.detector = detector;
+                        holder_html += `${arg.formal_name} <input type="checkbox" id="${flag.div}"><br>`;
+                        flags.push(flag);
                         break;
                     }
                         
@@ -107,7 +110,6 @@ module.exports = class DetectorRenderer{
                     }
                 }
             }
-            // holder_html += `Hide Results <input type="checkbox" id="${detector_id}_hidden" ${this.get_checked(detector.hidden)}>`;
             holder_html += "</div>"
             detector_id++;
         }
@@ -116,7 +118,7 @@ module.exports = class DetectorRenderer{
         this.detectors_nav.innerHTML = nav_html;
         
 
-
+        // loops below implement the placeholders.
         for(const slider of sliders){
             $(`#${slider.div}`).slider({
                 range: true,
@@ -129,8 +131,16 @@ module.exports = class DetectorRenderer{
                     slider.arg_obj.max = ui.values[1];
                 }
             });
-            //$(`#${slider.values_label}`).text("kekw");
             $(`#${slider.values_label}`).text($(`#${slider.div}`).slider("values", 0) + " - " + $(`#${slider.div}`).slider("values", 1));
+        }
+
+        for(const flag of flags){
+            let checkbox = document.getElementById(flag.div);
+            checkbox.checked = flag.arg_obj.val;
+            checkbox.onchange = () => {
+                flag.arg_obj.val = !flag.arg_obj.val;
+                console.log(flag.arg_obj.val);
+            };
         }
 
         for(const dropdown of dropdowns){
@@ -144,25 +154,15 @@ module.exports = class DetectorRenderer{
                 option.text = val;
                 select.appendChild(option);
             }
-        
+            select.value = dropdown.arg_obj.val;
+            select.onchange = (e) => {
+                dropdown.arg_obj.val = select.value;
+            }
             document.getElementById(dropdown.div).appendChild(select);
         }
 
+        
 
         DetectorRenderer.nav_button_clicked(0, true);
-//         $(`#0`).slider({
-//             range: true,
-//             min: 0,
-//             max: 500,
-//             values: [ 75, 300 ],
-//             slide: function( event, ui ) {
-//                 $( "#amount" ).val( "$" + ui.values[ 0 ] + " - $" + ui.values[ 1 ] );
-//             }
-//         });
-//         $( "#amount" ).val( "$" + $( `#0` ).slider( "values", 0 ) +
-// " - $" + $( `#0` ).slider( "values", 1 ) );
-
-        
-        //this.html_detectors_div.innerHTML = hmtl_str;
     }
 };

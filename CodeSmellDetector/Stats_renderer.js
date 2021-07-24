@@ -17,11 +17,22 @@ module.exports = class StatsRenderer{
     }
 
     clear_all(){
-        document.getElementById("stats_overview_sc").innerHTML = "";
-        document.getElementById("stats_overview_ti").innerHTML = "";
-        document.getElementById("stats_overview_ai").innerHTML = "";
-        document.getElementById("stats_overview_fws").innerHTML = "";
-        document.getElementById("stats_overview_sws").innerHTML = "";
+        // clear overview tables
+        document.getElementById("stats_overview_sc").innerHTML = "-------";
+        document.getElementById("stats_overview_ti").innerHTML = "-------";
+        document.getElementById("stats_overview_ai").innerHTML = "-------";
+        document.getElementById("stats_overview_mi").innerHTML = "-------";
+        // document.getElementById("stats_overview_swn").innerHTML = "-------";
+        document.getElementById("stats_overview_fws").innerHTML = "-------";
+        document.getElementById("stats_overview_pofws").innerHTML = "-------";
+        document.getElementById("stats_overview_sws").innerHTML = "-------";
+        document.getElementById("stats_overview_posws").innerHTML = "-------";
+        document.getElementById("stats_overview_mws").innerHTML = "-------";
+        document.getElementById("stats_overview_pomws").innerHTML = "-------";
+        document.getElementById("stats_overview_mcs").innerHTML = "-------";
+
+
+        // clear by_class and by_div graphs.
         this.by_class_div.innerHTML = "";
         this.by_file_div.innerHTML = "";
     }
@@ -317,7 +328,11 @@ module.exports = class StatsRenderer{
             data.addRows(rows);
 
 
-            //rgba(255, ${green}, 0, 0.6)
+            //color = rgb(255, ${green}, 0)
+            // green0 = 255 - 25.5 * 0.5;
+            // green1 = 255 - 25.5 * 1.5;
+            //...
+            // green9 = 255 - 25.5 * 9.5;
             let col_rgb_colors = ['#fff200', '#ffd800', 
                 '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
                 '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 

@@ -1,3 +1,4 @@
+// A general utility object
 const assert = require('assert');
 
 module.exports = {
