@@ -35,15 +35,18 @@ module.exports = class SmellRenderer{
         this.shown_detectors = [];
         this.sort_by = sort_by;
         this.order = order;
+        this.text_filer = "";
 
         this.init_show_only();
 
         $("#seach_txtfield").keyup(SmellRenderer.delay(() => {
             let text_field_contents = document.getElementById('seach_txtfield').value;
-            if(text_field_contents !== "")
-                this.render(SmellRenderer.smells_ref, text_field_contents);
-            else
-                this.render(SmellRenderer.smells_ref);
+            this.text_filer = text_field_contents;
+            this.render(SmellRenderer.smells_ref);
+            // if(text_field_contents !== "")
+            //     this.render(SmellRenderer.smells_ref, text_field_contents);
+            // else
+            //     this.render(SmellRenderer.smells_ref);
         }, 500));
 
         SmellRenderer.modal = (function(){
@@ -318,6 +321,7 @@ module.exports = class SmellRenderer{
     static smell_contains_query(smell, query){
         assert(query !== "");
 
+        query = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // escape any regex characters - only search pure text
         let regex = new RegExp(query, "i");
         if(regex.test(smell.detector))
             return true;
@@ -336,7 +340,7 @@ module.exports = class SmellRenderer{
         return false;
     }
 
-    async render(smells, filter=null){
+    async render(smells){
         
         smells.sort(this.get_smell_sort_func());
 
@@ -349,8 +353,8 @@ module.exports = class SmellRenderer{
         for(const smell of smells){
             smell_num++;
             if(!this.shown_detectors.includes(smell.detector)) continue;
-            if(filter !== null){
-                if(!SmellRenderer.smell_contains_query(smell, filter)) continue;
+            if(this.text_filer !== ""){
+                if(!SmellRenderer.smell_contains_query(smell, this.text_filer)) continue;
             }
 
             let green = 255 - 25.5 * smell.lvl;
