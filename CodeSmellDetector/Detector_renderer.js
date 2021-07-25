@@ -82,7 +82,7 @@ module.exports = class DetectorRenderer{
                         slider.div = "slider" + (slider_id++);
                         slider.arg_obj = arg;
                         holder_html += `<span>${arg.formal_name}  <label id="${slider.values_label}"></label></span>`;
-                        holder_html += `<div id="${slider.div}" class="dbl-slider"></div>`;
+                        holder_html += `<div id="${slider.div}" class="dbl-slider"></div><br>`;
                         sliders.push(slider);
                         break;
                     }
@@ -93,7 +93,7 @@ module.exports = class DetectorRenderer{
                         flag.div = "flag" + (flag_id++);
                         flag.arg_obj = arg;
                         flag.detector = detector;
-                        holder_html += `${arg.formal_name} <input type="checkbox" id="${flag.div}"><br>`;
+                        holder_html += `${arg.formal_name} <input type="checkbox" id="${flag.div}"><br><br>`;
                         flags.push(flag);
                         break;
                     }
@@ -104,7 +104,7 @@ module.exports = class DetectorRenderer{
                         dropdown.div = "dropdown" + (dropdown_id++);
                         dropdown.arg_obj = arg;
                         dropdown.detector = detector;
-                        holder_html += `<span>${arg.formal_name}  <label id="${dropdown.div}"></label></span><br>`;
+                        holder_html += `<span>${arg.formal_name}<br><label id="${dropdown.div}"></label></span><br><br>`;
                         dropdowns.push(dropdown);
                         break;
                     }

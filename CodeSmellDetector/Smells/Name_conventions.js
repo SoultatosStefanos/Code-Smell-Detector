@@ -57,8 +57,6 @@ module.exports = {
                         report.push(Util.get_incident_obj(src, msg, smell_level));
                     }
                 }
-                //console.log(regex_non_matching_chars(Util.get_clean_identifier(method_id), method_regex));
-                //console.log(Util.get_clean_identifier(method_id));
             }
 
             for(const field_id in structure.fields){
