@@ -983,6 +983,9 @@ void SymbolTable::AddJsonSymbolTable(Json::Value& st) {
 	for (auto& t : byID) {
 		Json::Value new_obj;
 
+		if (t.second->GetSourceInfo().GetFileName() == "")
+			continue;
+
 		if (t.second->GetClassType() == ClassType::Structure) {
 			 AddJsonStructure((dependenciesMining::Structure*)t.second, new_obj);
 		}
