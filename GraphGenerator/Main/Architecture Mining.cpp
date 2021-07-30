@@ -71,7 +71,7 @@ int main(int argc, const char** argv) {
 	std::string fullPath = std::string(__FILE__);
 	std::size_t found = fullPath.find_last_of("/\\");
 	std::string jsonPath = (argc >= 6) ? argv[5] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
-	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../../ST.json";
+	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../../ST0.json";
 	
 	/*std::vector<std::string> srcs;
 	srcs.push_back(path + "\\classes_simple.cpp");			

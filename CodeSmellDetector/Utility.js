@@ -2,7 +2,7 @@
 const assert = require('assert');
 
 module.exports = {
-    st_path: "D:/Thesis/ST.json",
+    st_path: "D:/Thesis/ST0.json",
     st_last_edit: null,
     smell_reports_save: "D:/Thesis/CodeSmellDetector/SmellReports.json",
 
@@ -79,9 +79,11 @@ module.exports = {
      * @argument method_id: clean id.
      * @returns true if a method is constructor / destructor / etc..
      */
-    is_standard_class_func: (method_id, class_id) =>{
-        if(method_id === class_id) return true;
-        if(method_id === "~" + class_id) return true;
+    is_standard_class_func: (method_id, structure_id) =>{
+        let clean_structures_id = module.exports.get_clean_identifier(structure_id);
+        if(method_id === clean_structures_id) return true;
+        if(method_id === "~" + clean_structures_id) return true;
+        if(method_id.startsWith("operator")) return true;
         return false;
     },
 
