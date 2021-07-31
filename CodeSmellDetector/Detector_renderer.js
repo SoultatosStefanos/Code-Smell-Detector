@@ -69,6 +69,8 @@ module.exports = class DetectorRenderer{
             `<div id='detector_${detector_id}' class='detector'>` +
             `<h2>${detector.name}</h2>`;
             DetectorRenderer.detector_div_ids.push(`detector_${detector_id}`);
+            if(Object.keys(detector.args).length === 0)
+                holder_html += "<label style='color:red'> No configuration available for this smell detector.</label>";
             
             // loop below creates placeholders for each type of argument.
             for(let arg_name of Object.keys(detector.args)){
