@@ -35,13 +35,13 @@ module.exports = class SmellRenderer{
         this.shown_detectors = [];
         this.sort_by = sort_by;
         this.order = order;
-        this.text_filer = "";
+        this.text_filter = "";
 
         this.init_show_only();
 
         $("#seach_txtfield").keyup(SmellRenderer.delay(() => {
             let text_field_contents = document.getElementById('seach_txtfield').value;
-            this.text_filer = text_field_contents;
+            this.text_filter = text_field_contents;
             this.render(SmellRenderer.smells_ref);
             // if(text_field_contents !== "")
             //     this.render(SmellRenderer.smells_ref, text_field_contents);
@@ -353,8 +353,8 @@ module.exports = class SmellRenderer{
         for(const smell of smells){
             smell_num++;
             if(!this.shown_detectors.includes(smell.detector)) continue;
-            if(this.text_filer !== ""){
-                if(!SmellRenderer.smell_contains_query(smell, this.text_filer)) continue;
+            if(this.text_filter !== ""){
+                if(!SmellRenderer.smell_contains_query(smell, this.text_filter)) continue;
             }
 
             let green = 255 - 25.5 * smell.lvl;
