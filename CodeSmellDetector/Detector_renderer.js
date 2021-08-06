@@ -78,7 +78,7 @@ module.exports = class DetectorRenderer{
                 if(arg.option === undefined) // skip args with no options
                     continue;
                 switch(arg.option.type){
-                    case "min-max-slider":{
+                    case "range":{
                         let slider = new Object();
                         slider.values_label = "lbl" + (slider_id);
                         slider.div = "slider" + (slider_id++);
@@ -100,7 +100,7 @@ module.exports = class DetectorRenderer{
                         break;
                     }
                         
-                    case "dict_item":{
+                    case "enum":{
                         let dropdown = new Object();
                         dropdown.id = dropdown_id;
                         dropdown.div = "dropdown" + (dropdown_id++);

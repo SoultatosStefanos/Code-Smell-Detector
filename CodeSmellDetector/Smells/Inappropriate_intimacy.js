@@ -6,6 +6,7 @@ module.exports = {
 
         for(const dependency of ST.dependencies){
             if(dependency.types.MemberExpr){
+                console.log(dependency.types.MemberExpr);
                 smell_level = Util.get_smell_lvl(args.max_member_expr.min, args.max_member_expr.max, dependency.types.MemberExpr);
                 if(smell_level > 0){
                     let from = ST.structures[dependency.from];

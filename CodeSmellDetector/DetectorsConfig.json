@@ -11,7 +11,7 @@
                     "min": 4,
                     "max": 12,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             2,
                             15
@@ -28,10 +28,10 @@
             "args": {
                 "max_literals": {
                     "formal_name": "Maximum method literals",
-                    "min": 12,
-                    "max": 24,
+                    "min": 15,
+                    "max": 30,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             50
@@ -48,10 +48,10 @@
             "args": {
                 "max_locals": {
                     "formal_name": "Maximum method locals",
-                    "min": 12,
+                    "min": 10,
                     "max": 24,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             30
@@ -71,7 +71,7 @@
                     "min": 60,
                     "max": 161,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             20,
                             200
@@ -83,7 +83,7 @@
                     "min": 70,
                     "max": 120,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             5,
                             200
@@ -103,7 +103,7 @@
                     "min": 6,
                     "max": 12,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             30
@@ -115,7 +115,7 @@
                     "min": 16,
                     "max": 28,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             60
@@ -132,10 +132,10 @@
             "args": {
                 "max_id_len": {
                     "formal_name": "Maximum length of an identifier",
-                    "min": 20,
-                    "max": 40,
+                    "min": 25,
+                    "max": 45,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             5,
                             100
@@ -152,10 +152,10 @@
             "args": {
                 "max_line_len": {
                     "formal_name": "Maximum length of a line",
-                    "min": 150,
-                    "max": 200,
+                    "min": 100,
+                    "max": 150,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             40,
                             200
@@ -179,17 +179,17 @@
                 },
                 "class_names": {
                     "formal_name": "Class names",
-                    "val": "lowerCamelCase",
+                    "val": "UpperCamelCase",
                     "option": {
-                        "type": "dict_item",
+                        "type": "enum",
                         "dict": "dict0"
                     }
                 },
                 "method_names": {
                     "formal_name": "Method names",
-                    "val": "any",
+                    "val": "UpperCamelCase",
                     "option": {
-                        "type": "dict_item",
+                        "type": "enum",
                         "dict": "dict0"
                     }
                 },
@@ -197,7 +197,7 @@
                     "formal_name": "Variable names",
                     "val": "any",
                     "option": {
-                        "type": "dict_item",
+                        "type": "enum",
                         "dict": "dict0"
                     }
                 },
@@ -207,7 +207,7 @@
                     "min": 0,
                     "max": 32,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             0,
                             60
@@ -227,7 +227,7 @@
                     "min": 4,
                     "max": 7,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             2,
                             12
@@ -247,7 +247,7 @@
                     "min": 2,
                     "max": 6,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             20
@@ -264,10 +264,10 @@
             "args": {
                 "max_methods": {
                     "formal_name": "Maximum count of methods",
-                    "min": 6,
+                    "min": 8,
                     "max": 17,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             2,
                             40
@@ -279,7 +279,7 @@
                     "min": 6,
                     "max": 17,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             2,
                             40
@@ -306,7 +306,7 @@
                     "min": 503,
                     "max": 1200,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             200,
                             1200
@@ -318,7 +318,7 @@
                     "min": 201,
                     "max": 554,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             100,
                             800
@@ -338,7 +338,7 @@
                     "min": 50,
                     "max": 120,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             20,
                             200
@@ -364,7 +364,7 @@
                     "min": 1,
                     "max": 20,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             1,
                             20
@@ -384,7 +384,7 @@
                     "min": 8,
                     "max": 14,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             2,
                             20
@@ -404,7 +404,7 @@
                     "min": 8,
                     "max": 16,
                     "option": {
-                        "type": "min-max-slider",
+                        "type": "range",
                         "range": [
                             4,
                             40
