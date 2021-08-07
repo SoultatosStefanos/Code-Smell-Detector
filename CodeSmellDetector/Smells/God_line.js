@@ -69,7 +69,7 @@ async function iterate_file(file_path, max_line_len){
             info = un_commented_strlen(line);
         }
         in_comment = info.comment_open;
-        smell_level = Util.get_smell_lvl(max_line_len.min, max_line_len.max, info.len);
+        smell_level = Util.get_smell_lvl(max_line_len.range, info.len);
         if(smell_level > 0){
             msg = `Line ${line_counter} of ${file_path} has an un-commented length of ${info.len} characters`;
             src = Util.get_src_obj(file_path, line_counter);

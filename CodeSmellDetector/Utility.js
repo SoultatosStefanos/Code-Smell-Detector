@@ -59,7 +59,7 @@ module.exports = {
      * Given the scale and level of a smell, returns the level of a smell on the scale 1-10.
      * Returns 0 if minimal_level is not reached.
      */
-    get_smell_lvl: (minimal_level, maximal_level, actual_level) => {
+    get_smell_lvl: ([minimal_level, maximal_level], actual_level) => {
         assert(maximal_level >= minimal_level, `maximal_level can never be larger than minimal_level.`);
         if(actual_level < minimal_level) return 0;
         if(actual_level >= maximal_level) return 10;

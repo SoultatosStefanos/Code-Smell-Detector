@@ -9,8 +9,8 @@ module.exports = {
                 const method = structure.methods[method_id];
 
 
-                statements_smell_lvl = Util.get_smell_lvl(args.max_statements.min, args.max_statements.max, method.statements);
-                lines_smell_lvl = Util.get_smell_lvl(args.max_lines.min, args.max_lines.max, method.lines);
+                statements_smell_lvl = Util.get_smell_lvl(args.max_statements.range, method.statements);
+                lines_smell_lvl = Util.get_smell_lvl(args.max_lines.range, method.lines);
 
                 if(statements_smell_lvl === 0 && lines_smell_lvl === 0) // neither statements or lines smell
                     continue;

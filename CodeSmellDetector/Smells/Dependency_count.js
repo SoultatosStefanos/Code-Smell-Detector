@@ -17,7 +17,7 @@ module.exports = {
 
         for(const dep_str in dependencies_map){
             const dep = dependencies_map[dep_str];
-            smell_level = Util.get_smell_lvl(args.max_direct_dependencies.min, args.max_direct_dependencies.max, dep.length);
+            smell_level = Util.get_smell_lvl(args.max_direct_dependencies.range, dep.length);
             if(smell_level > 0){
                 let dep_names = "";
                 for(let i=0; i<dep.length - 1; i++)

@@ -15,7 +15,7 @@ module.exports = {
             }
             for(const method_name in overloads){
                 let overload_count = overloads[method_name];
-                smell_level = Util.get_smell_lvl(args.max_overload.min, args.max_overload.max, overload_count);
+                smell_level = Util.get_smell_lvl(args.max_overload.range, overload_count);
                 if(smell_level > 0){ 
                     msg = `Method: "${method_name}" of structure "${structure_id}" is overloaded ${overload_count} times.`;
                     src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, structure_id);

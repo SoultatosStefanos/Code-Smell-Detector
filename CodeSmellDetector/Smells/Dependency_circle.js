@@ -8,7 +8,7 @@ module.exports = {
         let g = new Graph(nodes, list);
         let circuits = g.findCircuits();
         for(const circuit of circuits){
-            smell_level = Util.get_smell_lvl(args.max_circle_len.min, args.max_circle_len.max, circuit.length);
+            smell_level = Util.get_smell_lvl(args.max_circle_len.range, circuit.length);
             if(smell_level > 0){
                 var structure = ST.structures[circuit[0]];
                 msg = `Structure: "${circuit[0]}" is part of this dependency cycle: `;

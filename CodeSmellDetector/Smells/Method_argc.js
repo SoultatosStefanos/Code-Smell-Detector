@@ -10,7 +10,7 @@ module.exports = {
                 if(method.args === null)
                     continue;
                 let argc = Object.keys(method.args).length;
-                smell_level = Util.get_smell_lvl(args.max_argc.min, args.max_argc.max, argc);
+                smell_level = Util.get_smell_lvl(args.max_argc.range, argc);
                 if(smell_level > 0){
                     msg = `Method: "${method_id}" has ${argc} arguments.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);

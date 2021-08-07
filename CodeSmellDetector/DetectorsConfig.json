@@ -8,15 +8,15 @@
             "args": {
                 "max_argc": {
                     "formal_name": "Maximum method arguments",
-                    "min": 4,
-                    "max": 12,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            2,
-                            15
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        3,
+                        12
+                    ],
+                    "limits": [
+                        2,
+                        15
+                    ]
                 }
             },
             "hidden": false
@@ -28,15 +28,15 @@
             "args": {
                 "max_literals": {
                     "formal_name": "Maximum method literals",
-                    "min": 15,
-                    "max": 30,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            50
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        15,
+                        30
+                    ],
+                    "limits": [
+                        1,
+                        50
+                    ]
                 }
             },
             "hidden": false
@@ -48,15 +48,15 @@
             "args": {
                 "max_locals": {
                     "formal_name": "Maximum method locals",
-                    "min": 10,
-                    "max": 24,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            30
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        10,
+                        24
+                    ],
+                    "limits": [
+                        1,
+                        30
+                    ]
                 }
             },
             "hidden": false
@@ -68,27 +68,27 @@
             "args": {
                 "max_statements": {
                     "formal_name": "Maximum method statement count",
-                    "min": 60,
-                    "max": 161,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            20,
-                            200
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        60,
+                        161
+                    ],
+                    "limits": [
+                        20,
+                        200
+                    ]
                 },
                 "max_lines": {
                     "formal_name": "Maximum Method line count",
-                    "min": 70,
-                    "max": 120,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            5,
-                            200
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        70,
+                        120
+                    ],
+                    "limits": [
+                        5,
+                        200
+                    ]
                 }
             },
             "hidden": false
@@ -100,27 +100,27 @@
             "args": {
                 "max_loops": {
                     "formal_name": "Maximum method loops",
-                    "min": 6,
-                    "max": 12,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            30
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        6,
+                        12
+                    ],
+                    "limits": [
+                        1,
+                        30
+                    ]
                 },
                 "max_branches": {
                     "formal_name": "Maximum method branching statements",
-                    "min": 16,
-                    "max": 28,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            60
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        14,
+                        20
+                    ],
+                    "limits": [
+                        1,
+                        60
+                    ]
                 }
             },
             "hidden": false
@@ -132,15 +132,15 @@
             "args": {
                 "max_id_len": {
                     "formal_name": "Maximum length of an identifier",
-                    "min": 25,
-                    "max": 45,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            5,
-                            100
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        25,
+                        45
+                    ],
+                    "limits": [
+                        5,
+                        100
+                    ]
                 }
             },
             "hidden": false
@@ -152,15 +152,15 @@
             "args": {
                 "max_line_len": {
                     "formal_name": "Maximum length of a line",
-                    "min": 100,
-                    "max": 150,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            40,
-                            200
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        100,
+                        150
+                    ],
+                    "limits": [
+                        40,
+                        200
+                    ]
                 }
             },
             "hidden": false
@@ -180,39 +180,33 @@
                 "class_names": {
                     "formal_name": "Class names",
                     "val": "UpperCamelCase",
-                    "option": {
-                        "type": "enum",
-                        "dict": "dict0"
-                    }
+                    "type": "enum",
+                    "dict": "dict0"
                 },
                 "method_names": {
                     "formal_name": "Method names",
                     "val": "UpperCamelCase",
-                    "option": {
-                        "type": "enum",
-                        "dict": "dict0"
-                    }
+                    "type": "enum",
+                    "dict": "dict0"
                 },
                 "var_names": {
                     "formal_name": "Variable names",
                     "val": "any",
-                    "option": {
-                        "type": "enum",
-                        "dict": "dict0"
-                    }
+                    "type": "enum",
+                    "dict": "dict0"
                 },
                 "use_id_len_as_score": false,
                 "max_chars_ignored": {
                     "formal_name": "Maximum characters ignored",
-                    "min": 0,
-                    "max": 32,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            0,
-                            60
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        0,
+                        32
+                    ],
+                    "limits": [
+                        0,
+                        60
+                    ]
                 }
             },
             "hidden": false
@@ -224,15 +218,15 @@
             "args": {
                 "max_nested_scopes": {
                     "formal_name": "Maximum depth of nested blocks",
-                    "min": 4,
-                    "max": 7,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            2,
-                            12
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        4,
+                        7
+                    ],
+                    "limits": [
+                        2,
+                        12
+                    ]
                 }
             },
             "hidden": false
@@ -244,15 +238,15 @@
             "args": {
                 "max_circle_len": {
                     "formal_name": "Maximum circle length",
-                    "min": 2,
-                    "max": 6,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            20
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        2,
+                        6
+                    ],
+                    "limits": [
+                        1,
+                        20
+                    ]
                 }
             },
             "hidden": false
@@ -264,34 +258,32 @@
             "args": {
                 "max_methods": {
                     "formal_name": "Maximum count of methods",
-                    "min": 8,
-                    "max": 17,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            2,
-                            40
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        8,
+                        17
+                    ],
+                    "limits": [
+                        2,
+                        40
+                    ]
                 },
                 "max_fields": {
                     "formal_name": "Maximum count of fields",
-                    "min": 6,
-                    "max": 17,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            2,
-                            40
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        6,
+                        17
+                    ],
+                    "limits": [
+                        2,
+                        40
+                    ]
                 },
                 "public_only": {
                     "formal_name": "Public only",
                     "val": true,
-                    "option": {
-                        "type": "boolean"
-                    }
+                    "type": "boolean"
                 }
             },
             "hidden": false
@@ -303,27 +295,27 @@
             "args": {
                 "max_src_lines": {
                     "formal_name": "Maximum source file lines",
-                    "min": 503,
-                    "max": 1200,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            200,
-                            1200
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        500,
+                        1200
+                    ],
+                    "limits": [
+                        200,
+                        1200
+                    ]
                 },
                 "max_header_lines": {
                     "formal_name": "Maximum header file lines",
-                    "min": 201,
-                    "max": 554,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            100,
-                            800
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        200,
+                        550
+                    ],
+                    "limits": [
+                        100,
+                        800
+                    ]
                 }
             },
             "hidden": false
@@ -335,15 +327,15 @@
             "args": {
                 "max_member_expr": {
                     "formal_name": "Maximum member expressions",
-                    "min": 50,
-                    "max": 120,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            20,
-                            200
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        50,
+                        120
+                    ],
+                    "limits": [
+                        20,
+                        200
+                    ]
                 }
             },
             "hidden": false
@@ -361,15 +353,15 @@
             "args": {
                 "max_unneeded_protected": {
                     "formal_name": "Maximum unnecessary protected",
-                    "min": 1,
-                    "max": 20,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            1,
-                            20
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        1,
+                        20
+                    ],
+                    "limits": [
+                        1,
+                        20
+                    ]
                 }
             },
             "hidden": false
@@ -381,15 +373,15 @@
             "args": {
                 "max_overload": {
                     "formal_name": "Maximum overloads of a function",
-                    "min": 8,
-                    "max": 14,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            2,
-                            20
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        8,
+                        14
+                    ],
+                    "limits": [
+                        2,
+                        20
+                    ]
                 }
             },
             "hidden": false
@@ -401,15 +393,15 @@
             "args": {
                 "max_direct_dependencies": {
                     "formal_name": "Maximum direct dependencies",
-                    "min": 8,
-                    "max": 16,
-                    "option": {
-                        "type": "range",
-                        "range": [
-                            4,
-                            40
-                        ]
-                    }
+                    "type": "range",
+                    "range": [
+                        8,
+                        16
+                    ],
+                    "limits": [
+                        4,
+                        40
+                    ]
                 }
             },
             "hidden": false

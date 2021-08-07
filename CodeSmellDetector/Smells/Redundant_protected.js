@@ -28,7 +28,7 @@ module.exports = {
             }
 
 
-            smell_level = Util.get_smell_lvl(args.max_unneeded_protected.min, args.max_unneeded_protected.max, protected_members);
+            smell_level = Util.get_smell_lvl(args.max_unneeded_protected.range, protected_members);
             if(smell_level > 0){
                 msg = `Class: "${structure_id}" is not inherited from and has ${protected_members} protected variables or methods.`;
                 src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.column, structure_id);

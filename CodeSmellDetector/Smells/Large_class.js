@@ -8,8 +8,8 @@ module.exports = {
 
             field_count = get_structure_field_count(structure, args.public_only.val);
             method_count = get_structure_method_count(structure, args.public_only.val);
-            field_smell_lvl = Util.get_smell_lvl(args.max_fields.min, args.max_fields.max, field_count);
-            method_smell_lvl = Util.get_smell_lvl(args.max_methods.min, args.max_methods.max, method_count);
+            field_smell_lvl = Util.get_smell_lvl(args.max_fields.range, field_count);
+            method_smell_lvl = Util.get_smell_lvl(args.max_methods.range, method_count);
 
             if(field_smell_lvl === 0 && method_smell_lvl === 0) // neither fields or methods smell
                 continue;

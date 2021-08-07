@@ -11,7 +11,7 @@ module.exports = {
                 if(method.definitions === null) def_count = 0;
                 else def_count = Object.keys(method.definitions).length;
 
-                smell_level = Util.get_smell_lvl(args.max_locals.min, args.max_locals.max, def_count);
+                smell_level = Util.get_smell_lvl(args.max_locals.range, def_count);
                 if(smell_level > 0){
                     msg = `Method: "${method_id}" has ${def_count} definitions.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);

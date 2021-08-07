@@ -16,7 +16,7 @@ module.exports = {
                 let method = base_class.methods[method_id];
                 msg = `Destructor of base class: "${base_class_id}" is not virtual.`;
                 src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, base_class_id, method_id);
-                smell_level = Util.get_smell_lvl(1, 1, 1); // get max smell level.
+                smell_level = Util.get_smell_lvl([1, 1], 1); // get max smell level.
                 report.push(Util.get_incident_obj(src, msg, smell_level));
             }
                 

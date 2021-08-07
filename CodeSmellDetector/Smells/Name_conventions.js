@@ -7,9 +7,9 @@ module.exports = {
         assert(args.use_id_len_as_score === false); // TODO
         let msg, src, smell_level, non_matching, report = [];
 
-        const struct_regex = RegExp(args[args.class_names.option.dict][args.class_names.val], "g");
-        const method_regex = RegExp(args[args.method_names.option.dict][args.method_names.val], "g");
-        const var_regex = RegExp(args[args.var_names.option.dict][args.var_names.val], "g");
+        const struct_regex = RegExp(args[args.class_names.dict][args.class_names.val], "g");
+        const method_regex = RegExp(args[args.method_names.dict][args.method_names.val], "g");
+        const var_regex = RegExp(args[args.var_names.dict][args.var_names.val], "g");
 
         // const struct_regex = RegExp(args.class_names[args.class_names.val], "g");
         // const method_regex = RegExp(args.dict1[args.method_names.val], "g");
@@ -20,7 +20,7 @@ module.exports = {
             const structure = ST.structures[structure_id];
 
             non_matching = regex_non_matching_chars(Util.get_clean_identifier(structure_id), struct_regex);
-            smell_level = Util.get_smell_lvl(args.max_chars_ignored.min, args.max_chars_ignored.max, non_matching);
+            smell_level = Util.get_smell_lvl(args.max_chars_ignored.range, non_matching);
             if(smell_level > 0){
                 msg = `Structure: "${structure_id}" has an id deviating from standard naming convention by ${non_matching} characters.`;
                 src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, structure_id);
@@ -33,7 +33,7 @@ module.exports = {
                 let clean_method_id = Util.get_clean_identifier(method_id);
                 if(!Util.is_standard_class_func(clean_method_id, structure_id)){
                     non_matching = regex_non_matching_chars(clean_method_id, method_regex);
-                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.min, args.max_chars_ignored.max, non_matching);
+                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.range, non_matching);
                     if(smell_level > 0){
                         msg = `Method: "${method_id}" has an id deviating from standard naming convention by ${non_matching} characters.`;
                         src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
@@ -43,7 +43,7 @@ module.exports = {
 
                 for(const arg_id in method.args){
                     non_matching = regex_non_matching_chars(arg_id, var_regex);
-                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.min, args.max_chars_ignored.max, non_matching);
+                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.range, non_matching);
                     if(smell_level > 0){
                         msg = `Argument: "${arg_id}" of "${method_id}" has an id deviating from standard naming convention by ${non_matching} characters.`;
                         src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
@@ -53,7 +53,7 @@ module.exports = {
 
                 for(const def_id in method.definitions){
                     non_matching = regex_non_matching_chars(def_id, var_regex);
-                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.min, args.max_chars_ignored.max, non_matching);
+                    smell_level = Util.get_smell_lvl(args.max_chars_ignored.range, non_matching);
                     if(smell_level > 0){
                         msg = `Definition: "${def_id}" of "${method_id}" has an id deviating from standard naming convention by ${non_matching} characters.`;
                         src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
@@ -64,7 +64,7 @@ module.exports = {
 
             for(const field_id in structure.fields){
                 non_matching = regex_non_matching_chars(Util.get_clean_identifier(field_id), var_regex);
-                smell_level = Util.get_smell_lvl(args.max_chars_ignored.min, args.max_chars_ignored.max, non_matching);
+                smell_level = Util.get_smell_lvl(args.max_chars_ignored.range, non_matching);
                 if(smell_level > 0){
                     msg = `Field: "${field_id}" of "${structure_id}" has an id deviating from standard naming convention by ${non_matching} characters.`;
                     src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, structure_id);

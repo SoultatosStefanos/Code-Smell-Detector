@@ -7,7 +7,7 @@ module.exports = {
         let lines, msg, src, smell_level, report = [];
         for(const header of ST.headers){
             lines = await get_file_line_count(header);
-            smell_level = Util.get_smell_lvl(args.max_header_lines.min, args.max_header_lines.max, lines);
+            smell_level = Util.get_smell_lvl(args.max_header_lines.range, lines);
             if(smell_level > 0){
                 msg = `Header file: "${header}" has ${lines} of code.`;
                 src = Util.get_src_obj(header, 1, 1);
@@ -16,7 +16,7 @@ module.exports = {
         }
         for(const source of ST.sources){
             lines = await get_file_line_count(source);
-            smell_level = Util.get_smell_lvl(args.max_src_lines.min, args.max_src_lines.max, lines);
+            smell_level = Util.get_smell_lvl(args.max_src_lines.range, lines);
             if(smell_level > 0){
                 msg = `Source file: "${source}" has ${lines} of code.`;
                 src = Util.get_src_obj(source, 1, 1);

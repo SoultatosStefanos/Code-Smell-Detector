@@ -7,7 +7,7 @@ module.exports = {
             const structure = ST.structures[structure_id];
             for(const method_id in structure.methods){
                 const method = structure.methods[method_id];
-                smell_level = Util.get_smell_lvl(args.max_literals.min, args.max_literals.max, method.literals);
+                smell_level = Util.get_smell_lvl(args.max_literals.range, method.literals);
                 if(smell_level > 0){
                     msg = `Method: "${method_id}" has ${method.literals} literals.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);

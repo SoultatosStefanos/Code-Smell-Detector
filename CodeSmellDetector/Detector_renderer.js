@@ -75,9 +75,9 @@ module.exports = class DetectorRenderer{
             // loop below creates placeholders for each type of argument.
             for(let arg_name of Object.keys(detector.args)){
                 let arg = detector.args[arg_name];
-                if(arg.option === undefined) // skip args with no options
+                if(arg.type === undefined) // skip args with no type
                     continue;
-                switch(arg.option.type){
+                switch(arg.type){
                     case "range":{
                         let slider = new Object();
                         slider.values_label = "lbl" + (slider_id);
@@ -124,13 +124,12 @@ module.exports = class DetectorRenderer{
         for(const slider of sliders){
             $(`#${slider.div}`).slider({
                 range: true,
-                min: slider.arg_obj.option.range[0],
-                max: slider.arg_obj.option.range[1],
-                values: [slider.arg_obj.min, slider.arg_obj.max],
+                min: slider.arg_obj.limits[0],
+                max: slider.arg_obj.limits[1],
+                values: slider.arg_obj.range,
                 slide: (event, ui) => {
                     $(`#${slider.values_label}`).text(ui.values[0] + " - " + ui.values[1]);
-                    slider.arg_obj.min = ui.values[0];
-                    slider.arg_obj.max = ui.values[1];
+                    slider.arg_obj.range = ui.values;
                 }
             });
             $(`#${slider.values_label}`).text($(`#${slider.div}`).slider("values", 0) + " - " + $(`#${slider.div}`).slider("values", 1));
@@ -150,7 +149,7 @@ module.exports = class DetectorRenderer{
             select.name = "select" + dropdown.id;
             select.id = "select" + dropdown.id;
             
-            for(const val of Object.keys(dropdown.detector.args[dropdown.arg_obj.option.dict])){
+            for(const val of Object.keys(dropdown.detector.args[dropdown.arg_obj.dict])){
                 let option = document.createElement("option");
                 option.value = val;
                 option.text = val;
