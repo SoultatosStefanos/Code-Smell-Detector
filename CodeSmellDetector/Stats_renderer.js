@@ -1,4 +1,5 @@
 const assert = require('assert');
+const { Stats } = require('fs');
 const Util = require('./Utility');
 
 module.exports = class StatsRenderer{
@@ -30,6 +31,13 @@ module.exports = class StatsRenderer{
         document.getElementById("stats_overview_mws").innerHTML = "-------";
         document.getElementById("stats_overview_pomws").innerHTML = "-------";
         document.getElementById("stats_overview_mcs").innerHTML = "-------";
+        document.getElementById("stats_overview_fwhsi").innerHTML = "-------";
+        document.getElementById("stats_overview_fwms").innerHTML = "-------";
+        document.getElementById("stats_overview_swhsi").innerHTML = "-------";
+        document.getElementById("stats_overview_swms").innerHTML = "-------";
+        document.getElementById("stats_overview_mwhsi").innerHTML = "-------";
+        document.getElementById("stats_overview_mwms").innerHTML = "-------";
+
 
 
         // clear by_class and by_div graphs.
@@ -124,6 +132,12 @@ module.exports = class StatsRenderer{
         if(countof_methods !== 0)
             perc_of_smelly_methods = `${Math.round(10000 * countof_methods_with_smells / countof_methods)/100} %`;
 
+
+        let f_info = StatsRenderer.set_smells_in_buckets(files_with_smells);
+        let s_info = StatsRenderer.set_smells_in_buckets(structures_with_smells);
+        let m_info = StatsRenderer.set_smells_in_buckets(methods_with_smells);
+
+
         document.getElementById("stats_overview_sc").innerHTML = smells.length;
         document.getElementById("stats_overview_ti").innerHTML = total_intensity;
         document.getElementById("stats_overview_ai").innerHTML = avg_intensity;
@@ -143,54 +157,180 @@ module.exports = class StatsRenderer{
             document.getElementById("stats_overview_mcs").innerHTML = "-------";
 
 
+        if(f_info !== null){
+            document.getElementById("stats_overview_fwhsi").innerHTML = `${Util.get_file_name_from_path(f_info.most_intensity.id)} (${f_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_fwms").innerHTML = `${Util.get_file_name_from_path(f_info.most_smells.id)} (${f_info.most_smells.count})`;
+        }
+        else{
+            document.getElementById("stats_overview_fwhsi").innerHTML = "-------";
+            document.getElementById("stats_overview_fwms").innerHTML = "-------";
+        }
+        
+        if(s_info !== null){
+            document.getElementById("stats_overview_swhsi").innerHTML = `${s_info.most_intensity.id} (${s_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_swms").innerHTML = `${s_info.most_smells.id} (${s_info.most_smells.count})`;
+        }
+        else{
+            document.getElementById("stats_overview_swhsi").innerHTML = "-------";
+            document.getElementById("stats_overview_swms").innerHTML = "-------";
+        }
 
+        if(m_info !== null){
+            document.getElementById("stats_overview_mwhsi").innerHTML = `${m_info.most_intensity.id} (${m_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_mwms").innerHTML = `${m_info.most_smells.id} (${m_info.most_smells.count})`;
+        }
+        else{
+            document.getElementById("stats_overview_mwhsi").innerHTML = "-------";
+            document.getElementById("stats_overview_mwms").innerHTML = "-------";
+        }
         
+
+        if(s_info !== null){
+            this.compute_by_structure(s_info.rows);
+        }
+        else{
+            console.log("TODO");
+        }
         
-        this.compute_by_structure(structures_with_smells);
-        this.compute_by_file(files_with_smells);
+        if(f_info !== null){
+            this.compute_by_file(f_info.rows);
+        }
+        else {
+            console.log("TODO");
+        }
+        
     }
 
 
 
-    compute_by_structure(structures_with_smells){
+    /**
+     * 
+     * @param smells_dict = {
+     *      id0: {
+     *          smell_lvls = [smell_lvl0, smell_lvl1, ...]
+     *      },
+     *      ...,
+     *      ..
+     * } 
+     * 
+     * @returns = {
+     *      most_smells: {
+     *          id: ...,
+     *          count: ...    
+     *      },
+     *      most_intensity: {
+     *          id: ...,
+     *          total_lvl: ... 
+     *      },
+     *      rows: [
+     *          [idK, smell_lvlX, smell_lvlZ, .., .., .., .., .., .., ..],
+     *          ...,
+     *          ..
+     *      ]
+     * }
+     */
+    static set_smells_in_buckets(smells_dict){
+        if(Object.keys(smells_dict).length === 0)
+            return null;
+
+
+        let rows = [];
+        let most_intensity = new Object();
+        let most_smells = new Object();
+        most_smells.id = "------";
+        most_smells.count = 0;
+        most_intensity.id = "------";
+        most_intensity.total_lvl = 0;
+
+
+        for (const [key, value] of Object.entries(smells_dict)){
+            let smell_lvls = value.smell_lvls;
+            let smell_lvl_buckets = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            let smell_count_of_id = 0;
+            let total_intensity_of_id = 0;
+            
+            for(const smell_lvl of smell_lvls){
+                total_intensity_of_id += smell_lvl;
+                smell_count_of_id++;
+                let rounded = Math.round(smell_lvl);
+                if(rounded === 10) //  (put in range 9-10: smell_lvl_buckets[9])
+                    rounded = 9;
+                    smell_lvl_buckets[rounded]++;
+            }
+            if(smell_count_of_id > most_smells.count){
+                most_smells.count = smell_count_of_id;
+                most_smells.id = key;
+            }
+            if(total_intensity_of_id > most_intensity.total_lvl){
+                most_intensity.total_lvl = total_intensity_of_id;
+                most_intensity.id = key;
+            }
+            smell_lvl_buckets[smell_lvl_buckets.length] = total_intensity_of_id; // append temporarily the total intensity (for sorting)
+            let row = [key];
+            row.push(...smell_lvl_buckets);
+            rows.push(row);
+        }
+
+         // sort by total intensity
+         rows.sort((row1, row2) => {
+            if(row1[row1.length - 1] < row2[row2.length - 1])
+                return 1;
+            return -1;
+        });
+
+        // now remove the tmp sum.
+        for(let row of rows)
+            row.pop();
+
+
+        return {
+            most_smells: most_smells,
+            most_intensity: most_intensity,
+            rows: rows
+        };
+    }
+
+
+
+    compute_by_structure(rows){
         this.by_class_div.innerHTML = "Loading Chart";
 
         if(google_charts_loaded){
-            let rows = [];
-            for (const [key, value] of Object.entries(structures_with_smells)){ 
-                const structure_id = key;
-                let smell_lvls = value.smell_lvls;
-                let smell_lvl_ranges = [];
-                for(let i=0; i<10; i++){
-                    smell_lvl_ranges[i] = 0;
-                }
-                let structure_smell_lvl = 0;
-                for(const smell_lvl of smell_lvls){
-                    structure_smell_lvl += smell_lvl;
-                    let rounded = Math.round(smell_lvl);
-                    if(rounded === 10){ // put in range 9-10
-                        rounded = 9;
-                    }
-                    smell_lvl_ranges[rounded]++;
-                }
-                smell_lvl_ranges[smell_lvl_ranges.length] = structure_smell_lvl; // append temporarily the sum of smell_lvls
-                let row = [structure_id];
-                row.push(...smell_lvl_ranges);
-                rows.push(row);
-            }
+            // let rows = [];
+            // for (const [key, value] of Object.entries(structures_with_smells)){ 
+            //     const structure_id = key;
+            //     let smell_lvls = value.smell_lvls;
+            //     let smell_lvl_ranges = [];
+            //     for(let i=0; i<10; i++){
+            //         smell_lvl_ranges[i] = 0;
+            //     }
+            //     let structure_smell_lvl = 0;
+            //     for(const smell_lvl of smell_lvls){
+            //         structure_smell_lvl += smell_lvl;
+            //         let rounded = Math.round(smell_lvl);
+            //         if(rounded === 10){ // put in range 9-10
+            //             rounded = 9;
+            //         }
+            //         smell_lvl_ranges[rounded]++;
+            //     }
+            //     smell_lvl_ranges[smell_lvl_ranges.length] = structure_smell_lvl; // append temporarily the sum of smell_lvls
+            //     let row = [structure_id];
+            //     row.push(...smell_lvl_ranges);
+            //     rows.push(row);
+            // }
 
-            // sort by sum
-            rows.sort((row1, row2) => {
-                if(row1[row1.length - 1] < row2[row2.length - 1]){
-                    return 1;
-                }
-                return -1;
-            });
+            // // sort by sum
+            // rows.sort((row1, row2) => {
+            //     if(row1[row1.length - 1] < row2[row2.length - 1]){
+            //         return 1;
+            //     }
+            //     return -1;
+            // });
 
-            // now remove the tmp sum.
-            for(let row of rows){
-                row.pop();
-            }
+            // // now remove the tmp sum.
+            // for(let row of rows){
+            //     row.pop();
+            // }
 
 
 
@@ -262,48 +402,52 @@ module.exports = class StatsRenderer{
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_structure(structures_with_smells); }, 900);
+            setTimeout(function() { self.compute_by_structure(rows); }, 900);
         }
     }
 
-    compute_by_file(files_with_smells){
+    compute_by_file(rows){
         this.by_file_div.innerHTML = "Loading Chart";
 
         if(google_charts_loaded){
-            let rows = [];
-            for (const [key, value] of Object.entries(files_with_smells)){ 
-                const file_path = key;
-                let smell_lvls = value.smell_lvls;
-                let smell_lvl_ranges = [];
-                for(let i=0; i<10; i++){
-                    smell_lvl_ranges[i] = 0;
-                }
-                let file_smell_lvl = 0;
-                for(const smell_lvl of smell_lvls){
-                    file_smell_lvl += smell_lvl;
-                    let rounded = Math.round(smell_lvl);
-                    if(rounded === 10){ // put in range 9-10
-                        rounded = 9;
-                    }
-                    smell_lvl_ranges[rounded]++;
-                }
-                smell_lvl_ranges[smell_lvl_ranges.length] = file_smell_lvl; // append temporarily the sum of smell_lvls
-                let row = [Util.get_file_name_from_path(file_path)];
-                row.push(...smell_lvl_ranges);
-                rows.push(row);
-            }
+            // let rows = [];
+            // for (const [key, value] of Object.entries(files_with_smells)){ 
+            //     const file_path = key;
+            //     let smell_lvls = value.smell_lvls;
+            //     let smell_lvl_ranges = [];
+            //     for(let i=0; i<10; i++){
+            //         smell_lvl_ranges[i] = 0;
+            //     }
+            //     let file_smell_lvl = 0;
+            //     for(const smell_lvl of smell_lvls){
+            //         file_smell_lvl += smell_lvl;
+            //         let rounded = Math.round(smell_lvl);
+            //         if(rounded === 10){ // put in range 9-10
+            //             rounded = 9;
+            //         }
+            //         smell_lvl_ranges[rounded]++;
+            //     }
+            //     smell_lvl_ranges[smell_lvl_ranges.length] = file_smell_lvl; // append temporarily the sum of smell_lvls
+            //     let row = [Util.get_file_name_from_path(file_path)];
+            //     row.push(...smell_lvl_ranges);
+            //     rows.push(row);
+            // }
 
-            // sort by sum
-            rows.sort((row1, row2) => {
-                if(row1[row1.length - 1] < row2[row2.length - 1]){
-                    return 1;
-                }
-                return -1;
-            });
+            // // sort by sum
+            // rows.sort((row1, row2) => {
+            //     if(row1[row1.length - 1] < row2[row2.length - 1]){
+            //         return 1;
+            //     }
+            //     return -1;
+            // });
 
-            // now remove the tmp sum.
+            // // now remove the tmp sum.
+            // for(let row of rows){
+            //     row.pop();
+            // }
+
             for(let row of rows){
-                row.pop();
+                row[0] = Util.get_file_name_from_path(row[0]);
             }
 
 
@@ -379,7 +523,7 @@ module.exports = class StatsRenderer{
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_file(files_with_smells); }, 700);
+            setTimeout(function() { self.compute_by_file(rows); }, 700);
         }
     }
 
