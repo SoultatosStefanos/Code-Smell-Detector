@@ -33,6 +33,7 @@ async function init_backend(){
     Util.st_last_edit = fs.statSync(Util.st_path).mtime; // saves last edit time of st.
     Util.st_last_edit = Util.st_last_edit.toString();
     smells_config = require(get_full_path(smells_cfg_path));
+    //smells_config = JSON.parse(JSON.stringify(smells_config)); // clone object, otherwise another require will return the same reference as above...
     smell_detectors = get_smell_detectors(smells_config);
 
     return Util.get_smells_from_cache();
@@ -167,8 +168,8 @@ async function init_frontend(){
 
     
    
-    let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"));
-    detector_renderer.render(smells_config);
+    let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"), get_full_path(smells_cfg_path), smells_config);
+    detector_renderer.render();
 }
 
 
@@ -287,6 +288,7 @@ async function compute_smells(){
             smells_list.push(incident);
         }
     }
+    document.getElementById("cfg_changed_label").innerHTML = "";
     smell_renderer.render(smells_list);
     stat_renderer.compute_stats(smells_list, ST);
     await Util.save_smell_reports(smells_list);
@@ -307,7 +309,7 @@ async function compute_smells(){
 // dir: relative path to dir where smells.js are found
 function get_smell_detectors(smells_config){
     let _smell_detectors = [];
-    for(let smell_detector of smells_config.smells){
+    for(let smell_detector of smells_config.detectors){
         try {
             var smell_path = path.join(smells_config.folder, smell_detector.file);
             var new_smell_detector = require(smell_path);

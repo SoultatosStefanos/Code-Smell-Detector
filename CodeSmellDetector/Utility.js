@@ -147,5 +147,33 @@ module.exports = {
                 countof_methods += Object.keys(structure.methods).length;
         }
         return countof_methods;
-    }
+    },
+
+    // call function fn with delay = ms
+    // delay: (fn, ms) => {
+    //     let timer = 0;
+    //     return (...args) => {
+    //         clearTimeout(timer);
+    //         timer = setTimeout(fn.bind(this, ...args), ms || 0);
+    //     }
+    // },
+
+    // call function fn with delay = ms
+    // if called with the same label before the label specific timer runs out, the timer resets
+    delay_method: (label,callback,time) => {
+        if(typeof window.delayed_methods=="undefined")
+            window.delayed_methods={};
+        delayed_methods[label]=Date.now();
+        let t = delayed_methods[label];
+        setTimeout(function(){ 
+            if(delayed_methods[label]!=t)
+                return;
+            else{  
+                delayed_methods[label]="";
+                callback();
+            }
+        }, time||500);
+      }
+
+
 }

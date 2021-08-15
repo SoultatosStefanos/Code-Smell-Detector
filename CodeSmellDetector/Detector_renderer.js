@@ -1,4 +1,6 @@
 const assert = require('assert');
+const { delay } = require('./Smell_renderer');
+const Util = require("D:/Thesis/CodeSmellDetector/Utility");
 
 module.exports = class DetectorRenderer{
 
@@ -6,11 +8,14 @@ module.exports = class DetectorRenderer{
     static detector_nav_button_ids;
     static currently_selected_det_div;
     static currently_selected_nav_button;
+    static timed_func;
 
 
-    constructor(detectors_holder, detectors_nav){
+    constructor(detectors_holder, detectors_nav, detectors_cfg_path, smells_config_ref){
         this.detectors_holder = detectors_holder;
         this.detectors_nav = detectors_nav;
+        this.detectors_cfg_path = detectors_cfg_path;
+        this.smells_config_ref = smells_config_ref;
     }
 
     // when a nav button is clicked the view changes and a new nav button is hightlighted.
@@ -33,9 +38,36 @@ module.exports = class DetectorRenderer{
         }
     }
 
+    // static delay(fn, ms) {
+    //     let timer = 0;
+    //     return (...args) => {
+    //         clearTimeout(timer);
+    //         timer = setTimeout(fn.bind(this, ...args), ms || 0);
+    //     }
+    // }
 
-    render(smells_config){
-        let smell_detectors = smells_config.smells;
+
+    // must be called whenever detectors configuration changes.
+    // main use: re-computation warning activate / deactivate.
+    detector_config_change(){
+        Util.delay_method("recompute", () => {
+            delete require.cache[require.resolve(this.detectors_cfg_path)];
+            let saved_configuration = require(this.detectors_cfg_path);
+            if(JSON.stringify(this.smells_config_ref) === JSON.stringify(saved_configuration)){
+                document.getElementById("cfg_changed_label").innerHTML = "";
+            }
+            else {
+                document.getElementById("cfg_changed_label").innerHTML = "Detector configuration changed, smell recomputation needed";
+            }
+        }, 500);
+        //DetectorRenderer.timed_func();
+    }
+
+    
+
+
+    render(){
+        let smell_detectors = this.smells_config_ref.detectors;
         if(smell_detectors.length === 0){
             console.log("No detectors to render");
             return;
@@ -130,6 +162,7 @@ module.exports = class DetectorRenderer{
                 slide: (event, ui) => {
                     $(`#${slider.values_label}`).text(ui.values[0] + " - " + ui.values[1]);
                     slider.arg_obj.range = ui.values;
+                    this.detector_config_change();
                 }
             });
             $(`#${slider.values_label}`).text($(`#${slider.div}`).slider("values", 0) + " - " + $(`#${slider.div}`).slider("values", 1));
@@ -140,7 +173,7 @@ module.exports = class DetectorRenderer{
             checkbox.checked = flag.arg_obj.val;
             checkbox.onchange = () => {
                 flag.arg_obj.val = !flag.arg_obj.val;
-                console.log(flag.arg_obj.val);
+                this.detector_config_change();
             };
         }
 
@@ -158,6 +191,7 @@ module.exports = class DetectorRenderer{
             select.value = dropdown.arg_obj.val;
             select.onchange = (e) => {
                 dropdown.arg_obj.val = select.value;
+                this.detector_config_change();
             }
             document.getElementById(dropdown.div).appendChild(select);
         }

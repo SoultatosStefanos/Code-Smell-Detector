@@ -21,13 +21,14 @@ module.exports = class SmellRenderer{
     static smells_ref;
     static modal;
 
-    static delay(fn, ms) {
-        let timer = 0;
-        return (...args) => {
-            clearTimeout(timer);
-            timer = setTimeout(fn.bind(this, ...args), ms || 0);
-        }
-    }
+    // // calls fn with delay = ms
+    // static delay(fn, ms) {
+    //     let timer = 0;
+    //     return (...args) => {
+    //         clearTimeout(timer);
+    //         timer = setTimeout(fn.bind(this, ...args), ms || 0);
+    //     }
+    // }
 
     constructor(html_smell_table, smell_detectors, sort_by, order){
         this.html_smell_table = html_smell_table;
@@ -39,15 +40,27 @@ module.exports = class SmellRenderer{
 
         this.init_show_only();
 
-        $("#seach_txtfield").keyup(SmellRenderer.delay(() => {
-            let text_field_contents = document.getElementById('seach_txtfield').value;
-            this.text_filter = text_field_contents;
-            this.render(SmellRenderer.smells_ref);
-            // if(text_field_contents !== "")
-            //     this.render(SmellRenderer.smells_ref, text_field_contents);
-            // else
-            //     this.render(SmellRenderer.smells_ref);
-        }, 500));
+        // $("#seach_txtfield").keyup(Util.delay(() => {
+        //     let text_field_contents = document.getElementById('seach_txtfield').value;
+        //     this.text_filter = text_field_contents;
+        //     this.render(SmellRenderer.smells_ref);
+        //     // if(text_field_contents !== "")
+        //     //     this.render(SmellRenderer.smells_ref, text_field_contents);
+        //     // else
+        //     //     this.render(SmellRenderer.smells_ref);
+        // }, 500));
+
+        $("#seach_txtfield").keyup(() => {
+            Util.delay_method("smell_txt_search", () => {
+                let text_field_contents = document.getElementById('seach_txtfield').value;
+                this.text_filter = text_field_contents;
+                this.render(SmellRenderer.smells_ref);
+                // if(text_field_contents !== "")
+                //     this.render(SmellRenderer.smells_ref, text_field_contents);
+                // else
+                //     this.render(SmellRenderer.smells_ref);
+            }, 500);
+        });
 
         SmellRenderer.modal = (function(){
             var method = {}, $overlay, $modal, $content, $close, $save, $delete, smell_ref, smell_num;

@@ -6,6 +6,14 @@ body {
   padding: 20px;
 }
 
+#cfg_changed_holder{
+    min-height: 40px;
+}
+
+#cfg_changed_label{
+    color: red;
+}
+
 button:focus { outline: none; }
 
 #b_compute_code_smells{

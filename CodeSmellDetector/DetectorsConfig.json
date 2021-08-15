@@ -1,6 +1,6 @@
 {
     "folder": "D:\\Thesis\\CodeSmellDetector\\Smells",
-    "smells": [
+    "detectors": [
         {
             "name": "Too many parameters",
             "file": "Method_argc.js",
@@ -10,8 +10,8 @@
                     "formal_name": "Maximum method arguments",
                     "type": "range",
                     "range": [
-                        3,
-                        12
+                        6,
+                        10
                     ],
                     "limits": [
                         2,
@@ -30,7 +30,7 @@
                     "formal_name": "Maximum method literals",
                     "type": "range",
                     "range": [
-                        15,
+                        1,
                         30
                     ],
                     "limits": [
@@ -220,7 +220,7 @@
                     "formal_name": "Maximum depth of nested blocks",
                     "type": "range",
                     "range": [
-                        4,
+                        3,
                         7
                     ],
                     "limits": [
@@ -261,7 +261,7 @@
                     "type": "range",
                     "range": [
                         8,
-                        17
+                        29
                     ],
                     "limits": [
                         2,
@@ -297,7 +297,7 @@
                     "formal_name": "Maximum source file lines",
                     "type": "range",
                     "range": [
-                        500,
+                        619,
                         1200
                     ],
                     "limits": [
