@@ -158,7 +158,7 @@ module.exports = class StatsRenderer{
 
 
         if(f_info !== null){
-            document.getElementById("stats_overview_fwhsi").innerHTML = `${Util.get_file_name_from_path(f_info.most_intensity.id)} (${f_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_fwhsi").innerHTML = `${Util.get_file_name_from_path(f_info.most_intensity.id)} (${Math.round(f_info.most_intensity.total_lvl*100)/100})`;
             document.getElementById("stats_overview_fwms").innerHTML = `${Util.get_file_name_from_path(f_info.most_smells.id)} (${f_info.most_smells.count})`;
         }
         else{
@@ -167,7 +167,7 @@ module.exports = class StatsRenderer{
         }
         
         if(s_info !== null){
-            document.getElementById("stats_overview_swhsi").innerHTML = `${s_info.most_intensity.id} (${s_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_swhsi").innerHTML = `${s_info.most_intensity.id} (${Math.round(s_info.most_intensity.total_lvl*100)/100})`;
             document.getElementById("stats_overview_swms").innerHTML = `${s_info.most_smells.id} (${s_info.most_smells.count})`;
         }
         else{
@@ -176,7 +176,7 @@ module.exports = class StatsRenderer{
         }
 
         if(m_info !== null){
-            document.getElementById("stats_overview_mwhsi").innerHTML = `${m_info.most_intensity.id} (${m_info.most_intensity.total_lvl})`;
+            document.getElementById("stats_overview_mwhsi").innerHTML = `${m_info.most_intensity.id} (${Math.round(m_info.most_intensity.total_lvl*100)/100})`;
             document.getElementById("stats_overview_mwms").innerHTML = `${m_info.most_smells.id} (${m_info.most_smells.count})`;
         }
         else{
