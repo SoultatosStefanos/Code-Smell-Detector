@@ -2,9 +2,19 @@
 const assert = require('assert');
 
 module.exports = {
-    st_path: "D:/Thesis/ST0.json",
+    st_path: "../ST0.json",
     st_last_edit: null,
-    smell_reports_save: "D:/Thesis/CodeSmellDetector/SmellReports.json",
+    smell_reports_save: "SmellReports.json",
+
+    /**
+     * @argument relative_path: relative path to Main.js || Main.js behaves as if under "./code-smell-detector-gui/src"
+     * @returns full path
+    */
+    get_full_path: (relative_path) => {
+        let full_path = __dirname + "\\" + relative_path;
+        full_path = path.normalize(full_path);
+        return full_path.replace(/\\/g, "/");
+    },
 
     execute_smell_callback: async (smell_detector, ST) => {
         let report = new Object();
@@ -105,22 +115,34 @@ module.exports = {
      * @returns previous smell reports if the st matches the one that was used last time. Otherwise null
      */
     get_smells_from_cache: () => {
-        const previous_smells = require(module.exports.smell_reports_save);
-        if(previous_smells.computed_for.file === module.exports.st_path && previous_smells.computed_for.last_edit === module.exports.st_last_edit)
-            return previous_smells.smells;
+        try {
+            const previous_smells = require(module.exports.get_full_path(module.exports.smell_reports_save));
+            if(previous_smells.computed_for.file === module.exports.get_full_path(module.exports.st_path) && previous_smells.computed_for.last_edit === module.exports.st_last_edit)
+                return previous_smells.smells;
+            else{
+                console.log("Smells cache does not match current symbol table version. Smell computation needed.")
+                document.getElementById("cfg_changed_label").innerHTML = "Smells cache does not match current symbol table version. Smell computation needed.";
+            }
+                
+
+        } catch (error) {
+            console.log("Smells cache not found. Smell computation needed.");
+            document.getElementById("cfg_changed_label").innerHTML = "Smells cache not found. Smell computation needed.";
+        }
+
         return null;
     },
 
     save_smell_reports: async (smell_reports) => {
         let json = new Object();
         let computed_for = new Object();
-        computed_for.file = module.exports.st_path;
+        computed_for.file = module.exports.get_full_path(module.exports.st_path);
         computed_for.last_edit = module.exports.st_last_edit;
         json.computed_for = computed_for;
         json.smells = smell_reports;
     
         json = JSON.stringify(json, null, 4);
-        fs.writeFile(module.exports.smell_reports_save, json, "utf8", (error) => {
+        fs.writeFile(get_full_path(module.exports.smell_reports_save), json, "utf8", (error) => {
             if(error) throw error;
         });
     },

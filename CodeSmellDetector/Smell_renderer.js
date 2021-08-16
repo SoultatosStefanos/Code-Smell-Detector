@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { exec } = require('child_process');
-const Util = require("D:/Thesis/CodeSmellDetector/Utility");
+const Util = require("./Utility.js");
 const text_editor_call = "code -g";
 
 module.exports = class SmellRenderer{

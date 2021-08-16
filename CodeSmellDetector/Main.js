@@ -3,15 +3,18 @@
 /**
      * @argument relative_path: relative path to Main.js || Main.js behaves as if under "./code-smell-detector-gui/src"
      * @returns full path
-*/
+    */
 function get_full_path(relative_path){
-    return __dirname + "\\..\\..\\" + relative_path;
+    let full_path = __dirname + "\\..\\..\\" + relative_path;
+    full_path = path.normalize(full_path);
+    return full_path.replace(/\\/g, "/");
 }
 
 const fs = require("fs");
 const path = require("path");
 const Util = require(get_full_path("Utility.js"));
 const SmellRenderer = require(get_full_path("Smell_renderer.js"));
+console.log(get_full_path("Smell_renderer.js"));
 const DetectorRenderer = require(get_full_path("Detector_renderer.js"));
 const StatsRenderer = require(get_full_path("Stats_renderer"));
 const smells_cfg_path = "DetectorsConfig.json";
@@ -29,8 +32,8 @@ async function initialize(){
  * @returns previous smell reports if the st matches the one that was used last time. Otherwise null
  */
 async function init_backend(){
-    ST = require(Util.st_path); // loads json ST.
-    Util.st_last_edit = fs.statSync(Util.st_path).mtime; // saves last edit time of st.
+    ST = require(Util.get_full_path(Util.st_path)); // loads json ST.
+    Util.st_last_edit = fs.statSync(Util.get_full_path(Util.st_path)).mtime; // saves last edit time of st.
     Util.st_last_edit = Util.st_last_edit.toString();
     smells_config = require(get_full_path(smells_cfg_path));
     //smells_config = JSON.parse(JSON.stringify(smells_config)); // clone object, otherwise another require will return the same reference as above...

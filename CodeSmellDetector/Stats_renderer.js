@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { Stats } = require('fs');
-const Util = require('./Utility');
+const Util = require("./Utility.js");
 
 module.exports = class StatsRenderer{
     constructor(overview_div, by_class_div, by_file_div){

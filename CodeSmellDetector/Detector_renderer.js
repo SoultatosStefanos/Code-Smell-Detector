@@ -1,6 +1,6 @@
 const assert = require('assert');
 const { delay } = require('./Smell_renderer');
-const Util = require("D:/Thesis/CodeSmellDetector/Utility");
+const Util = require("./Utility.js");
 
 module.exports = class DetectorRenderer{
 

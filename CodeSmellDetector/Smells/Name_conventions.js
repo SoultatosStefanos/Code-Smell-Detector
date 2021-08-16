@@ -1,6 +1,5 @@
 const Util = require("../Utility.js");
 const assert = require('assert');
-const { is_standard_class_func } = require("../Utility.js");
 
 module.exports = {
     callback: async function(ST, args){
