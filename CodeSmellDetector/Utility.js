@@ -1,10 +1,11 @@
 // A general utility object
 const assert = require('assert');
+const MainCfg = require('./MainConfig.json');
 
 module.exports = {
-    st_path: "../ST0.json",
+    st_path: MainCfg.ST_Path,
     st_last_edit: null,
-    smell_reports_save: "SmellReports.json",
+    smell_reports_save: MainCfg.SmellsCache_Path,
 
     /**
      * @argument relative_path: relative path to Main.js || Main.js behaves as if under "./code-smell-detector-gui/src"

@@ -17,7 +17,7 @@ const SmellRenderer = require(get_full_path("Smell_renderer.js"));
 console.log(get_full_path("Smell_renderer.js"));
 const DetectorRenderer = require(get_full_path("Detector_renderer.js"));
 const StatsRenderer = require(get_full_path("Stats_renderer"));
-const smells_cfg_path = "DetectorsConfig.json";
+const smells_cfg_path = require(get_full_path("MainConfig.json")).DetectorsConfig_Path;
 
 // JavaScript runs an event loop, thus, global objects are necessary
 let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = null, smell_renderer, stat_renderer;
