@@ -1,7 +1,7 @@
 const assert = require('assert');
 const { exec } = require('child_process');
 const Util = require("./Utility.js");
-const text_editor_call = "code -g";
+const text_editor_call = require("./MainConfig.json").TextEditorStartUpCommand;
 
 module.exports = class SmellRenderer{
     static EnumPreferences = {

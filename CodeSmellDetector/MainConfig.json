@@ -1,5 +1,23 @@
+
+
+
+
 {
     "ST_Path": "../ST0.json",
-    "SmellsCache_Path": "SmellReports.json",
-    "DetectorsConfig_Path": "./DetectorsConfig.json"
+    "SmellsCache_Path": "./SmellReports.json",
+    "DetectorsConfig_Path": "./DetectorsConfig.json",
+    "TextEditorStartUpCommand": "code -g"
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
