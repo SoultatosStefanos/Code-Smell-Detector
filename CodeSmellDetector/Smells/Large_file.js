@@ -11,7 +11,7 @@ module.exports = {
             if(smell_level > 0){
                 msg = `Header file: "${header}" has ${lines} of code.`;
                 src = Util.get_src_obj(header, 1, 1);
-                report.push(Util.get_incident_obj(src, msg, smell_level));
+                report.push(Util.get_smell_obj(src, msg, smell_level));
             }
         }
         for(const source of ST.sources){
@@ -20,7 +20,7 @@ module.exports = {
             if(smell_level > 0){
                 msg = `Source file: "${source}" has ${lines} of code.`;
                 src = Util.get_src_obj(source, 1, 1);
-                report.push(Util.get_incident_obj(src, msg, smell_level));
+                report.push(Util.get_smell_obj(src, msg, smell_level));
             }
         }
         return report;

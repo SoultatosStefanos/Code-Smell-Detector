@@ -58,7 +58,7 @@ module.exports = {
     /**
      *  @returns parameters as an object
      */
-    get_incident_obj: (src, msg, lvl) => {
+    get_smell_obj: (src, msg, lvl) => {
        return {
            msg: msg,
            src: src,

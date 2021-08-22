@@ -13,13 +13,13 @@ module.exports = {
                 if(smell_level > 0){
                     msg = `Method: "${method_id}" has ${branches} branching statements.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                    report.push(Util.get_incident_obj(src, msg, smell_level));
+                    report.push(Util.get_smell_obj(src, msg, smell_level));
                 }
                 smell_level = Util.get_smell_lvl(args.max_loops.range, loops);
                 if(smell_level > 0){
                     msg = `Method: "${method.constructor.name}" has ${loops} loop statements.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                    report.push(Util.get_incident_obj(src, msg, smell_level));
+                    report.push(Util.get_smell_obj(src, msg, smell_level));
                 }
             }
         }

@@ -73,7 +73,7 @@ async function iterate_file(file_path, max_line_len){
         if(smell_level > 0){
             msg = `Line ${line_counter} of ${file_path} has an un-commented length of ${info.len} characters`;
             src = Util.get_src_obj(file_path, line_counter);
-            file_report.push(Util.get_incident_obj(src, msg, smell_level));
+            file_report.push(Util.get_smell_obj(src, msg, smell_level));
         }
     }
     return file_report;

@@ -4,7 +4,7 @@
         {
             "name": "Too many parameters",
             "file": "Method_argc.js",
-            "description": "Detects excessive method parameter count",
+            "description": "Detects methods with an excessive amount of parameters",
             "args": {
                 "max_argc": {
                     "formal_name": "Maximum method arguments",
@@ -18,8 +18,7 @@
                         15
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Too many function literals",
@@ -30,7 +29,7 @@
                     "formal_name": "Maximum method literals",
                     "type": "range",
                     "range": [
-                        1,
+                        13,
                         30
                     ],
                     "limits": [
@@ -38,8 +37,7 @@
                         50
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Too many locals",
@@ -58,8 +56,7 @@
                         30
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Long function",
@@ -90,8 +87,7 @@
                         200
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Cyclomatic complexity",
@@ -122,8 +118,7 @@
                         60
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Excessively long identifier",
@@ -142,8 +137,7 @@
                         100
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Excessively long line of code",
@@ -151,7 +145,7 @@
             "description": "Detects too long lines of un-commented code",
             "args": {
                 "max_line_len": {
-                    "formal_name": "Maximum length of a line",
+                    "formal_name": "Maximum length of a line in characters",
                     "type": "range",
                     "range": [
                         100,
@@ -162,8 +156,7 @@
                         200
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Naming conventions",
@@ -174,8 +167,7 @@
                     "UpperCamelCase": "([A-Z][a-z0-9]*)((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "lowerCamelCase": "[a-z]+((\\d)|([A-Z0-9][a-z0-9]+))*([A-Z])?",
                     "snake_case": "([a-z]*_?[a-z]*)*",
-                    "any": "[\\s\\S]*",
-                    "custom0": "regex4"
+                    "any": "[\\s\\S]*"
                 },
                 "class_names": {
                     "formal_name": "Class names",
@@ -208,8 +200,7 @@
                         60
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Nested scopes",
@@ -228,8 +219,7 @@
                         12
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Circular dependency",
@@ -248,8 +238,7 @@
                         20
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Large Class",
@@ -285,8 +274,7 @@
                     "val": true,
                     "type": "boolean"
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Large File",
@@ -317,8 +305,7 @@
                         800
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Inappropriate Intimacy",
@@ -337,8 +324,7 @@
                         200
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Non virtual base destructor",
@@ -363,8 +349,7 @@
                         20
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Excessive function overloading",
@@ -383,8 +368,7 @@
                         20
                     ]
                 }
-            },
-            "hidden": false
+            }
         },
         {
             "name": "Many dependencies",
@@ -403,8 +387,7 @@
                         40
                     ]
                 }
-            },
-            "hidden": false
+            }
         }
     ]
 }

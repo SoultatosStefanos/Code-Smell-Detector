@@ -15,7 +15,7 @@ module.exports = {
                     `member expressions regarding structure "${dependency.to}" at ` +
                     `${to.src_info.file}:${to.src_info.line}:${to.src_info.col}.`;
                     src = Util.get_src_obj(from.src_info.file, from.src_info.line, from.src_info.col);
-                    report.push(Util.get_incident_obj(src, msg, smell_level));
+                    report.push(Util.get_smell_obj(src, msg, smell_level));
                 }
             }
         }

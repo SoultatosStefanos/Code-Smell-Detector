@@ -33,7 +33,7 @@ module.exports = {
                     smell_level = lines_smell_lvl;
                 }
                 src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                report.push(Util.get_incident_obj(src, msg, smell_level));
+                report.push(Util.get_smell_obj(src, msg, smell_level));
             }
         }
         return report;

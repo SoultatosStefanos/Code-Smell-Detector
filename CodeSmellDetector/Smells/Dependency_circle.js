@@ -17,7 +17,7 @@ module.exports = {
                 }
                 msg += `${circuit[circuit.length - 1]}\n`;
                 src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, circuit[0]);
-                report.push(Util.get_incident_obj(src, msg, smell_level));
+                report.push(Util.get_smell_obj(src, msg, smell_level));
             }
         }
         return report;

@@ -10,7 +10,7 @@ module.exports = {
             if(smell_level > 0){
                 msg = `Structure: "${structure_id}" has an id of ${id_len} characters.`;
                 src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, structure_id);
-                report.push(Util.get_incident_obj(src, msg, smell_level));
+                report.push(Util.get_smell_obj(src, msg, smell_level));
             }
             for(const method_id in structure.methods){
                 const method = structure.methods[method_id];
@@ -19,14 +19,14 @@ module.exports = {
                 if(smell_level > 0){
                     msg = `Method: "${method_id}" has an id of ${id_len} characters.`;
                     src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                    report.push(Util.get_incident_obj(src, msg, smell_level));
+                    report.push(Util.get_smell_obj(src, msg, smell_level));
                 }
                 for(const arg_id in method.args){
                     smell_level = Util.get_smell_lvl(args.max_id_len.range, arg_id.length);
                     if(smell_level > 0){
                         msg = `Argument: "${arg_id}" of "${method_id}" has an id of ${arg_id.length} characters.`;
                         src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                        report.push(Util.get_incident_obj(src, msg, smell_level));
+                        report.push(Util.get_smell_obj(src, msg, smell_level));
                     }
                 }
                 for(const def_id in method.definitions){
@@ -34,7 +34,7 @@ module.exports = {
                     if(smell_level > 0){
                         msg = `Definition: "${def_id}" in "${method_id}" has an id of ${def_id.length} characters.`;
                         src = Util.get_src_obj(method.src_info.file, method.src_info.line, method.src_info.col, structure_id, method_id);
-                        report.push(Util.get_incident_obj(src, msg, smell_level));
+                        report.push(Util.get_smell_obj(src, msg, smell_level));
                     }
                 }
             }
@@ -44,7 +44,7 @@ module.exports = {
                 if(smell_level > 0){
                     msg = `Field: "${field_id}" of "${structure_id}" has an id of ${id_len} characters.`;
                     src = Util.get_src_obj(structure.src_info.file, structure.src_info.line, structure.src_info.col, structure_id);
-                    report.push(Util.get_incident_obj(src, msg, smell_level));
+                    report.push(Util.get_smell_obj(src, msg, smell_level));
                 }
             }
         }
