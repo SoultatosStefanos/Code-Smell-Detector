@@ -896,7 +896,7 @@ static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can
 int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string>& srcs, std::vector<std::string>& headers, const char* ignoredFilePaths, const char* ignoredNamespaces) {
 	ClangTool* Tool;
 	std::unique_ptr<CompilationDatabase> cmpDB;
-	CommonOptionsParser *OptionsParser = nullptr;
+	//CommonOptionsParser *OptionsParser = nullptr;
 
 	if (cmpDBPath == nullptr) {
 		int argc = 3;
@@ -904,7 +904,10 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::
 		argv[0] = "";
 		argv[1] = "";
 		argv[2] = "--";
-		OptionsParser = new CommonOptionsParser(argc, argv, MyToolCategory);
+
+		auto OptionsParser = CommonOptionsParser::create(argc, argv, MyToolCategory);
+		//OptionsParser = new CommonOptionsParser(argc, argv, MyToolCategory);
+
 		Tool = new ClangTool(OptionsParser->getCompilations(), srcs);
 	}
 	else {
@@ -935,7 +938,5 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::
 	SetFiles(Tool, srcs, headers);
 	
 	delete Tool;
-	if (OptionsParser)
-		delete OptionsParser;
 	return result;
 }

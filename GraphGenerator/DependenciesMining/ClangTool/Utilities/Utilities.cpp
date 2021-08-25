@@ -65,7 +65,12 @@ void dependenciesMining::AppendTemplateArgNameCallback(const TemplateArgument& t
 		auto qualifiedName = d->getQualifiedNameAsString();
 		auto name = d->getName().str(); 
 		if (templateArg.getKind() == TemplateArgument::Integral) {
-			name = templateArg.getAsIntegral().toString(10);
+			llvm::SmallVector<char> str;
+			templateArg.getAsIntegral().toString(str);
+			name = "";
+			for (auto c : str) {
+				name += c;
+			}
 		}
 		if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 			 *args += qualifiedName + GetInnerTemplateArgs(d);							
@@ -78,7 +83,12 @@ void dependenciesMining::AppendTemplateArgNameCallback(const TemplateArgument& t
 	else {
 		std::string name = argType.getAsString();
 		if (templateArg.getKind() == TemplateArgument::Integral) {
-			name = templateArg.getAsIntegral().toString(10);
+			llvm::SmallVector<char> str;
+			templateArg.getAsIntegral().toString(str);
+			name = "";
+			for (auto c : str) {
+				name += c;
+			}
 		}
 		*args += name;
 	}
