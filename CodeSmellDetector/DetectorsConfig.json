@@ -148,7 +148,7 @@
                     "formal_name": "Maximum length of a line in characters",
                     "type": "range",
                     "range": [
-                        100,
+                        120,
                         150
                     ],
                     "limits": [
