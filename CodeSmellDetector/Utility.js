@@ -17,6 +17,10 @@ module.exports = {
         return full_path.replace(/\\/g, "/");
     },
 
+    uniform_path: (path) => {
+        return path.replace(/\\/g, "/");
+    },
+
     execute_smell_callback: async (smell_detector, ST) => {
         let report = new Object();
         const startTime = Date.now();

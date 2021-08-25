@@ -75,13 +75,14 @@ module.exports = class StatsRenderer{
                     structures_with_smells[smell.src.struct].smell_lvls.push(smell.lvl);
             }
             if(smell.src.file !== ""){
-                if(files_with_smells[smell.src.file] === undefined){
+                let uniform_path = Util.uniform_path(smell.src.file);
+                if(files_with_smells[uniform_path] === undefined){
                     // files_with_smells[smell.src.file] = [smell.lvl];
-                    files_with_smells[smell.src.file] = new Object();
-                    files_with_smells[smell.src.file].smell_lvls = [smell.lvl];
+                    files_with_smells[uniform_path] = new Object();
+                    files_with_smells[uniform_path].smell_lvls = [smell.lvl];
                 }
                 else
-                    files_with_smells[smell.src.file].smell_lvls.push(smell.lvl);
+                    files_with_smells[uniform_path].smell_lvls.push(smell.lvl);
             }
             if(smell.src.method !== null){
                 if(methods_with_smells[smell.src.method] === undefined){
@@ -115,6 +116,8 @@ module.exports = class StatsRenderer{
                 detector_with_most_smells = key;
             }
         }
+
+        console.log(files_with_smells);
 
         let countof_files_with_smells = Object.keys(files_with_smells).length;
         let countof_structures_with_smells = Object.keys(structures_with_smells).length;
