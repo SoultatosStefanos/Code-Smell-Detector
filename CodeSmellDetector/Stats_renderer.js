@@ -372,9 +372,9 @@ module.exports = class StatsRenderer{
                 legend: { position: 'top', maxLines: 2 },
                 //bar: { groupWidth: '75%' },
                 isStacked: true,
-                chartArea:{left:250,top:100, width: 1200, height: rows.length * 34,},
+                chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
                 width: 1400,
-                height: rows.length * 40,
+                height: 100 + rows.length * 40,
                 colors: col_rgb_colors,
                 backgroundColor: '#F6FFEF'
             };
@@ -494,9 +494,9 @@ module.exports = class StatsRenderer{
                 legend: { position: 'top', maxLines: 2 },
                 //bar: { groupWidth: '75%' },
                 isStacked: true,
-                chartArea:{left:250,top:100, width: 1200, height: rows.length * 34},
+                chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
                 width: 1400,
-                height: rows.length * 40,
+                height: 100 + rows.length * 40,
                 colors: col_rgb_colors,
                 backgroundColor: '#F6FFEF'
             };
