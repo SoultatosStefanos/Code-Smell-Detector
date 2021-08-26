@@ -37,8 +37,46 @@ module.exports = class SmellRenderer{
         this.sort_by = sort_by;
         this.order = order;
         this.text_filter = "";
-
+        
         this.init_show_only();
+
+        this.smells_per_page = 10;
+        this.smell_page = 1;
+        this.total_smell_pages = 1;
+        document.getElementById("b_10_smells_per_page").onclick = () => {
+            this.smells_per_page = 10;
+            this.render(SmellRenderer.smells_ref);
+        };
+        document.getElementById("b_20_smells_per_page").onclick = () => {
+            this.smells_per_page = 20;
+            this.render(SmellRenderer.smells_ref);
+        };
+        document.getElementById("b_50_smells_per_page").onclick = () => {
+            this.smells_per_page = 50;
+            this.render(SmellRenderer.smells_ref);
+        };
+        document.getElementById("b_100_smells_per_page").onclick = () => {
+            this.smells_per_page = 100;
+            this.render(SmellRenderer.smells_ref);
+        };
+        document.getElementById("b_200_smells_per_page").onclick = () => {
+            this.smells_per_page = 200;
+            this.render(SmellRenderer.smells_ref);
+        };
+
+        document.getElementById("b_prev_page").onclick = () => {
+            if(this.smell_page === 1)
+                return;
+            this.smell_page--;
+            this.render(SmellRenderer.smells_ref, false);
+        }
+        document.getElementById("b_next_page").onclick = () => {
+            if(this.smell_page >= this.total_smell_pages)
+                return;
+            this.smell_page++;
+            this.render(SmellRenderer.smells_ref, false);
+        }
+        
 
         // $("#seach_txtfield").keyup(Util.delay(() => {
         //     let text_field_contents = document.getElementById('seach_txtfield').value;
@@ -353,7 +391,9 @@ module.exports = class SmellRenderer{
         return false;
     }
 
-    async render(smells){
+    async render(smells, reset_page = true){
+        if(reset_page)
+            this.smell_page = 1;
         
         smells.sort(this.get_smell_sort_func());
 
@@ -363,12 +403,22 @@ module.exports = class SmellRenderer{
         // let html_str = "<tr><th>Detector</th>" +
         // "<th>Intensity</th><th>Location</th><th>Structure</th><th>Message</th></tr>";
         let smell_num = -1;
+        let candidate_shown_smells = 0; // this is the sum of smells that could be shown. However out of all the candidates some will be shown only, those that belong to the current page.
+        let first_shown_smell = (this.smell_page - 1) * this.smells_per_page;
+        let last_shown_smell = (this.smell_page * this.smells_per_page) - 1;
         for(const smell of smells){
             smell_num++;
             if(!this.shown_detectors.includes(smell.detector)) continue;
             if(this.text_filter !== ""){
                 if(!SmellRenderer.smell_contains_query(smell, this.text_filter)) continue;
             }
+
+            if((candidate_shown_smells < first_shown_smell) || (candidate_shown_smells > last_shown_smell)){
+                candidate_shown_smells++;
+                continue;
+            }
+            candidate_shown_smells++;
+
 
             let green = 255 - 25.5 * smell.lvl;
             html_str += `<tr style='background-color:rgba(255, ${green}, 0, 0.6)'><td>${smell.detector}</td>` +
@@ -381,8 +431,12 @@ module.exports = class SmellRenderer{
                 html_str += `<i id='note_holder${smell_num}' class='icon_edit_note' onclick='SmellRenderer.edit_note(${smell_num})'></i></td></tr>`;
             }
         }
+        this.total_smell_pages = Math.trunc((candidate_shown_smells - 1) / this.smells_per_page) + 1;
+
+
         this.html_smell_table.innerHTML = html_str;
         SmellRenderer.smells_ref = smells;
+        document.getElementById("page_info").innerHTML = ` Page ${this.smell_page}/${this.total_smell_pages} `;
         this.set_text_editor_on_path_click();
     }
 };

@@ -121,6 +121,38 @@ button:focus { outline: none; }
     display: block;
 }
 
+#smells_per_page{
+    position: relative;
+    display: inline-block;
+}
+
+#smells_per_page_content{
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 90px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+#smells_per_page:hover #smells_per_page_content{
+    display: block;
+}
+
+/*
+
+<div id="page_functionality">
+                <button id="b_smells_per_page">Smells / page</button>
+                <div id="smells_per_page_content">
+                    <button id="b_10_smells_per_page">10</button>
+                    <button id="b_20_smells_per_page">20</button>
+                    <button id="b_40_smells_per_page">40</button>
+                    <button id="b_80_smells_per_page">80</button>
+                    <button id="b_160_smells_per_page">160</button>
+                </div>
+            </div>
+*/
+
 .dropdown_b{
     width: 100%;
 }
@@ -434,14 +466,12 @@ li {
     /* background-color: rgb(41, 40, 40); */
 }
 
-#stats_by_class{
-    border: 2px solid black;
+/* #stats_by_class{
 }
 
 
 #stats_by_file{
-    border: 2px solid black;
-}
+} */
 
 .stats_overview_category {
     width: 450px;

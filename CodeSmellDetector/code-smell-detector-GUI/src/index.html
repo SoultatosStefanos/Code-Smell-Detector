@@ -39,7 +39,6 @@
     
   </head>
   <body>
-
     <h1>Code Smell Detector </h1>
     <div id="cfg_changed_holder">
         <h3 id="cfg_changed_label"></h3>
@@ -69,14 +68,33 @@
                     </div> 
                 </div>
                 <div id="show_only">
-                    <button id="b_show_only">Show Only</button>
+                    <button id="b_show_only">Shown Detectors</button>
                     <div id="show_only_dropdown_content">
                     </div>
                 </div>
+                <div id="smells_per_page">
+                    <button id="b_smells_per_page">Smells / Page</button>
+                    <div id="smells_per_page_content">
+                        <button id="b_10_smells_per_page" class="dropdown_b">10</button>
+                        <button id="b_20_smells_per_page" class="dropdown_b">20</button>
+                        <button id="b_50_smells_per_page" class="dropdown_b">50</button>
+                        <button id="b_100_smells_per_page" class="dropdown_b">100</button>
+                        <button id="b_200_smells_per_page" class="dropdown_b">200</button>
+                    </div>
+                </div>
+                <button id="b_prev_page">&lt;</button>
+                &nbsp;
+                <label id="page_info"> Page 1/1 </label>
+                &nbsp;
+                <button id="b_next_page">&gt;</button>
+
                 <div id="search_div">
                     <input type="text" id="seach_txtfield" placeholder="Search...">
                 </div>
             </div>
+                
+
+
             <div id="smell_display_body">
                 <table id="smell_table">
 
