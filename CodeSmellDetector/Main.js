@@ -98,37 +98,37 @@ async function init_frontend(){
     }
 
 
-    document.getElementById("b_stats_overall").style.border = "3px solid black";
+    // document.getElementById("b_stats_overall").style.border = "3px solid black";
 
-    document.getElementById("b_stats_overall").onclick = () => {
-        stat_renderer.hide_all();
-        document.getElementById("stats_overview").style.display = "block";
-        let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
-        for(let i=0; i<stat_tab_buttons.length; i++){
-            stat_tab_buttons[i].style.border = "initial";
-        }
-        document.getElementById("b_stats_overall").style.border = "2px solid black";
-    }
+    // document.getElementById("b_stats_overall").onclick = () => {
+    //     stat_renderer.hide_all();
+    //     document.getElementById("stats_overview").style.display = "block";
+    //     let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+    //     for(let i=0; i<stat_tab_buttons.length; i++){
+    //         stat_tab_buttons[i].style.border = "initial";
+    //     }
+    //     document.getElementById("b_stats_overall").style.border = "2px solid black";
+    // }
 
-    document.getElementById("b_stats_structures").onclick = () => {
-        stat_renderer.hide_all();
-        document.getElementById("stats_by_class").style.display = "block";
-        let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
-        for(let i=0; i<stat_tab_buttons.length; i++){
-            stat_tab_buttons[i].style.border = "initial";
-        }
-        document.getElementById("b_stats_structures").style.border = "2px solid black";
-    }
+    // document.getElementById("b_stats_structures").onclick = () => {
+    //     stat_renderer.hide_all();
+    //     document.getElementById("stats_by_class").style.display = "block";
+    //     let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+    //     for(let i=0; i<stat_tab_buttons.length; i++){
+    //         stat_tab_buttons[i].style.border = "initial";
+    //     }
+    //     document.getElementById("b_stats_structures").style.border = "2px solid black";
+    // }
 
-    document.getElementById("b_stats_files").onclick = () => {
-        stat_renderer.hide_all();
-        document.getElementById("stats_by_file").style.display = "block";
-        let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
-        for(let i=0; i<stat_tab_buttons.length; i++){
-            stat_tab_buttons[i].style.border = "initial";
-        }
-        document.getElementById("b_stats_files").style.border = "2px solid black";
-    }
+    // document.getElementById("b_stats_files").onclick = () => {
+    //     stat_renderer.hide_all();
+    //     document.getElementById("stats_by_file").style.display = "block";
+    //     let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+    //     for(let i=0; i<stat_tab_buttons.length; i++){
+    //         stat_tab_buttons[i].style.border = "initial";
+    //     }
+    //     document.getElementById("b_stats_files").style.border = "2px solid black";
+    // }
 
 
 

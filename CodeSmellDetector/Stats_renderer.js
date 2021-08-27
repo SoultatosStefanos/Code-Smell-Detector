@@ -1,14 +1,91 @@
 const assert = require('assert');
 const { Stats } = require('fs');
 const Util = require("./Utility.js");
+const max_chart_rows = 4;
 
 module.exports = class StatsRenderer{
     constructor(overview_div, by_class_div, by_file_div){
         this.overview_div = document.getElementById("stats_overview");
         this.by_class_div = document.getElementById("stats_by_class");
+        this.by_class_charts = document.getElementById("stats_by_class_charts");
+        this.by_class_chart_current_page = 1;
+        this.by_class_chart_pages = 1;
+
         this.by_file_div = document.getElementById("stats_by_file");
+        this.by_file_charts = document.getElementById("stats_by_file_charts");
+        this.by_file_chart_current_page = 1;
+        this.by_file_chart_pages = 1;
+
         this.by_class_div.style.display = "none";
         this.by_file_div.style.display = "none";
+
+        document.getElementById("b_stats_overall").style.border = "3px solid black";
+
+        document.getElementById("b_stats_overall").onclick = () => {
+            this.hide_all();
+            document.getElementById("stats_overview").style.display = "block";
+            let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+            for(let i=0; i<stat_tab_buttons.length; i++){
+                stat_tab_buttons[i].style.border = "initial";
+            }
+            document.getElementById("b_stats_overall").style.border = "2px solid black";
+        }
+
+        document.getElementById("b_stats_structures").onclick = () => {
+            this.hide_all();
+            document.getElementById("stats_by_class").style.display = "block";
+            let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+            for(let i=0; i<stat_tab_buttons.length; i++){
+                stat_tab_buttons[i].style.border = "initial";
+            }
+            document.getElementById("b_stats_structures").style.border = "2px solid black";
+        }
+
+        document.getElementById("b_stats_files").onclick = () => {
+            this.hide_all();
+            document.getElementById("stats_by_file").style.display = "block";
+            let stat_tab_buttons = document.getElementsByClassName("b_stats_tab");
+            for(let i=0; i<stat_tab_buttons.length; i++){
+                stat_tab_buttons[i].style.border = "initial";
+            }
+            document.getElementById("b_stats_files").style.border = "2px solid black";
+        }
+
+        document.getElementById("b_stats_by_class_prev_page").onclick = () => {
+            if(this.by_class_chart_current_page <= 1) 
+                return;
+            document.getElementById(`by_class_chart${this.by_class_chart_current_page - 1}`).style.display = "none";
+            this.by_class_chart_current_page--;
+            document.getElementById(`by_class_chart${this.by_class_chart_current_page - 1}`).style.display = "block";
+            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_class_chart_current_page}/${this.by_class_chart_pages} `;
+        }
+
+        document.getElementById("b_stats_by_class_next_page").onclick = () => {
+            if(this.by_class_chart_current_page >= this.by_class_chart_pages) 
+                return;
+            document.getElementById(`by_class_chart${this.by_class_chart_current_page - 1}`).style.display = "none";
+            this.by_class_chart_current_page++;
+            document.getElementById(`by_class_chart${this.by_class_chart_current_page - 1}`).style.display = "block";
+            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_class_chart_current_page}/${this.by_class_chart_pages} `;
+        }
+
+        document.getElementById("b_stats_by_file_prev_page").onclick = () => {
+            if(this.by_file_chart_current_page <= 1) 
+                return;
+            document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "none";
+            this.by_file_chart_current_page--;
+            document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "block";
+            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
+        }
+
+        document.getElementById("b_stats_by_file_prev_page").onclick = () => {
+            if(this.by_file_chart_current_page >= this.by_file_chart_pages) 
+                return;
+            document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "none";
+            this.by_file_chart_current_page++;
+            document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "block";
+            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
+        }
     }
 
     hide_all(){
@@ -41,8 +118,14 @@ module.exports = class StatsRenderer{
 
 
         // clear by_class and by_div graphs.
-        this.by_class_div.innerHTML = "";
-        this.by_file_div.innerHTML = "";
+        this.by_class_chart_current_page = 1;
+        this.by_class_chart_pages = 1;
+        this.by_file_chart_current_page = 1;
+        this.by_file_chart_pages = 1;
+        this.by_class_charts.innerHTML = "";
+        this.by_file_charts.innerHTML = "";
+        document.getElementById("stats_by_class_page_info").innerHTML = " Page 1/1 ";
+        document.getElementById("stats_by_file_page_info").innerHTML = " Page 1/1 ";
     }
 
     async compute_stats(smells, ST){
@@ -296,237 +379,324 @@ module.exports = class StatsRenderer{
 
 
     compute_by_structure(rows){
-        this.by_class_div.innerHTML = "Loading Chart";
+        this.by_class_charts.innerHTML = "Loading Charts";
 
         if(google_charts_loaded){
-            // let rows = [];
-            // for (const [key, value] of Object.entries(structures_with_smells)){ 
-            //     const structure_id = key;
-            //     let smell_lvls = value.smell_lvls;
-            //     let smell_lvl_ranges = [];
-            //     for(let i=0; i<10; i++){
-            //         smell_lvl_ranges[i] = 0;
-            //     }
-            //     let structure_smell_lvl = 0;
-            //     for(const smell_lvl of smell_lvls){
-            //         structure_smell_lvl += smell_lvl;
-            //         let rounded = Math.round(smell_lvl);
-            //         if(rounded === 10){ // put in range 9-10
-            //             rounded = 9;
-            //         }
-            //         smell_lvl_ranges[rounded]++;
-            //     }
-            //     smell_lvl_ranges[smell_lvl_ranges.length] = structure_smell_lvl; // append temporarily the sum of smell_lvls
-            //     let row = [structure_id];
-            //     row.push(...smell_lvl_ranges);
-            //     rows.push(row);
-            // }
 
-            // // sort by sum
-            // rows.sort((row1, row2) => {
-            //     if(row1[row1.length - 1] < row2[row2.length - 1]){
-            //         return 1;
-            //     }
-            //     return -1;
-            // });
+            this.by_class_chart_pages = Math.trunc(rows.length / max_chart_rows) + 1;
 
-            // // now remove the tmp sum.
-            // for(let row of rows){
-            //     row.pop();
-            // }
+            let html = "";
+            for(let page_num = 0; page_num < this.by_class_chart_pages; page_num++){
+                html += `<div id="by_class_chart${page_num}"></div>`;
+            }
+            this.by_class_charts.innerHTML = "";
+            this.by_class_charts.innerHTML = html;
+
+            for(let page_num = 0; page_num < this.by_class_chart_pages; page_num++){
+                let page_rows = rows.slice(page_num * max_chart_rows, (page_num + 1) * max_chart_rows);
+
+                var data = google.visualization.arrayToDataTable([
+                    [   
+                        {label: 'STR', type: 'string'},
+                        {label: '0 - 1', type: 'number'},
+                        {label: '1 - 2', type: 'number'},
+                        {label: '2 - 3', type: 'number'},
+                        {label: '3 - 4', type: 'number'},
+                        {label: '4 - 5', type: 'number'},
+                        {label: '5 - 6', type: 'number'},
+                        {label: '6 - 7', type: 'number'},
+                        {label: '7 - 8', type: 'number'},
+                        {label: '8 - 9', type: 'number'},
+                        {label: '9 - 10', type: 'number'},
+                    ]
+                ]);
+    
+                data.addRows(page_rows);
+    
+    
+                //rgba(255, ${green}, 0, 0.6)
+                let col_rgb_colors = ['#fff200', '#ffd800', 
+                    '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
+                    '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
+                ];
+    
+                // Set chart options
+                let options = {
+    
+                    title: 'Smell Intensity Distribution by Structure',
+    
+                    
+                    legend: { position: 'top', maxLines: 2 },
+                    //bar: { groupWidth: '75%' },
+                    isStacked: true,
+                    chartArea:{left:250,top:100, width: 1200, height: 40 + page_rows.length * 34},
+                    width: 1400,
+                    height: 100 + page_rows.length * 40,
+                    colors: col_rgb_colors,
+                    backgroundColor: '#F6FFEF'
+                };
+    
+                // Instantiate and draw our chart, passing in some options.
+                let chart = new google.visualization.BarChart(document.getElementById(`by_class_chart${page_num}`));
+                
+                let enclosing_was_hidden = false;
+                let was_hidden = false;
+                if(document.getElementById("smells_stats").style.display === "none"){
+                    enclosing_was_hidden = true;
+                    document.getElementById("smells_stats").style.display = "block";
+                }
+                if(this.by_class_div.style.display === "none"){
+                    was_hidden = true;
+                    this.by_class_div.style.display = "block";
+                }    
+                
+                chart.draw(data, options);
+    
+                if(was_hidden){
+                    this.by_class_div.style.display = "none";
+                }
+                if(enclosing_was_hidden){
+                    document.getElementById("smells_stats").style.display = "none";
+                }
+                if(page_num > 0)
+                    document.getElementById(`by_class_chart${page_num}`).style.display = "none";
+            }
+
+            document.getElementById("stats_by_class_page_info").innerHTML = ` Page 1/${this.by_class_chart_pages} `;
+            this.by_file_chart_current_page = 1;
+            // var data = google.visualization.arrayToDataTable([
+            //     [   
+            //         {label: 'STR', type: 'string'},
+            //         {label: '0 - 1', type: 'number'},
+            //         {label: '1 - 2', type: 'number'},
+            //         {label: '2 - 3', type: 'number'},
+            //         {label: '3 - 4', type: 'number'},
+            //         {label: '4 - 5', type: 'number'},
+            //         {label: '5 - 6', type: 'number'},
+            //         {label: '6 - 7', type: 'number'},
+            //         {label: '7 - 8', type: 'number'},
+            //         {label: '8 - 9', type: 'number'},
+            //         {label: '9 - 10', type: 'number'},
+            //     ]
+            // ]);
+
+            // data.addRows(rows);
 
 
+            // //rgba(255, ${green}, 0, 0.6)
+            // let col_rgb_colors = ['#fff200', '#ffd800', 
+            //     '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
+            //     '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
+            // ];
 
+            // // Set chart options
+            // let options = {
 
-            var data = google.visualization.arrayToDataTable([
-                [   
-                    {label: 'STR', type: 'string'},
-                    {label: '0 - 1', type: 'number'},
-                    {label: '1 - 2', type: 'number'},
-                    {label: '2 - 3', type: 'number'},
-                    {label: '3 - 4', type: 'number'},
-                    {label: '4 - 5', type: 'number'},
-                    {label: '5 - 6', type: 'number'},
-                    {label: '6 - 7', type: 'number'},
-                    {label: '7 - 8', type: 'number'},
-                    {label: '8 - 9', type: 'number'},
-                    {label: '9 - 10', type: 'number'},
-                ]
-            ]);
-
-            data.addRows(rows);
-
-
-            //rgba(255, ${green}, 0, 0.6)
-            let col_rgb_colors = ['#fff200', '#ffd800', 
-                '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
-                '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
-            ];
-
-            // Set chart options
-            let options = {
-
-                title: 'Smell Intensity Distribution by Structure',
+            //     title: 'Smell Intensity Distribution by Structure',
 
                 
-                legend: { position: 'top', maxLines: 2 },
-                //bar: { groupWidth: '75%' },
-                isStacked: true,
-                chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
-                width: 1400,
-                height: 100 + rows.length * 40,
-                colors: col_rgb_colors,
-                backgroundColor: '#F6FFEF'
-            };
+            //     legend: { position: 'top', maxLines: 2 },
+            //     //bar: { groupWidth: '75%' },
+            //     isStacked: true,
+            //     chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
+            //     width: 1400,
+            //     height: 100 + rows.length * 40,
+            //     colors: col_rgb_colors,
+            //     backgroundColor: '#F6FFEF'
+            // };
 
-            // Instantiate and draw our chart, passing in some options.
-            let chart = new google.visualization.BarChart(this.by_class_div);
+            // // Instantiate and draw our chart, passing in some options.
+            // let chart = new google.visualization.BarChart(this.by_class_div);
             
-            let enclosing_was_hidden = false;
-            let was_hidden = false;
-            if(document.getElementById("smells_stats").style.display === "none"){
-                enclosing_was_hidden = true;
-                document.getElementById("smells_stats").style.display = "block";
-            }
-            if(this.by_class_div.style.display === "none"){
-                was_hidden = true;
-                this.by_class_div.style.display = "block";
-            }    
+            // let enclosing_was_hidden = false;
+            // let was_hidden = false;
+            // if(document.getElementById("smells_stats").style.display === "none"){
+            //     enclosing_was_hidden = true;
+            //     document.getElementById("smells_stats").style.display = "block";
+            // }
+            // if(this.by_class_div.style.display === "none"){
+            //     was_hidden = true;
+            //     this.by_class_div.style.display = "block";
+            // }    
             
-            chart.draw(data, options);
+            // chart.draw(data, options);
 
-            if(was_hidden){
-                this.by_class_div.style.display = "none";
-            }
-            if(enclosing_was_hidden){
-                document.getElementById("smells_stats").style.display = "none";
-            }
+            // if(was_hidden){
+            //     this.by_class_div.style.display = "none";
+            // }
+            // if(enclosing_was_hidden){
+            //     document.getElementById("smells_stats").style.display = "none";
+            // }
             
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_structure(rows); }, 900);
+            setTimeout(function() { self.compute_by_structure(rows); }, 850);
         }
     }
 
     compute_by_file(rows){
-        this.by_file_div.innerHTML = "Loading Chart";
+        this.by_file_charts.innerHTML = "Loading Chart";
 
         if(google_charts_loaded){
-            // let rows = [];
-            // for (const [key, value] of Object.entries(files_with_smells)){ 
-            //     const file_path = key;
-            //     let smell_lvls = value.smell_lvls;
-            //     let smell_lvl_ranges = [];
-            //     for(let i=0; i<10; i++){
-            //         smell_lvl_ranges[i] = 0;
-            //     }
-            //     let file_smell_lvl = 0;
-            //     for(const smell_lvl of smell_lvls){
-            //         file_smell_lvl += smell_lvl;
-            //         let rounded = Math.round(smell_lvl);
-            //         if(rounded === 10){ // put in range 9-10
-            //             rounded = 9;
-            //         }
-            //         smell_lvl_ranges[rounded]++;
-            //     }
-            //     smell_lvl_ranges[smell_lvl_ranges.length] = file_smell_lvl; // append temporarily the sum of smell_lvls
-            //     let row = [Util.get_file_name_from_path(file_path)];
-            //     row.push(...smell_lvl_ranges);
-            //     rows.push(row);
-            // }
-
-            // // sort by sum
-            // rows.sort((row1, row2) => {
-            //     if(row1[row1.length - 1] < row2[row2.length - 1]){
-            //         return 1;
-            //     }
-            //     return -1;
-            // });
-
-            // // now remove the tmp sum.
-            // for(let row of rows){
-            //     row.pop();
-            // }
-
             for(let row of rows){
                 row[0] = Util.get_file_name_from_path(row[0]);
             }
 
+            this.by_file_chart_pages = Math.trunc(rows.length / max_chart_rows) + 1;
+
+            let html = "";
+            for(let page_num = 0; page_num < this.by_file_chart_pages; page_num++){
+                html += `<div id="by_file_chart${page_num}"></div>`;
+            }
+            this.by_file_charts.innerHTML = "";
+            this.by_file_charts.innerHTML = html;
+
+            for(let page_num = 0; page_num < this.by_file_chart_pages; page_num++){
+                let page_rows = rows.slice(page_num * max_chart_rows, (page_num + 1) * max_chart_rows);
+
+                var data = google.visualization.arrayToDataTable([
+                    [   
+                        {label: 'STR', type: 'string'},
+                        {label: '0 - 1', type: 'number'},
+                        {label: '1 - 2', type: 'number'},
+                        {label: '2 - 3', type: 'number'},
+                        {label: '3 - 4', type: 'number'},
+                        {label: '4 - 5', type: 'number'},
+                        {label: '5 - 6', type: 'number'},
+                        {label: '6 - 7', type: 'number'},
+                        {label: '7 - 8', type: 'number'},
+                        {label: '8 - 9', type: 'number'},
+                        {label: '9 - 10', type: 'number'},
+                    ]
+                ]);
+    
+                data.addRows(page_rows);
+    
+    
+                //color = rgb(255, ${green}, 0)
+                // green0 = 255 - 25.5 * 0.5;
+                // green1 = 255 - 25.5 * 1.5;
+                //...
+                // green9 = 255 - 25.5 * 9.5;
+                let col_rgb_colors = ['#fff200', '#ffd800', 
+                    '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
+                    '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
+                ];
+    
+                // Set chart options
+                let options = {
+    
+                    title: 'Smell Intensity Distribution by File',
+    
+                    
+                    legend: { position: 'top', maxLines: 2 },
+                    //bar: { groupWidth: '75%' },
+                    isStacked: true,
+                    chartArea:{left:250,top:100, width: 1200, height: 40 + page_rows.length * 34},
+                    width: 1400,
+                    height: 100 + page_rows.length * 40,
+                    colors: col_rgb_colors,
+                    backgroundColor: '#F6FFEF'
+                };
+    
+                // Instantiate and draw our chart, passing in some options.
+                let chart = new google.visualization.BarChart(document.getElementById(`by_file_chart${page_num}`));
+    
+                let enclosing_was_hidden = false;
+                let was_hidden = false;
+                if(document.getElementById("smells_stats").style.display === "none"){
+                    enclosing_was_hidden = true;
+                    document.getElementById("smells_stats").style.display = "block";
+                }
+                if(this.by_file_div.style.display === "none"){
+                    was_hidden = true;
+                    this.by_file_div.style.display = "block";
+                }    
+                
+                chart.draw(data, options);
+    
+                if(was_hidden){
+                    this.by_file_div.style.display = "none";
+                }
+                if(enclosing_was_hidden){
+                    document.getElementById("smells_stats").style.display = "none";
+                }
+                if(page_num > 0)
+                    document.getElementById(`by_file_chart${page_num}`).style.display = "none";
+            }
+
+            // var data = google.visualization.arrayToDataTable([
+            //     [   
+            //         {label: 'STR', type: 'string'},
+            //         {label: '0 - 1', type: 'number'},
+            //         {label: '1 - 2', type: 'number'},
+            //         {label: '2 - 3', type: 'number'},
+            //         {label: '3 - 4', type: 'number'},
+            //         {label: '4 - 5', type: 'number'},
+            //         {label: '5 - 6', type: 'number'},
+            //         {label: '6 - 7', type: 'number'},
+            //         {label: '7 - 8', type: 'number'},
+            //         {label: '8 - 9', type: 'number'},
+            //         {label: '9 - 10', type: 'number'},
+            //     ]
+            // ]);
+
+            // data.addRows(rows);
 
 
+            // //color = rgb(255, ${green}, 0)
+            // // green0 = 255 - 25.5 * 0.5;
+            // // green1 = 255 - 25.5 * 1.5;
+            // //...
+            // // green9 = 255 - 25.5 * 9.5;
+            // let col_rgb_colors = ['#fff200', '#ffd800', 
+            //     '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
+            //     '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
+            // ];
 
-            var data = google.visualization.arrayToDataTable([
-                [   
-                    {label: 'STR', type: 'string'},
-                    {label: '0 - 1', type: 'number'},
-                    {label: '1 - 2', type: 'number'},
-                    {label: '2 - 3', type: 'number'},
-                    {label: '3 - 4', type: 'number'},
-                    {label: '4 - 5', type: 'number'},
-                    {label: '5 - 6', type: 'number'},
-                    {label: '6 - 7', type: 'number'},
-                    {label: '7 - 8', type: 'number'},
-                    {label: '8 - 9', type: 'number'},
-                    {label: '9 - 10', type: 'number'},
-                ]
-            ]);
+            // // Set chart options
+            // let options = {
 
-            data.addRows(rows);
-
-
-            //color = rgb(255, ${green}, 0)
-            // green0 = 255 - 25.5 * 0.5;
-            // green1 = 255 - 25.5 * 1.5;
-            //...
-            // green9 = 255 - 25.5 * 9.5;
-            let col_rgb_colors = ['#fff200', '#ffd800', 
-                '#ffbf00', '#ffa500', '#ff8c00', '#ff7200',
-                '#ff5900', '#ff3f00', '#ff2600', '#ff0c00' 
-            ];
-
-            // Set chart options
-            let options = {
-
-                title: 'Smell Intensity Distribution by File',
+            //     title: 'Smell Intensity Distribution by File',
 
                 
-                legend: { position: 'top', maxLines: 2 },
-                //bar: { groupWidth: '75%' },
-                isStacked: true,
-                chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
-                width: 1400,
-                height: 100 + rows.length * 40,
-                colors: col_rgb_colors,
-                backgroundColor: '#F6FFEF'
-            };
+            //     legend: { position: 'top', maxLines: 2 },
+            //     //bar: { groupWidth: '75%' },
+            //     isStacked: true,
+            //     chartArea:{left:250,top:100, width: 1200, height: 40 + rows.length * 34},
+            //     width: 1400,
+            //     height: 100 + rows.length * 40,
+            //     colors: col_rgb_colors,
+            //     backgroundColor: '#F6FFEF'
+            // };
 
-            // Instantiate and draw our chart, passing in some options.
-            let chart = new google.visualization.BarChart(this.by_file_div);
+            // // Instantiate and draw our chart, passing in some options.
+            // let chart = new google.visualization.BarChart(this.by_file_div);
 
-            let enclosing_was_hidden = false;
-            let was_hidden = false;
-            if(document.getElementById("smells_stats").style.display === "none"){
-                enclosing_was_hidden = true;
-                document.getElementById("smells_stats").style.display = "block";
-            }
-            if(this.by_file_div.style.display === "none"){
-                was_hidden = true;
-                this.by_file_div.style.display = "block";
-            }    
+            // let enclosing_was_hidden = false;
+            // let was_hidden = false;
+            // if(document.getElementById("smells_stats").style.display === "none"){
+            //     enclosing_was_hidden = true;
+            //     document.getElementById("smells_stats").style.display = "block";
+            // }
+            // if(this.by_file_div.style.display === "none"){
+            //     was_hidden = true;
+            //     this.by_file_div.style.display = "block";
+            // }    
             
-            chart.draw(data, options);
+            // chart.draw(data, options);
 
-            if(was_hidden){
-                this.by_file_div.style.display = "none";
-            }
-            if(enclosing_was_hidden){
-                document.getElementById("smells_stats").style.display = "none";
-            }
+            // if(was_hidden){
+            //     this.by_file_div.style.display = "none";
+            // }
+            // if(enclosing_was_hidden){
+            //     document.getElementById("smells_stats").style.display = "none";
+            // }
         }
         else {
             var self = this;
-            setTimeout(function() { self.compute_by_file(rows); }, 700);
+            setTimeout(function() { self.compute_by_file(rows); }, 650);
         }
     }
 
