@@ -10,7 +10,7 @@
                     "formal_name": "Maximum method arguments",
                     "type": "range",
                     "range": [
-                        6,
+                        5,
                         10
                     ],
                     "limits": [
@@ -48,7 +48,7 @@
                     "formal_name": "Maximum method locals",
                     "type": "range",
                     "range": [
-                        10,
+                        12,
                         24
                     ],
                     "limits": [
