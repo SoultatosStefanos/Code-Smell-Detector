@@ -314,17 +314,17 @@ function get_smell_detectors(smells_config){
     let _smell_detectors = [];
     for(let smell_detector of smells_config.detectors){
         try {
-            var smell_path = path.join(smells_config.folder, smell_detector.file);
-            var new_smell_detector = require(smell_path);
+            var detector_path = get_full_path(smell_detector.file);
+            var new_smell_detector = require(detector_path);
         } catch (error) {
-            console.log(`Could not load smell detector "${smell_detector.name}" from "${smell_path}". Skipped.`);
+            console.log(`Could not load smell detector "${smell_detector.name}" from "${detector_path}". Skipped.`);
             continue;
         }
         new_smell_detector.name = smell_detector.name;
         new_smell_detector.args = smell_detector.args;
         new_smell_detector.hidden = smell_detector.hidden;
         _smell_detectors.push(new_smell_detector);
-        console.log(`Loaded smell "${smell_detector.name}" from "${smell_path}".`);
+        console.log(`Loaded smell "${smell_detector.name}" from "${detector_path}".`);
     }
     return _smell_detectors;
 }

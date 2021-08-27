@@ -1,9 +1,8 @@
 {
-    "folder": "D:\\Thesis\\CodeSmellDetector\\Smells",
     "detectors": [
         {
             "name": "Too many parameters",
-            "file": "Method_argc.js",
+            "file": "./Smells/Method_argc.js",
             "description": "Detects methods with an excessive amount of parameters",
             "args": {
                 "max_argc": {
@@ -22,14 +21,14 @@
         },
         {
             "name": "Too many function literals",
-            "file": "Method_literals.js",
+            "file": "./Smells/Method_literals.js",
             "description": "Detects excessive method literal count",
             "args": {
                 "max_literals": {
                     "formal_name": "Maximum method literals",
                     "type": "range",
                     "range": [
-                        13,
+                        12,
                         30
                     ],
                     "limits": [
@@ -41,14 +40,14 @@
         },
         {
             "name": "Too many locals",
-            "file": "Method_locals.js",
+            "file": "./Smells/Method_locals.js",
             "description": "Detects excessive method local variable declarations",
             "args": {
                 "max_locals": {
                     "formal_name": "Maximum method locals",
                     "type": "range",
                     "range": [
-                        12,
+                        1,
                         24
                     ],
                     "limits": [
@@ -60,14 +59,14 @@
         },
         {
             "name": "Long function",
-            "file": "Long_function.js",
+            "file": "./Smells/Long_function.js",
             "description": "Detects methods with too many statemets or too many lines",
             "args": {
                 "max_statements": {
                     "formal_name": "Maximum method statement count",
                     "type": "range",
                     "range": [
-                        60,
+                        70,
                         161
                     ],
                     "limits": [
@@ -91,7 +90,7 @@
         },
         {
             "name": "Cyclomatic complexity",
-            "file": "Cyclo_complex.js",
+            "file": "./Smells/Cyclo_complex.js",
             "description": "Detects methods with excessive branches (if, switch, while, for, conintue, break, return)",
             "args": {
                 "max_loops": {
@@ -122,7 +121,7 @@
         },
         {
             "name": "Excessively long identifier",
-            "file": "Long_identifier.js",
+            "file": "./Smells/Long_identifier.js",
             "description": "Detects identifiers with too many characters",
             "args": {
                 "max_id_len": {
@@ -141,7 +140,7 @@
         },
         {
             "name": "Excessively long line of code",
-            "file": "God_line.js",
+            "file": "./Smells/God_line.js",
             "description": "Detects too long lines of un-commented code",
             "args": {
                 "max_line_len": {
@@ -160,7 +159,7 @@
         },
         {
             "name": "Naming conventions",
-            "file": "Name_conventions.js",
+            "file": "./Smells/Name_conventions.js",
             "description": "Detects identifiers that do not follow naming conventions",
             "args": {
                 "dict0": {
@@ -177,13 +176,13 @@
                 },
                 "method_names": {
                     "formal_name": "Method names",
-                    "val": "UpperCamelCase",
+                    "val": "snake_case",
                     "type": "enum",
                     "dict": "dict0"
                 },
                 "var_names": {
                     "formal_name": "Variable names",
-                    "val": "any",
+                    "val": "snake_case",
                     "type": "enum",
                     "dict": "dict0"
                 },
@@ -204,7 +203,7 @@
         },
         {
             "name": "Nested scopes",
-            "file": "Nested_scopes.js",
+            "file": "./Smells/Nested_scopes.js",
             "description": "Detects methods that nest scopes too deep",
             "args": {
                 "max_nested_scopes": {
@@ -223,7 +222,7 @@
         },
         {
             "name": "Circular dependency",
-            "file": "Dependency_circle.js",
+            "file": "./Smells/Dependency_circle.js",
             "description": "Detects circlular dependency between structures",
             "args": {
                 "max_circle_len": {
@@ -242,7 +241,7 @@
         },
         {
             "name": "Large Class",
-            "file": "Large_class.js",
+            "file": "./Smells/Large_class.js",
             "description": "Detects structures with too many methods or fields",
             "args": {
                 "max_methods": {
@@ -278,7 +277,7 @@
         },
         {
             "name": "Large File",
-            "file": "Large_file.js",
+            "file": "./Smells/Large_file.js",
             "description": "Detects code files with too many lines",
             "args": {
                 "max_src_lines": {
@@ -309,7 +308,7 @@
         },
         {
             "name": "Inappropriate Intimacy",
-            "file": "Inappropriate_intimacy.js",
+            "file": "./Smells/Inappropriate_intimacy.js",
             "description": "@argument max_member_expr: Max count of member expr from one class to any other class.",
             "args": {
                 "max_member_expr": {
@@ -328,13 +327,13 @@
         },
         {
             "name": "Non virtual base destructor",
-            "file": "Virtual_destructor.js",
+            "file": "./Smells/Virtual_destructor.js",
             "description": "Flags destructors of base classes that are not virtual.",
             "args": {}
         },
         {
             "name": "Redundant protected access",
-            "file": "Redundant_protected.js",
+            "file": "./Smells/Redundant_protected.js",
             "description": "Detects protected member functions or variables declared in classes that are not inherited from.",
             "args": {
                 "max_unneeded_protected": {
@@ -353,7 +352,7 @@
         },
         {
             "name": "Excessive function overloading",
-            "file": "Function_overload.js",
+            "file": "./Smells/Function_overload.js",
             "description": "Detects functions that are overloaded too many times.",
             "args": {
                 "max_overload": {
@@ -372,7 +371,7 @@
         },
         {
             "name": "Many dependencies",
-            "file": "Dependency_count.js",
+            "file": "./Smells/Dependency_count.js",
             "description": "Detects structures that directly depend upon too many other structures. Indirect dependencies are not counted.",
             "args": {
                 "max_direct_dependencies": {
