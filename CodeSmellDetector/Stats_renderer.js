@@ -1,7 +1,7 @@
 const assert = require('assert');
 const { Stats } = require('fs');
 const Util = require("./Utility.js");
-const max_chart_rows = 4;
+const max_chart_rows = 20;
 
 module.exports = class StatsRenderer{
     constructor(overview_div, by_class_div, by_file_div){
@@ -75,16 +75,16 @@ module.exports = class StatsRenderer{
             document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "none";
             this.by_file_chart_current_page--;
             document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "block";
-            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
+            document.getElementById("stats_by_file_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
         }
 
-        document.getElementById("b_stats_by_file_prev_page").onclick = () => {
+        document.getElementById("b_stats_by_file_next_page").onclick = () => {
             if(this.by_file_chart_current_page >= this.by_file_chart_pages) 
                 return;
             document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "none";
             this.by_file_chart_current_page++;
             document.getElementById(`by_file_chart${this.by_file_chart_current_page - 1}`).style.display = "block";
-            document.getElementById("stats_by_class_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
+            document.getElementById("stats_by_file_page_info").innerHTML = ` Page ${this.by_file_chart_current_page}/${this.by_file_chart_pages} `;
         }
     }
 
@@ -378,12 +378,19 @@ module.exports = class StatsRenderer{
 
 
 
-    compute_by_structure(rows){
-        this.by_class_charts.innerHTML = "Loading Charts";
+    async compute_by_structure(rows){
+        if(rows.length === 0){
+            this.by_class_charts.innerHTML = "No classes with smells.";
+            return;
+        }
+        else{
+            this.by_class_charts.innerHTML = "Loading Charts";
+        }
+
 
         if(google_charts_loaded){
 
-            this.by_class_chart_pages = Math.trunc(rows.length / max_chart_rows) + 1;
+            this.by_class_chart_pages = Math.trunc((rows.length - 1) / max_chart_rows) + 1;
 
             let html = "";
             for(let page_num = 0; page_num < this.by_class_chart_pages; page_num++){
@@ -463,7 +470,7 @@ module.exports = class StatsRenderer{
             }
 
             document.getElementById("stats_by_class_page_info").innerHTML = ` Page 1/${this.by_class_chart_pages} `;
-            this.by_file_chart_current_page = 1;
+            this.by_class_chart_current_page = 1;
             // var data = google.visualization.arrayToDataTable([
             //     [   
             //         {label: 'STR', type: 'string'},
@@ -535,15 +542,22 @@ module.exports = class StatsRenderer{
         }
     }
 
-    compute_by_file(rows){
-        this.by_file_charts.innerHTML = "Loading Chart";
+    async compute_by_file(rows){
+        if(rows.length === 0){
+            this.by_file_charts.innerHTML = "No files with smells."
+            return;
+        }
+        else {
+            this.by_file_charts.innerHTML = "Loading Charts";
+        }
+        
 
         if(google_charts_loaded){
             for(let row of rows){
                 row[0] = Util.get_file_name_from_path(row[0]);
             }
 
-            this.by_file_chart_pages = Math.trunc(rows.length / max_chart_rows) + 1;
+            this.by_file_chart_pages = Math.trunc((rows.length - 1) / max_chart_rows) + 1;
 
             let html = "";
             for(let page_num = 0; page_num < this.by_file_chart_pages; page_num++){
@@ -626,6 +640,8 @@ module.exports = class StatsRenderer{
                     document.getElementById(`by_file_chart${page_num}`).style.display = "none";
             }
 
+            document.getElementById("stats_by_file_page_info").innerHTML = ` Page 1/${this.by_file_chart_pages} `;
+            this.by_file_chart_current_page = 1;
             // var data = google.visualization.arrayToDataTable([
             //     [   
             //         {label: 'STR', type: 'string'},

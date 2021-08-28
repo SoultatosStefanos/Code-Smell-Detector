@@ -47,7 +47,7 @@
                     "formal_name": "Maximum method locals",
                     "type": "range",
                     "range": [
-                        1,
+                        10,
                         24
                     ],
                     "limits": [
@@ -176,13 +176,13 @@
                 },
                 "method_names": {
                     "formal_name": "Method names",
-                    "val": "snake_case",
+                    "val": "UpperCamelCase",
                     "type": "enum",
                     "dict": "dict0"
                 },
                 "var_names": {
                     "formal_name": "Variable names",
-                    "val": "snake_case",
+                    "val": "any",
                     "type": "enum",
                     "dict": "dict0"
                 },
@@ -341,7 +341,7 @@
                     "type": "range",
                     "range": [
                         1,
-                        20
+                        5
                     ],
                     "limits": [
                         1,
