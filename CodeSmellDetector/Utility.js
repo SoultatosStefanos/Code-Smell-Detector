@@ -51,7 +51,7 @@ module.exports = {
      */
      get_src_obj: (file, line, col = 0, struct = null, method = null) => {
         return {
-            file: file,
+            file: module.exports.uniform_path(file),
             line: line,
             col: col,
             struct: struct,
@@ -157,20 +157,25 @@ module.exports = {
     },
 
     get_countof_files: (ST) => {
-        return ST.headers.length + ST.sources.length;
+        let file_count = 0;
+        if(ST.headers)
+            file_count += ST.headers.length;
+        if(ST.sources)
+            file_count += ST.sources.length; 
+        return file_count;
     },
 
     get_countof_structures: (ST) => {
-        if(ST.structures === null) return 0;
+        if(!ST.structures) return 0;
         return Object.keys(ST.structures).length;
     },
 
     get_countof_methods: (ST) => {
-        if(ST.structures === null) return 0;
+        if(!ST.structures) return 0;
         let countof_methods = 0;
         for(const structure_id in ST.structures){
             let structure = ST.structures[structure_id];
-            if(structure.methods !== null)
+            if(structure.methods)
                 countof_methods += Object.keys(structure.methods).length;
         }
         return countof_methods;
