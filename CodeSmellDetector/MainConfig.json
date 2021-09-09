@@ -1,5 +1,5 @@
 {
-    "ST_Path": "../ST0.json",
+    "ST_Path": "../ST.json",
     "SmellsCache_Path": "./SmellReports.json",
     "DetectorsConfig_Path": "./DetectorsConfig.json",
     "TextEditorStartUpCommand": "code -g"

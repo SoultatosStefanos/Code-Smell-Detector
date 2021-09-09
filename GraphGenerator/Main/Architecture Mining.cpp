@@ -14,8 +14,7 @@ static void PrintMainArgInfo(void) {
 	std::cout << "argv[1]: \"--cmp-db\" to use compilation database (argv[2]: path/to/compile_commands.json)\n";
 	std::cout << "argv[3]: (file path) path/to/ignoredFilePaths\n";
 	std::cout << "argv[4]: (file path) path/to/ignoredNamespaces\n";
-	std::cout << "argv[5]: (file path) path/to/output\n";
-	std::cout << "argv[6]: (file path) path/to/ST-output\n";
+	std::cout << "argv[5]: (file path) path/to/ST-output\n";
 }
 
 static void SetDepedenciesToST(const Json::Value& graph, Json::Value& ST) {
@@ -42,7 +41,7 @@ static void SetCodeFilesToST(Json::Value& ST, const std::vector<std::string>& sr
 }
 
 int main(int argc, const char** argv) {
-	if (argc < 2) {
+	if (argc < 6) {
 		PrintMainArgInfo();
 		return 1;
 	}
@@ -65,13 +64,16 @@ int main(int argc, const char** argv) {
 	}
 	const char* option = argv[1]; // option = "--src", option = "--cmp-db"
 	
-	const char* ignoredFilePaths = (argc >= 4) ? argv[3] : "";
-	const char* ignoredNamespaces = (argc >= 5) ? argv[4] : "";
-	
+	//const char* ignoredFilePaths = (argc >= 4) ? argv[3] : "";
+	//const char* ignoredNamespaces = (argc >= 5) ? argv[4] : "";
+	const char* ignoredFilePaths = argv[3];
+	const char* ignoredNamespaces = argv[4];
+
 	std::string fullPath = std::string(__FILE__);
 	std::size_t found = fullPath.find_last_of("/\\");
-	std::string jsonPath = (argc >= 6) ? argv[5] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
-	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../../ST0.json";
+	/*std::string jsonPath = (argc >= 6) ? argv[5] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
+	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../../ST0.json";*/
+	std::string jsonSTPath = argv[5];
 	
 	/*std::vector<std::string> srcs;
 	srcs.push_back(path + "\\classes_simple.cpp");			
@@ -108,12 +110,12 @@ int main(int argc, const char** argv) {
 	jsonSTFile.close();
 	//std::cout << json_ST << std::endl;
 	// --------- Phiv ends here -------------------
-	std::string json_graph_str = graphToJson::GetJsonString(graph);
+	/*std::string json_graph_str = graphToJson::GetJsonString(graph);
 	
 	std::ofstream jsonFile;
 
 	jsonFile.open(jsonPath);
 	jsonFile << json_graph_str;
- 	jsonFile.close();
-	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
+ 	jsonFile.close();*/
+	std::cout << "\nCOMPILATION FINISHED\n";
 }

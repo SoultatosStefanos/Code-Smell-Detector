@@ -27,7 +27,12 @@
     <script src="../src/loader.js"></script>
     <script>
         // Load the Visualization API and the corechart package.
-        google.charts.load('current', {'packages':['corechart']});
+        try{
+            google.charts.load('current', {'packages':['corechart']}); // todo: no internet handle
+        }
+        catch (error){
+            console.log(error);
+        }
         var google_charts_loaded = false;
         google.charts.setOnLoadCallback(function (){ 
             google_charts_loaded = true;
