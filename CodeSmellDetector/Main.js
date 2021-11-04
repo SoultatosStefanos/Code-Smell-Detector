@@ -14,7 +14,6 @@ const fs = require("fs");
 const path = require("path");
 const Util = require(get_full_path("Utility.js"));
 const SmellRenderer = require(get_full_path("Smell_renderer.js"));
-console.log(get_full_path("Smell_renderer.js"));
 const DetectorRenderer = require(get_full_path("Detector_renderer.js"));
 const StatsRenderer = require(get_full_path("Stats_renderer"));
 const smells_cfg_path = require(get_full_path("MainConfig.json")).DetectorsConfig_Path;
@@ -290,7 +289,6 @@ function get_relevant_note_count(){
     Confirms user re-computation request if notes are about to be deleted.
 */
 function try_compute_smells(){
-    console.log("!!!!!\n ", smells_list, "\n!!!!!");
     let note_count = get_relevant_note_count();
     if(note_count === 0)
         compute_smells();

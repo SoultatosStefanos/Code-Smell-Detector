@@ -200,8 +200,6 @@ module.exports = class StatsRenderer{
             }
         }
 
-        console.log(files_with_smells);
-
         let countof_files_with_smells = Object.keys(files_with_smells).length;
         let countof_structures_with_smells = Object.keys(structures_with_smells).length;
         let countof_methods_with_smells = Object.keys(methods_with_smells).length;
@@ -274,15 +272,9 @@ module.exports = class StatsRenderer{
         if(s_info !== null){
             this.compute_by_structure(s_info.rows);
         }
-        else{
-            console.log("TODO");
-        }
         
         if(f_info !== null){
             this.compute_by_file(f_info.rows);
-        }
-        else {
-            console.log("TODO");
         }
         
     }

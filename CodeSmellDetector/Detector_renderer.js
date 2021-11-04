@@ -61,7 +61,6 @@ module.exports = class DetectorRenderer{
             else {
                 document.getElementById("cfg_changed_label").innerHTML = "Detector configuration changed, smell recomputation needed";
                 detector.recompute_flag = true;
-                console.log(detector);
             }
         }, 500);
         //DetectorRenderer.timed_func();
