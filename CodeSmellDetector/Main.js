@@ -25,6 +25,10 @@ let smells_config, smell_detectors, ST, smell_detectors_reports, smells_list = n
 
 async function initialize(){
     smells_list = await init_backend();
+    if(smells_list === null || smells_list.length === 0){
+        for(let det of smell_detectors)
+            det.recompute_flag = true;
+    }
     init_frontend();
 }
 
@@ -171,7 +175,7 @@ async function init_frontend(){
 
     
    
-    let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"), get_full_path(smells_cfg_path), smells_config);
+    let detector_renderer = new DetectorRenderer(document.getElementById("detector_config_div"), document.getElementById("detector_cfg_nav"), get_full_path(smells_cfg_path), smells_config, smell_detectors);
     detector_renderer.render();
 }
 
@@ -257,14 +261,26 @@ let dialog_box = (function(){
 }());
 
 /**
-     * @returns note count in smells_list.
+     * @returns true only if detector with the name 'detector_name' exists and has its recompute_flag true.
 */
-function get_note_count(){
+function has_recompute_flag(detector_name){
+    for(let det of smell_detectors){
+        if(det.name === detector_name && det.recompute_flag === true)
+            return true;
+    }
+    return false;
+}
+
+/**
+     * @returns note count in smells_list originating from one of the detectors with recompute_flag === true.
+*/
+function get_relevant_note_count(){
     if(smells_list === null)
         return 0;
+        
     let note_count = 0;
     for(const smell of smells_list){
-        if(smell.note !== undefined) 
+        if(smell.note !== undefined && has_recompute_flag(smell.detector))
             note_count++;
     }
     return note_count;
@@ -274,7 +290,8 @@ function get_note_count(){
     Confirms user re-computation request if notes are about to be deleted.
 */
 function try_compute_smells(){
-    let note_count = get_note_count();
+    console.log("!!!!!\n ", smells_list, "\n!!!!!");
+    let note_count = get_relevant_note_count();
     if(note_count === 0)
         compute_smells();
     else if(note_count === 1)
@@ -283,15 +300,30 @@ function try_compute_smells(){
         dialog_box.open({content: `Are you sure you want to re-compute smells and delete ${note_count} notes?`});
 }
 
+function remove_smells_from_modified_detectors(smells_list){
+    let i = 0;
+    while (i < smells_list.length) {
+        if (has_recompute_flag(smells_list[i].detector))
+            smells_list.splice(i, 1);
+        else
+            i++;
+    }
+}
+
 async function compute_smells(){
     smell_detectors_reports = await run_smell_detectors(smell_detectors, ST);
-    smells_list = [];
+    if(smells_list)
+        remove_smells_from_modified_detectors(smells_list);
+    else
+        smells_list = [];
     for(let report of smell_detectors_reports){
         for(let incident of report.incidents){
             smells_list.push(incident);
         }
     }
     document.getElementById("cfg_changed_label").innerHTML = "";
+    for(let det of smell_detectors)
+        det.recompute_flag = false;
     smell_renderer.render(smells_list);
     stat_renderer.compute_stats(smells_list, ST);
     await Util.save_smell_reports(smells_list);
@@ -322,7 +354,7 @@ function get_smell_detectors(smells_config){
         }
         new_smell_detector.name = smell_detector.name;
         new_smell_detector.args = smell_detector.args;
-        new_smell_detector.hidden = smell_detector.hidden;
+        new_smell_detector.recompute_flag = false;
         _smell_detectors.push(new_smell_detector);
         console.log(`Loaded smell "${smell_detector.name}" from "${detector_path}".`);
     }
@@ -342,6 +374,8 @@ function get_smell_detectors(smells_config){
 async function run_smell_detectors(smell_detectors, ST){
     let smell_reports = [];
     for(const smell_detector of smell_detectors){
+        if(!smell_detector.recompute_flag)
+            continue;
         console.log(`Running smell detector: "${smell_detector.name}"`);
         let promise = Util.execute_smell_callback(smell_detector, ST);
         smell_reports.push(promise);
