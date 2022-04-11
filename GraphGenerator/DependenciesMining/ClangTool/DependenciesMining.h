@@ -4,7 +4,7 @@
 
 #include <iostream>
 #include "SymbolTable.h"
-#include "../Ignored/Ignored.h";
+#include "../Ignored/Ignored.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
 #include "clang/Tooling/Tooling.h"

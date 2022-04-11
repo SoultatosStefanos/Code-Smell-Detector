@@ -1,5 +1,6 @@
 #include "SymbolTable.h"
 #include "STVisitor.h"
+#include <algorithm>
 
 using namespace dependenciesMining;
 

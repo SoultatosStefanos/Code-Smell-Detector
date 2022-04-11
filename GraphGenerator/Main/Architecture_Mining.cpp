@@ -40,7 +40,7 @@ static void SetCodeFilesToST(Json::Value& ST, const std::vector<std::string>& sr
 	}
 }
 
-int main(int argc, const char** argv) {
+int main(int argc, char const *argv[]) {
 	if (argc < 6) {
 		PrintMainArgInfo();
 		return 1;
