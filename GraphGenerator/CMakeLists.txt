@@ -9,7 +9,10 @@ project(GraphGenerator CXX)
 if (MSVC)
   add_compile_options(/W4 /WX)
 else()
-  add_compile_options(-Wall -Wextra -pedantic )
+  add_compile_options(
+		-Wall -Wextra -pedantic
+		-I/usr/lib/gcc/x86_64-linux-gnu/11/include
+)
 endif()
 
 add_executable(${PROJECT_NAME} )
