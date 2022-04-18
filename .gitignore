@@ -32,6 +32,7 @@
 *.app
 Testfiles/.vscode/settings.json
 GraphVisualizer/node_modules
+.vscode
 
 
 GraphVisualizer/.vscode/launch.json
