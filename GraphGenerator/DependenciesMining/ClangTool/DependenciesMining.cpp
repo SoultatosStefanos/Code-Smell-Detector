@@ -908,6 +908,9 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::
 		auto OptionsParser = CommonOptionsParser::create(argc, argv, MyToolCategory);
 		//OptionsParser = new CommonOptionsParser(argc, argv, MyToolCategory);
 
+		if(!OptionsParser)
+			return -1;
+
 		Tool = new ClangTool(OptionsParser->getCompilations(), srcs);
 	}
 	else {
@@ -933,6 +936,7 @@ int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback); 
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
+
 	int result = Tool->run(newFrontendActionFactory(&Finder).get());
 
 	SetFiles(Tool, srcs, headers);
