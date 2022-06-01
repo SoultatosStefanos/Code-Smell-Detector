@@ -34,7 +34,7 @@ namespace incremental {
 
 	CompilationCache& GetCompilationCache();
 
-	bool LoadingArchiveExists(const std::string_view fname);
+	bool ArchiveExists(const std::string_view fname); // confirms the existence of a file with an fname
 
 	void DeserializeCompilationCache(LoadingArchive& from, CompilationCache& cache = GetCompilationCache());
 

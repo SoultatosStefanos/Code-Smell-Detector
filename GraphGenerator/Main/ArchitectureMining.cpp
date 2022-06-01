@@ -54,10 +54,9 @@ int main(int argc, char const *argv[]) {
 	{
 		using namespace incremental;
 
-		if (LoadingArchiveExists(cacheName)) {
+		if (ArchiveExists(cacheName)) {
 			LoadingArchive tmp{cacheName};
 			DeserializeCompilationCache(tmp);
-			tmp.close();
 		}
 
 		std::cout << "\nCACHED SYMBOLS:\n\n";
@@ -141,7 +140,6 @@ int main(int argc, char const *argv[]) {
 
 		SavingArchive tmp{cacheName};
 		SerializeCompilationCache(tmp);
-		tmp.close();
 	}
 
 	// ----------- Incremental 2 ends here ------------- //

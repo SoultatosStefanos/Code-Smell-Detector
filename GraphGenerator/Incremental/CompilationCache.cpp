@@ -9,7 +9,7 @@ namespace incremental {
 		return cache;
 	}
 
-	bool LoadingArchiveExists(const std::string_view fname) {
+	bool ArchiveExists(const std::string_view fname) {
 		struct stat buffer;   
   		return (stat(fname.data(), &buffer) == 0);  // optimized with POSIX function
 	}
