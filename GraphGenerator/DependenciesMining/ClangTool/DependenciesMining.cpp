@@ -88,6 +88,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	auto structID = GetIDfromDecl(d);	
+
 	//assert(structID); 
 	structure.SetName(GetFullStructureName(d));
 	structure.SetID(structID);
@@ -301,6 +302,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		//	typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
 		auto fieldID = GetIDfromDecl(d);
+
 		//assert(fieldID);
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
 		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
@@ -361,6 +363,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
 			auto fieldID = GetIDfromDecl(d);
+
 			//assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
@@ -382,7 +385,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		auto methodID = GetIDfromDecl(d);
 		//assert(parentID);
 		//assert(methodID);
-
 
 		if(!(d->isThisDeclarationADefinition())){
 			return;

@@ -1,6 +1,6 @@
 set(FILES 
-	CompilationCache.cpp
-	CompilationCache.h
+	ImportST.cpp
+	ImportST.h
 )
 set(SUBDIRECTORIES )
 

@@ -7,7 +7,7 @@
 #include "GraphGeneration.h"
 #include "GraphToJson.h"
 #include "json/writer.h"
-#include "CompilationCache.h"
+#include "ImportST.h"
 
 static void PrintMainArgInfo(void) {
 	std::cout << "MAIN ARGUMENTS:\n\n";
@@ -47,26 +47,11 @@ int main(int argc, char const *argv[]) {
 		return 1;
 	}
 
-	// ----------- Incremental 1 starts here ------------- //
+	// ----------- Incremental starts here ------------- //
 
-	constexpr auto cacheName{"cache.tmp"};
+	incremental::ImportSTIfCached(argv[5],  dependenciesMining::structuresTable);
 
-	{
-		using namespace incremental;
-
-		if (std::filesystem::exists(cacheName)) {
-			LoadingArchive tmp{cacheName};
-			DeserializeCompilationCache(tmp);
-		}
-
-		std::cout << "\nCACHED SYMBOLS:\n\n";
-		
-		for (const auto& symbol : GetCompilationCache())
-			std::cout << symbol << '\n';
-
-	}
-
-	// ----------- Incremental 1 ends here ------------- //
+	// ----------- Incremental ends here ------------- //
 
 
 	std::string option1 = "--src";
@@ -132,18 +117,6 @@ int main(int argc, char const *argv[]) {
 	SetCodeFilesToST(json_ST, srcs, headers);
 	jsonSTFile << json_ST;
 	jsonSTFile.close();
-
-	// ----------- Incremental 2 starts here ------------- //
-
-	{
-		using namespace incremental;
-
-		SavingArchive tmp{cacheName};
-		SerializeCompilationCache(tmp);
-	}
-
-	// ----------- Incremental 2 ends here ------------- //
-
 
 	//std::cout << json_ST << std::endl;
 	// --------- Phiv ends here -------------------

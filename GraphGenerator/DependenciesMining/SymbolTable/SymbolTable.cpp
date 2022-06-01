@@ -1,10 +1,8 @@
 #include "SymbolTable.h"
 #include "STVisitor.h"
 #include <algorithm>
-#include "CompilationCache.h"
 
 using namespace dependenciesMining;
-using namespace incremental;
 
 // SourceInfo 
 std::string SourceInfo::GetFileName() const {
@@ -679,7 +677,6 @@ Symbol* SymbolTable::Install(const ID_T& id, const std::string& name, const Clas
 
 Symbol* SymbolTable::Install(const ID_T& id, const Symbol& symbol) {
 	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
-	GetCompilationCache().Insert(id);
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -702,7 +699,6 @@ Symbol* SymbolTable::Install(const ID_T& id, const Symbol& symbol) {
 
 Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
 	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
-	GetCompilationCache().Insert(id);
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -725,7 +721,6 @@ Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
 
 Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
 	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
-	GetCompilationCache().Insert(id);
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -741,7 +736,6 @@ Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
 
 Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 	std::cout << "Installing from file: " << symbol.GetSourceInfo().GetFileName() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
-	GetCompilationCache().Insert(id);
 
 	auto it = byID.find(id);
 	if (it != byID.end()) 
@@ -758,7 +752,6 @@ Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 
 Symbol* SymbolTable::Install(const ID_T& id, Symbol* symbol) {
 	std::cout << "Installing from: " << symbol->GetSourceInfo().toString() << ", " << symbol->GetID() << '\n';  // TODO REMOVE
-	GetCompilationCache().Insert(id);
 	
 	auto it = byID.find(id);
 	if (it != byID.end()) {
