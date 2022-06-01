@@ -1,5 +1,6 @@
 set(FILES 
-	ArchitectureMining.cpp
+	CompilationCache.cpp
+	CompilationCache.h
 )
 set(SUBDIRECTORIES )
 

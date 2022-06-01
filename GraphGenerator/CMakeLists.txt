@@ -30,6 +30,7 @@ set(SUBDIRECTORIES
 	Graph
 	GraphGeneration
 	GraphToJson
+	Incremental
 	Main
 	SourceLoader
 	Utilities

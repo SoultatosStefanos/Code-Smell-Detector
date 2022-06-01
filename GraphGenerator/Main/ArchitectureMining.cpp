@@ -7,6 +7,7 @@
 #include "GraphGeneration.h"
 #include "GraphToJson.h"
 #include "json/writer.h"
+#include "CompilationCache.h"
 
 static void PrintMainArgInfo(void) {
 	std::cout << "MAIN ARGUMENTS:\n\n";
@@ -45,6 +46,30 @@ int main(int argc, char const *argv[]) {
 		PrintMainArgInfo();
 		return 1;
 	}
+
+	// ----------- Incremental 1 starts here ------------- //
+
+	constexpr auto cacheName{"cache.tmp"};
+
+	{
+		using namespace incremental;
+
+		if (LoadingArchiveExists(cacheName)) {
+			LoadingArchive tmp{cacheName};
+			DeserializeCompilationCache(tmp);
+			tmp.close();
+		}
+
+		std::cout << "\nCACHED SYMBOLS:\n\n";
+		
+		for (const auto& symbol : GetCompilationCache())
+			std::cout << symbol << '\n';
+
+	}
+
+	// ----------- Incremental 1 ends here ------------- //
+
+
 	std::string option1 = "--src";
 	std::string option2 = "--cmp-db";
 	const char* cmpDBPath = nullptr;
@@ -108,6 +133,20 @@ int main(int argc, char const *argv[]) {
 	SetCodeFilesToST(json_ST, srcs, headers);
 	jsonSTFile << json_ST;
 	jsonSTFile.close();
+
+	// ----------- Incremental 2 starts here ------------- //
+
+	{
+		using namespace incremental;
+
+		SavingArchive tmp{cacheName};
+		SerializeCompilationCache(tmp);
+		tmp.close();
+	}
+
+	// ----------- Incremental 2 ends here ------------- //
+
+
 	//std::cout << json_ST << std::endl;
 	// --------- Phiv ends here -------------------
 	/*std::string json_graph_str = graphToJson::GetJsonString(graph);
