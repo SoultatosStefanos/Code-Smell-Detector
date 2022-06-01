@@ -19,6 +19,8 @@ add_executable(${PROJECT_NAME} )
 
 add_definitions("-fno-exceptions -fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 
+target_compile_definitions(${PROJECT_NAME} PRIVATE INCREMENTAL_COMPILATION=1)
+
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
 

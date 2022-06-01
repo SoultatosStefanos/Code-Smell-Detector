@@ -47,12 +47,9 @@ int main(int argc, char const *argv[]) {
 		return 1;
 	}
 
-	// ----------- Incremental starts here ------------- //
-
+#ifdef INCREMENTAL_COMPILATION
 	incremental::ImportSTIfCached(argv[5],  dependenciesMining::structuresTable);
-
-	// ----------- Incremental ends here ------------- //
-
+#endif
 
 	std::string option1 = "--src";
 	std::string option2 = "--cmp-db";
