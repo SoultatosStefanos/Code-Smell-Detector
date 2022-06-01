@@ -54,7 +54,7 @@ int main(int argc, char const *argv[]) {
 	{
 		using namespace incremental;
 
-		if (ArchiveExists(cacheName)) {
+		if (std::filesystem::exists(cacheName)) {
 			LoadingArchive tmp{cacheName};
 			DeserializeCompilationCache(tmp);
 		}

@@ -3,7 +3,6 @@
 #include "SymbolTable.h"
 #include <fstream>
 #include <unordered_set>
-#include <string_view>
 
 namespace incremental {
 
@@ -33,8 +32,6 @@ namespace incremental {
 	};
 
 	CompilationCache& GetCompilationCache();
-
-	bool ArchiveExists(const std::string_view fname); // confirms the existence of a file with an fname
 
 	void DeserializeCompilationCache(LoadingArchive& from, CompilationCache& cache = GetCompilationCache());
 

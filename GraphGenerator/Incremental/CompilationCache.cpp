@@ -1,17 +1,11 @@
 #include "CompilationCache.h"
 #include <cassert>
-#include <sys/stat.h>
 
 namespace incremental {
 
 	CompilationCache& GetCompilationCache() {
 		static CompilationCache cache;
 		return cache;
-	}
-
-	bool ArchiveExists(const std::string_view fname) {
-		struct stat buffer;   
-  		return (stat(fname.data(), &buffer) == 0);  // optimized with POSIX function
 	}
 
 	void DeserializeCompilationCache(LoadingArchive& from, CompilationCache& cache) {
