@@ -60,8 +60,14 @@ namespace incremental {
 	}
 
 	void ImportST(JsonArchive& from, SymbolTable& cache) {
+		assert(from.good());
+		assert(from.is_open());
+
 		const auto root = GetArchiveRoot(from);
 		ImportStructures(root["structures"], cache);
+
+		assert(from.good());
+		assert(from.is_open());
 	}
 
 	void ImportSTIfCached(const std::string_view fpath, dependenciesMining::SymbolTable& table) {
