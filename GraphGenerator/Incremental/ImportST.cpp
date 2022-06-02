@@ -17,9 +17,7 @@ namespace incremental {
 
 		inline JsonVal GetArchiveRoot(JsonArchive& from) {
 			JsonVal root;
-			try {				// TODO Cleanup, currently cannot check for file validity elsewise
-				from >> root;
-			} catch(Json::RuntimeError& err) {}
+			from >> root;
 			return root;
 		}
 
@@ -36,6 +34,7 @@ namespace incremental {
 		template <typename Function>
 		void ForEach(const JsonVal& val, Function f) {
 			static_assert(std::is_invocable_v<Function, const JsonString&, const JsonVal&>, "Invalid function.");
+
 			for (auto iter = std::begin(val); iter != std::end(val); ++iter)
 				f(iter.name(), *iter);
 		}
@@ -78,11 +77,12 @@ namespace incremental {
 			m->SetLiterals(Get(val, "literals").asInt());
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
-			m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // FIXME?
+			// m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // FIXME? Cannot set void structure
 			m->SetAccessType(FromString(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
+			// m->SetMethodType(MethodType::UserMethod); // FIXME? Doesn't seem to matter, can't know from json
 
 			// Import args.
 			ForEach(Get(val, "args"), [m, &table](const auto& id, const auto& val) { 
@@ -173,10 +173,9 @@ namespace incremental {
 		assert(from.is_open());
 
 		const auto root = GetArchiveRoot(from);
-		if(root)
-			ForEach(Get(root, "structures"), [&table](const auto& id, const auto& val) { 
-				ImportStructure(id, val, table); 
-			});
+		ForEach(Get(root, "structures"), [&table](const auto& id, const auto& val) { 
+			ImportStructure(id, val, table); 
+		});
 
 		assert(from.good());
 		assert(from.is_open());

@@ -265,6 +265,8 @@ void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	Edge::DependencyType oldCurrDepType = currDepType;
 	
 	Structure* typeStruct = (Structure*)s->GetType();
+	assert(typeStruct);
+	
 	if (typeStruct->IsUndefined())
 		assert(0);
 
