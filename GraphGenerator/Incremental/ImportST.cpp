@@ -72,14 +72,14 @@ namespace incremental {
 
 		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
 
-		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, Method* m) {
+		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table, Method* m) {
 			m->SetID(id);
 			m->SetBranches(Get(val, "branches").asInt());
 			m->SetLineCount(Get(val, "lines").asInt());
 			m->SetLiterals(Get(val, "literals").asInt());
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
-			// m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // FIXME? Cannot set void structure
+			m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // will write nullptr in case of "void"
 			m->SetAccessType(AccessTypeFromString(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
@@ -118,7 +118,7 @@ namespace incremental {
 			auto* m = (Method*) table.Install(id, Method{});
 			assert(m);
 
-			DeserializeMethod(id, val, m);
+			DeserializeMethod(id, val,  table, m);
 
 			ImportArgs(val, table, m);
 			ImportDefinitions(val, table, m);
