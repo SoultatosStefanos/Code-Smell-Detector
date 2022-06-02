@@ -48,7 +48,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 #ifdef INCREMENTAL_COMPILATION
-	incremental::ImportSTIfCached(argv[5],  dependenciesMining::structuresTable);
+	incremental::ImportStashedST(argv[5],  dependenciesMining::structuresTable);
 #endif
 
 	std::string option1 = "--src";

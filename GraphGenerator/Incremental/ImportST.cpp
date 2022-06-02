@@ -21,16 +21,13 @@ namespace incremental {
 			return root;
 		}
 
-		inline auto Get(const JsonVal& val, const char* at) { // safe access
+		// Utility for safe json access.
+		inline auto Get(const JsonVal& val, const char* at) { 
 			assert(val.isMember(at));
 			return val[at];
 		}
 
-		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
-			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
-		}
-
-		// Utility for id based json iteration
+		// Utility for id based json iteration.
 		template <typename Function>
 		void ForEach(const JsonVal& val, Function f) {
 			static_assert(std::is_invocable_v<Function, const JsonString&, const JsonVal&>, "Invalid function.");
@@ -39,7 +36,7 @@ namespace incremental {
 				f(iter.name(), *iter);
 		}
 
-		inline AccessType FromString(const JsonString& string) {
+		inline AccessType AccessTypeFromString(const JsonString& string) {
 			using AccessTable = std::unordered_map<JsonString, AccessType>;
 
 			static const auto table = AccessTable{ { "public", AccessType::_public },
@@ -52,25 +49,30 @@ namespace incremental {
 			return table.at(string);
 		}
 
-
-		Definition* ImportDefinition(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* f = (Definition*) table.Install(id, Definition{});
-			assert(f);
-
-			f->SetID(id);
-			if (val.isMember("access"))
-				f->SetAccessType(FromString(Get(val, "access").asString()));
-			f->SetFullType(Get(val, "type").asString());
-
-			return f;
+		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
+			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
 		}
 
-		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table);
+		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
+			d->SetID(id);
+			if (val.isMember("access"))
+				d->SetAccessType(AccessTypeFromString(Get(val, "access").asString()));
+			d->SetFullType(Get(val, "type").asString());
+		}
 
-		Method* ImportMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* m = (Method*) table.Install(id, Method{});
-			assert(m);
 
+		inline Definition* ImportDefinition(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* d = (Definition*) table.Install(id, Definition{});
+			assert(d);
+
+			DeserializeDefinition(id, val ,d);
+
+			return d;
+		}
+
+		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
+
+		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, Method* m) {
 			m->SetID(id);
 			m->SetBranches(Get(val, "branches").asInt());
 			m->SetLineCount(Get(val, "lines").asInt());
@@ -78,55 +80,68 @@ namespace incremental {
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
 			// m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // FIXME? Cannot set void structure
-			m->SetAccessType(FromString(Get(val, "access").asString()));
+			m->SetAccessType(AccessTypeFromString(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
 			// m->SetMethodType(MethodType::UserMethod); // FIXME? Doesn't seem to matter, can't know from json
+		}
 
-			// Import args.
+		inline void ImportArgs(const JsonVal& val, SymbolTable& table, Method* m) {
 			ForEach(Get(val, "args"), [m, &table](const auto& id, const auto& val) { 
 				auto* arg = ImportDefinition(id, val, table);
 				assert(arg);
 
 				m->InstallArg(id, *arg); 
 			});
+		}
 
-			// Import definitions.
+		inline void ImportDefinitions(const JsonVal& val, SymbolTable& table, Method* m) {
 			ForEach(Get(val, "definitions"), [m, &table](const auto& id, const auto& val) {
 				auto* def = ImportDefinition(id, val, table);
 				assert(def);
 
 				m->InstallDefinition(id, *def); 
 			});
+		}
 
-			// Import template args.
+		inline void ImportTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) {
 			ForEach(Get(val, "template_args"), [m, &table](const auto& id, const auto& val) { 
 				auto* s = ImportStructure(id, val, table);
 				assert(s);
 
 				m->InstallTemplateSpecializationArguments(id, s); 
 			});
+		}
+
+		inline Method* ImportMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* m = (Method*) table.Install(id, Method{});
+			assert(m);
+
+			DeserializeMethod(id, val, m);
+
+			ImportArgs(val, table, m);
+			ImportDefinitions(val, table, m);
+			ImportTemplateArgs(val, table, m);
 
 			return m;
 		}
 
-		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* s = (Structure*) table.Install(id, Structure{});
-			assert(s);
-
+		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
 			s->SetID(id);
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
+		}
 
-			// Import nested classes.
+		inline void ImportNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) { 
 				auto* c = ImportStructure(id, val, table);
 				assert(c);
 
 				s->InstallNestedClass(id, c); 
 			});
+		}
 
-			// Import fields.
+		inline void ImportFields(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "fields"), [&table, s](const auto& id, const auto& val) { 
 				auto* f = ImportDefinition(id, val, table);
 				assert(f);
@@ -134,25 +149,28 @@ namespace incremental {
 				f->SetType(s);
 				s->InstallField(id, *f);
 			});
+		}
 
-			// Import friends.
+		inline void ImportFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "friends"), [&table, s](const auto& id, const auto& val) {
 				auto* f = ImportStructure(id, val, table);
 				assert(f);
 
 				s->InstallFriend(id, f); 
 			});
+		}
 
-			// Import methods.
+		inline void ImportMethods(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "methods"), [&table, s](const auto& id, const auto& val) {
 				auto* m = ImportMethod(id, val, table);
 				assert(m);
 
 				s->InstallMethod(id, *m);
 			});
+		}
 
-			// Import bases.
-			if(val.isMember("bases")) { 	// could not be at json file
+		void ImportBases(const JsonVal& val, SymbolTable& table, Structure* s) {
+			if(val.isMember("bases")) {	// could not be at json file
 				assert(Get(val, "bases").isArray());
 
 				for (const auto& base : Get(val, "bases")) {
@@ -162,30 +180,46 @@ namespace incremental {
 					s->InstallBase(id, (Structure*) table.Lookup(id));
 				}
 			}
+		}
+
+		inline Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* s = (Structure*) table.Install(id, Structure{});
+			assert(s);
+
+			DeserializeStructure(id, val, s);
+
+			ImportNestedClasses(val, table, s);
+			ImportFields(val, table, s);
+			ImportFriends(val, table, s);
+			ImportMethods(val, table, s);
+			ImportBases(val, table, s);
 
 			return s;
 		}
 
-	}
+		inline void ImportStructures(const JsonVal& val, SymbolTable& table) {
+			ForEach(Get(val, "structures"), [&table](const auto& id, const auto& val) { 
+				ImportStructure(id, val, table); 
+			});
+		}
+
+	} // namespace
 
 	void ImportST(JsonArchive& from, SymbolTable& table) {
 		assert(from.good());
 		assert(from.is_open());
 
-		const auto root = GetArchiveRoot(from);
-		ForEach(Get(root, "structures"), [&table](const auto& id, const auto& val) { 
-			ImportStructure(id, val, table); 
-		});
+		ImportStructures(GetArchiveRoot(from), table);
 
 		assert(from.good());
 		assert(from.is_open());
 	}
 
-	void ImportSTIfCached(const std::string_view fpath, dependenciesMining::SymbolTable& table) {
+	void ImportStashedST(const std::string_view fpath, dependenciesMining::SymbolTable& table) {
 		if (std::filesystem::exists(fpath)) {
 			JsonArchive file{fpath.data()};
 			ImportST(file, table);
 		}
 	}
 
-}
+} // incremental
