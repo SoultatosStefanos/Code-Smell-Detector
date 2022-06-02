@@ -804,6 +804,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 				//assert(defID);
 				def = new Definition (defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
 				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+				def->SetFullType(typeName);
 			}
 			else {
 
