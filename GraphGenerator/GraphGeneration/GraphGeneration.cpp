@@ -1,4 +1,5 @@
 #include "GraphGeneration.h"
+#include <cassert>
 
 using namespace dependenciesMining; 
 using namespace graph;
@@ -7,6 +8,7 @@ using namespace graphGeneration;
 // GraphGenerationSTVisitor
 
 void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
+	assert(s);
 	
 	if (s->IsUndefined())
 		return;
@@ -130,6 +132,8 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 
 
 void GraphGenerationSTVisitor::VisitMethod(Method* s) {
+	assert(s);
+
 	Edge::DependencyType oldCurrDepType = currDepType;
 	untyped::Object data;
 
@@ -256,6 +260,8 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 
 
 void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
+	assert(s);
+	
 	Edge::DependencyType oldCurrDepType = currDepType;
 	
 	Structure* typeStruct = (Structure*)s->GetType();
