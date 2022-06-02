@@ -28,6 +28,23 @@ namespace incremental {
 			return val[at];
 		}
 
+		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table);
+
+		void ImportStructures(const JsonVal& val, SymbolTable& table) {
+			for (auto iter = std::begin(val); iter != std::end(val); ++iter)
+				ImportStructure(iter.name(), *iter, table);
+		}
+
+		template <typename Function>
+		void ImportStructureSymbols(const JsonVal& val, SymbolTable& table, Structure* s, Function import) {
+			static_assert(std::is_invocable_v<Function, const JsonString&, const JsonVal&, SymbolTable&, Structure*>, "Invalid import function.");
+
+			assert(s);
+
+			for (auto iter = std::begin(val); iter != std::end(val); ++iter)
+				import(iter.name(), *iter, table, s);
+		}
+		
 		inline AccessType FromString(const JsonString& string) {
 			using AccessTable = std::unordered_map<JsonString, AccessType>;
 
@@ -41,79 +58,70 @@ namespace incremental {
 			return table.at(string);
 		}
 
-		template <typename TSymbol, typename Function>
-		auto ImportSymbols(const JsonVal& val, SymbolTable& table, Function import) {
-			static_assert(std::is_base_of_v<Symbol, TSymbol>, "Expected derivative of dependenciesMining::Symbol.");
-			static_assert(std::is_invocable_r_v<TSymbol, Function, const JsonString&, const JsonVal&, SymbolTable&>, "Invalid import function.");
+		void ImportField(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
+			assert(s);
 
-			using Symbols = std::vector<TSymbol>;
+			auto* f = (Definition*) table.Install(id, Definition{});
+			assert(f);
 
-			Symbols syms;
-			syms.reserve(std::distance(std::begin(val), std::end(val)));
-			for (auto iter = std::begin(val); iter != std::end(val); ++iter) {
-				auto sym = import(iter.name(), *iter, table);
-				assert(table.Lookup(sym.GetID()));
-				syms.push_back(std::move(sym));
+			f->SetID(id);
+			f->SetAccessType(FromString(Get(val, "access").asString()));
+			f->SetFullType(Get(val, "type").asString());
+			f->SetType(s);
+
+			s->InstallField(id, *f);
+		}
+
+		inline void ImportNestedClass(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
+			assert(s);
+
+			auto* c = ImportStructure(id, val, table);
+			assert(c);
+
+			s->InstallNestedClass(id, c);
+		}
+
+		inline void ImportFriend(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
+			assert(s);
+
+			auto* f = ImportStructure(id, val, table);
+			assert(f);
+
+			s->InstallFriend(id, f);
+		}
+
+		void ImportBases(const JsonVal& val, SymbolTable& table, Structure* s) {
+			assert(s);
+			assert(val.isArray());
+
+			for (const auto& base : val) {
+				assert(base.isString());
+
+				const auto id = base.asString();
+				s->InstallBase(id, (Structure*) table.Lookup(id));
 			}
-
-			return syms;
 		}
 
-		Definition ImportField(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			const auto access = Get(val, "access").asString();
-			const auto type = Get(val, "type").asString();
-
-			Definition field;
-			field.SetID(id);
-			field.SetAccessType(FromString(access));
-			field.SetFullType(type);
-
-			table.Install(id, field);
-
-			return field;
+		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
+			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
 		}
 
-		inline auto DeserializeSrcInfo(const JsonVal& val) {
-			const auto col = Get(val, "col").asInt();
-			const auto file = Get(val, "file").asString();
-			const auto line = Get(val, "line").asInt();
+		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* s = (Structure*) table.Install(id, Structure{});
 
-			return SourceInfo{file, line, col};
-		}
+			assert(s);
 
-		Structure ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			std::cout << id << '\n';
+			s->SetID(id);
+			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 
-			Structure sym;
-			sym.SetID(id);
-			
-			const auto contains = ImportSymbols<Structure>(Get(val, "contains"), table, ImportStructure);
-			for (const auto& c : contains)
-				sym.InstallNestedClass(c.GetID(), (Structure*) table.Lookup(c.GetID()));
+			ImportStructureSymbols(Get(val, "contains"), table, s, ImportNestedClass);
+			ImportStructureSymbols(Get(val, "fields"), table, s, ImportField);
+			ImportStructureSymbols(Get(val, "friends"), table, s, ImportFriend);
 
-			const auto fields = ImportSymbols<Definition>(Get(val, "fields"), table, ImportField);
-			for (const auto& f : fields)
-				sym.InstallField(f.GetID(), f);
+			if(val.isMember("bases")) // could not be at json file
+				ImportBases(Get(val, "bases"), table, s);
 
-			const auto friends = ImportSymbols<Structure>(Get(val, "friends"), table, ImportStructure);
-			for (const auto& f : friends)
-				sym.InstallFriend(f.GetID(), (Structure*) table.Lookup(f.GetID()));
-
-			const auto srcInfo = DeserializeSrcInfo(Get(val, "src_info"));
-			sym.SetSourceInfo(srcInfo);
-
-			if(val.isMember("bases")) {
-				assert(Get(val, "bases").isArray());
-
-				for (const auto& val : Get(val, "bases")) {
-					const auto base = val.asString();
-					sym.InstallBase(base, (Structure*) table.Lookup(base));
-				}
-			}
-
-			table.Install(sym.GetID(), sym);
-
-			return sym;
+			return s;
 		}
 
 	}
@@ -124,7 +132,7 @@ namespace incremental {
 
 		const auto root = GetArchiveRoot(from);
 		if(root) // valid json
-			ImportSymbols<Structure>(Get(root, "structures"), table, ImportStructure);
+			ImportStructures(Get(root, "structures"), table);
 
 		assert(from.good());
 		assert(from.is_open());
