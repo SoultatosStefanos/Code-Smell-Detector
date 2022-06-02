@@ -47,7 +47,7 @@ int main(int argc, char const *argv[]) {
 		return 1;
 	}
 
-#ifdef INCREMENTAL_COMPILATION
+#ifdef INCREMENTAL_GENERATION
 	incremental::ImportStashedST(argv[5],  dependenciesMining::structuresTable);
 #endif
 
