@@ -2,6 +2,7 @@
 // Soultatos Stefanos 2022
 
 #include "ImportST.h"
+#include "Converters.h"
 #include <cassert>
 #include <iostream>
 #include <jsoncpp/json/json.h>
@@ -10,6 +11,7 @@
 #include <sstream>
 
 namespace incremental {
+	using namespace details;
 
 	namespace {
 
@@ -39,38 +41,6 @@ namespace incremental {
 				f(iter.name(), *iter);
 		}
 
-		// TODO Clean up
-
-		inline AccessType FromStringGetAccessType(const JsonString& string) {
-			using AccessTable = std::unordered_map<JsonString, AccessType>;
-
-			static const auto table = AccessTable{ { "public", AccessType::_public },
-			 									   { "protected", AccessType::_protected },
-												   { "private", AccessType::_private },
-												   { "unknown", AccessType::unknown } };
-
-			assert(table.find(string) != std::end(table));
-
-			return table.at(string);
-		}
-
-		inline StructureType FromStringGetStructureType(const JsonString& string) {
-			using StructureTable = std::unordered_map<JsonString, StructureType>;
-
-			static const auto table = StructureTable{	{ "Class", StructureType::Class },
-			 									   		{ "Struct", StructureType::Struct },
-												   		{ "TemplateDefinition", StructureType::TemplateDefinition },
-												  	 	{ "TemplateFullSpecialization", StructureType::TemplateFullSpecialization },
-														{ "TemplateInstantiationSpecialization", StructureType::TemplateInstantiationSpecialization },
-														{ "TemplatePartialSpecialization", StructureType::TemplatePartialSpecialization},
-														{ "Undefined", StructureType::Undefined} };
-
-			assert(table.find(string) != std::end(table));
-
-			return table.at(string);
-		}
-
-
 		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
 			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
 		}
@@ -78,7 +48,7 @@ namespace incremental {
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
 			if (val.isMember("access"))
-				d->SetAccessType(FromStringGetAccessType(Get(val, "access").asString()));
+				d->SetAccessType(ToAccessType(Get(val, "access").asString()));
 			d->SetFullType(Get(val, "type").asString());
 		}
 
@@ -102,7 +72,7 @@ namespace incremental {
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
 			m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // will write nullptr in case of "void"
-			m->SetAccessType(FromStringGetAccessType(Get(val, "access").asString()));
+			m->SetAccessType(ToAccessType(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
@@ -153,7 +123,7 @@ namespace incremental {
 			s->SetID(id);
 			s->SetName(Get(val, "name").asString());
 			s->SetNamespace(Get(val, "namespace").asString());
-			s->SetStructureType(FromStringGetStructureType(Get(val, "structure_type").asString()));
+			s->SetStructureType(ToStructureType(Get(val, "structure_type").asString()));
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 

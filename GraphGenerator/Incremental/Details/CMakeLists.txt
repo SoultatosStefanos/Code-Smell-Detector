@@ -1,8 +1,8 @@
 set(FILES 
-	ImportST.cpp
-	ImportST.h
+	Converters.cpp
+	Converters.h
 )
-set(SUBDIRECTORIES Details)
+set(SUBDIRECTORIES )
 
 foreach(VAR ${SUBDIRECTORIES})
 	target_include_directories(${PROJECT_NAME} PUBLIC ${VAR})
