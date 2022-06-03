@@ -50,7 +50,7 @@ namespace {
 		return resolved_path;
 	}
 
-	inline void ExportST(SymbolTable& table,const std::string_view jsonPath) {
+	inline void ExportST(SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
 		Json::Value jsonST;
@@ -89,7 +89,7 @@ namespace {
 	TEST(ImportStashedST, Imports_one_empty_structure_correctly) {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
-		exported.Install("A", Structure{"A", "a"});
+		exported.Install("A", Structure{"A", "a", "namespace", StructureType::Class, "file", -1, -1});
 		ExportST(exported, tmp);
 
 		ImportStashedST(tmp, imported);
@@ -104,7 +104,7 @@ namespace {
 		SymbolTable exported, imported;
 		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
 			const auto id = "A" + std::to_string(i++);
-			exported.Install(id, Structure{id, id});
+			exported.Install(id, Structure{id, id, "namespace", StructureType::Class, "file", -1, -1});
 		});
 		ExportST(exported, tmp);
 
