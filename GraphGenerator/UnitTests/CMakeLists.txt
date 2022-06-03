@@ -1,4 +1,5 @@
 set(FILES 
+  IncrementalTests.cpp
   Tests.cpp
 )
 

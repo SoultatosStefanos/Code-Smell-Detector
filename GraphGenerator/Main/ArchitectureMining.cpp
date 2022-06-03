@@ -75,8 +75,8 @@ int main(int argc, char const *argv[]) {
 	const char* ignoredFilePaths = argv[3];
 	const char* ignoredNamespaces = argv[4];
 
-	std::string fullPath = std::string(__FILE__);
-	std::size_t found = fullPath.find_last_of("/\\");
+	// std::string fullPath = std::string(__FILE__);
+	// std::size_t found = fullPath.find_last_of("/\\");
 	/*std::string jsonPath = (argc >= 6) ? argv[5] : fullPath.substr(0, found + 1) + "../../GraphVisualizer/Graph/graph.json";
 	std::string jsonSTPath = (argc >= 7) ? argv[6] : fullPath.substr(0, found + 1) + "../../ST0.json";*/
 	std::string jsonSTPath = argv[5];
