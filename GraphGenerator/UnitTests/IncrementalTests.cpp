@@ -91,7 +91,7 @@ namespace {
 
 		ImportStashedST(tmp, imported);
 
-		EXPECT_EQ(imported, exported);
+		EXPECT_EQ(imported, exported) << "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported;
 
 		std::remove(tmp.data());
 	}
@@ -100,14 +100,14 @@ namespace {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
 		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
-			const auto id = "A" + i++;
+			const auto id = "A" + std::to_string(i++);
 			exported.Install(id, Structure{id, id});
 		});
 		ExportST(exported, tmp);
 
 		ImportStashedST(tmp, imported);
 
-		EXPECT_EQ(imported, exported);
+		EXPECT_EQ(imported, exported) << "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported;
 
 		std::remove(tmp.data());
 	}

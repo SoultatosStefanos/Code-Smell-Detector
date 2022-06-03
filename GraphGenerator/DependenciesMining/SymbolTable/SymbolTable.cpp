@@ -165,10 +165,6 @@ void Symbol::SetAccessType(const AccessType& access_type) {
 	this->access_type = access_type;
 }
 
-bool Symbol::operator==(const Symbol& rhs) const {
-	return GetClassType() == rhs.GetClassType() and IsEqual(rhs);
-}
-
 // Template 
 template<typename Parent_T> Parent_T* Template<Parent_T>::GetParent() const {
 	return parent;
@@ -679,7 +675,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const std::string& name, const Clas
 }
 
 Symbol* SymbolTable::Install(const ID_T& id, const Symbol& symbol) {
-	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
+	// std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -701,7 +697,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Symbol& symbol) {
 
 
 Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
-	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
+	// std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -723,7 +719,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
 }
 
 Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
-	std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
+	// std::cout << "Installing from: " << symbol.GetSourceInfo().toString() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -738,7 +734,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
 }
 
 Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
-	std::cout << "Installing from file: " << symbol.GetSourceInfo().GetFileName() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
+	// std::cout << "Installing from file: " << symbol.GetSourceInfo().GetFileName() << ", " << symbol.GetID() << '\n';  // TODO REMOVE
 
 	auto it = byID.find(id);
 	if (it != byID.end()) 
@@ -754,7 +750,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 }
 
 Symbol* SymbolTable::Install(const ID_T& id, Symbol* symbol) {
-	std::cout << "Installing from: " << symbol->GetSourceInfo().toString() << ", " << symbol->GetID() << '\n';  // TODO REMOVE
+	// std::cout << "Installing from: " << symbol->GetSourceInfo().toString() << ", " << symbol->GetID() << '\n';  // TODO REMOVE
 	
 	auto it = byID.find(id);
 	if (it != byID.end()) {
@@ -1057,12 +1053,25 @@ void SymbolTable::Accept(STVisitor* visitor) const {
 	}
 }
 
+// ----------------------------------------------------------------------------- //
+// ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
+// ----------------------------------------------------------------------------- //
+
+bool Symbol::IsEqual(const Symbol& other) const {
+	return GetAccessType() == other.GetAccessType()
+			and GetID() == other.GetID() 
+			and GetName() == other.GetName() 
+			and GetNamespace() == other.GetNamespace() 
+			and GetSourceInfo() == other.GetSourceInfo();
+}
+
 bool Structure::IsEqual(const Symbol& other) const {
 	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
 
 	const auto& rhs = static_cast<const Structure&>(other);
 
-	return GetStructureType() == rhs.GetStructureType()
+	return Symbol::IsEqual(other)
+			and GetStructureType() == rhs.GetStructureType()
 	 		and GetTemplateParent() == rhs.GetTemplateParent()
 			and GetNestedParent() == rhs.GetNestedParent() 
 			and GetMethods() == rhs.GetMethods()
@@ -1078,7 +1087,8 @@ bool Method::IsEqual(const Symbol& other) const {
 
 	const auto& rhs = static_cast<const Method&>(other);
 
-	return GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
+	return Symbol::IsEqual(other)
+			and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
 			and GetReturnType() == rhs.GetReturnType()
 			and GetArguments() == rhs.GetArguments()
 			and GetDefinitions() == rhs.GetDefinitions()
@@ -1096,5 +1106,52 @@ bool Definition::IsEqual(const Symbol& other) const {
 
 	const auto& rhs = static_cast<const Definition&>(other);
 
-	return GetType() == rhs.GetType();
+	return Symbol::IsEqual(other) 
+			and GetType() == rhs.GetType() 
+			and GetFullType() == rhs.GetFullType();
 }
+
+void Symbol::Output(std::ostream& os) const {
+	os 	<< " ID: " << GetID() << ','
+		<< " Name: " << GetName() << ','
+		<< " Access type: " << GetAccessTypeStr() << ','
+		<< " Class type: " << GetClassTypeAsString() << ','
+		<< " Source info: " << GetSourceInfo() << ',';
+}
+
+void Definition::Output(std::ostream& os) const {
+	Symbol::Output(os);
+	os << " Full type: " << GetFullType();
+}
+
+void Method::Output(std::ostream& os) const {
+	Symbol::Output(os);
+	os 	<< " Method type: " << GetMethodTypeAsString() << ','
+		<< " Return type: " << [this]() { return GetReturnType() ? GetReturnType()->GetID() : "nullptr"; } () << '\n'
+		<< " Arguments: \n" << GetArguments() << '\n'
+		<< " Definitions: \n" << GetDefinitions() << '\n'
+		<< " Template arguments: \n" << GetTemplateArguments() << '\n'
+		<< " Literals: " << GetLiterals() << ','
+		<< " Statements: " << GetStatements() << ','
+		<< " Branches: " << GetBranches() << ','
+		<< " Loops: " << GetLoops() << ','
+		<< " Max scope depth: " << GetMaxScopeDepth() << ','
+		<< " Line count: " << GetLineCount();
+}
+
+void Structure::Output(std::ostream& os) const {
+	Symbol::Output(os);
+	os 	<< " Structure type: " << GetStructureTypeAsString()  << ','
+		<< " Template parent: " << [this]() { return GetTemplateParent() ? GetTemplateParent()->GetID() : "nullptr"; } ()  << ','
+		<< " Nested parent: " << [this]() { return GetNestedParent() ? GetNestedParent()->GetID() : "nullptr"; } () << '\n'
+		<< " Methods: \n" << GetMethods()
+		<< " Fields: \n" << GetFields()
+		<< " Bases: \n" << GetBases()
+		<< " Nested classes: \n" << GetContains()
+		<< " Friends: \n" << GetFriends()
+		<< " Template arguments: \n" << GetTemplateArguments();
+}
+
+// ----------------------------------------------------------------------------- //
+// ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
+// ----------------------------------------------------------------------------- //

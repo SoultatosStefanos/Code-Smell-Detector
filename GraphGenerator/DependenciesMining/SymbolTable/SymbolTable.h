@@ -10,6 +10,8 @@
 
 #define ID_T std::string 
 
+#define DEBUG_FRIENDLY
+
 namespace dependenciesMining {
 
 	class SymbolTable;
@@ -82,6 +84,10 @@ namespace dependenciesMining {
 		bool  operator==(SourceInfo const& loc) const;		
 	};
 
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SourceInfo& src) {
+		return os << src.toString();
+	}
+
 	// ----------------------------------------------------------------------------------------
 
 	class Symbol {
@@ -93,7 +99,7 @@ namespace dependenciesMining {
 		ClassType classType = ClassType::Undefined;
 		AccessType access_type = AccessType::unknown;
 
-		virtual bool IsEqual(const Symbol& other) const { assert(false); return false; /* cannot make pure virtual due to breaking changes */ };
+		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const;
 
 	public:
 		Symbol() = default; 
@@ -117,12 +123,25 @@ namespace dependenciesMining {
 		virtual void SetSourceInfo(const std::string& fileName, int line, int column);
 		virtual void SetNamespace(const std::string& nameSpace);
 		void SetAccessType(const AccessType& access_type);
+
+		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const;
 		
-		bool operator==(const Symbol& rhs) const;
+		DEBUG_FRIENDLY bool operator==(const Symbol& rhs) const;
 	};
 
-	inline bool operator!=(const Symbol& lhs, const Symbol& rhs) {
+	DEBUG_FRIENDLY inline bool Symbol::operator==(const Symbol& rhs) const {
+		// GetClassType() == rhs.GetClassType() ensures safe static casting down the line.
+		// God knows why clang links only with -fno-rtti.
+		return GetClassType() == rhs.GetClassType() and IsEqual(rhs); 
+	}
+
+	DEBUG_FRIENDLY inline bool operator!=(const Symbol& lhs, const Symbol& rhs) {
 		return !(lhs == rhs);
+	}
+
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Symbol& s) {
+		s.Output(os);
+		return os;
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -174,14 +193,26 @@ namespace dependenciesMining {
 
 	};
 
-	inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
 		for (const auto& [id, symbol] : t) 
-			os << "ID: " << id << '\n';
+			os << *symbol << '\n';
 		return os;
 	}
 
-	inline bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) {
-		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs));
+	DEBUG_FRIENDLY inline bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) {
+		return	lhs.GetSize() == rhs.GetSize() ?
+		 		std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
+					const auto* lhs = lpair.second;
+					const auto* rhs = rpair.second;
+					assert(lhs and rhs);
+					
+					return *lhs == *rhs;
+				}) :
+				false;
+	}
+
+	DEBUG_FRIENDLY inline bool operator!=(const SymbolTable& lhs, const SymbolTable& rhs) {
+		return	!(lhs == rhs);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -208,7 +239,7 @@ namespace dependenciesMining {
 		std::string full_type = "";
 
 	protected:
-		virtual bool IsEqual(const Symbol& other) const override;
+		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
@@ -222,7 +253,24 @@ namespace dependenciesMining {
 		std::string GetFullType() const;
 		void SetType(Structure* structure);
 		void SetFullType(const std::string& type);
+
+		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
+
+		DEBUG_FRIENDLY bool operator==(const Definition& rhs) const;
 	};
+
+	DEBUG_FRIENDLY inline bool Definition::operator==(const Definition& rhs) const {
+		return IsEqual(rhs);
+	}
+
+	DEBUG_FRIENDLY inline bool operator!=(const Definition& lhs, const Definition& rhs) {
+		return !(lhs == rhs);
+	}
+
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Definition& d) {
+		d.Output(os);
+		return os;
+	}
 
 	#define Value_mem_t "Value"
 	#define ClassField_mem_t "ClassField"
@@ -286,7 +334,7 @@ namespace dependenciesMining {
 		bool is_virtual;
 	
 	protected:
-		virtual bool IsEqual(const Symbol& other) const override;
+		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
 
 	public:
 		Method() : Symbol(ClassType::Method) {};
@@ -336,7 +384,24 @@ namespace dependenciesMining {
 		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTrivial() const;
 		bool IsVirtual() const;
+
+		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
+
+		DEBUG_FRIENDLY bool operator==(const Method& rhs) const;
 	};
+
+	DEBUG_FRIENDLY inline bool Method::operator==(const Method& rhs) const {
+		return IsEqual(rhs);
+	}
+
+	DEBUG_FRIENDLY inline bool operator!=(const Method& lhs, const Method& rhs) {
+		return !(lhs == rhs);
+	}
+
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Method& m) {
+		m.Output(os);
+		return os;
+	}
 
 	// ----------------------------------------------------------------------------------------
 
@@ -354,7 +419,7 @@ namespace dependenciesMining {
 								// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
 	
 	protected:
-		virtual bool IsEqual(const Symbol& other) const override;
+		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
 
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
@@ -396,9 +461,29 @@ namespace dependenciesMining {
 		bool IsTemplate() const;
 		bool IsUndefined() const;
 		bool IsNestedClass() const;
+
+		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
+
+		DEBUG_FRIENDLY bool operator==(const Structure& rhs) const;
 	};
+
+	DEBUG_FRIENDLY inline bool Structure::operator==(const Structure& rhs) const {
+		return IsEqual(rhs);
+	}
+
+	DEBUG_FRIENDLY inline bool operator!=(const Structure& lhs, const Structure& rhs) {
+		return !(lhs == rhs);
+	}
+
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Structure& s) {
+		s.Output(os);
+		return os;
+	}
 
 	/*class Fundamental : public Symbol {
 
 	};*/
+
+	
+
 }
