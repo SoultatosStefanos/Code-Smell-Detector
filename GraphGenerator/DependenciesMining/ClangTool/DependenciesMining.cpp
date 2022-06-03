@@ -35,7 +35,9 @@ void initializeIgnored(const std::string& ignoredFiles, const std::string& ignor
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	const CXXRecordDecl* d;
+
 	Structure structure;
+
 	if ((d = result.Nodes.getNodeAs<CXXRecordDecl>(CLASS_DECL))) {
 		structure.SetStructureType(StructureType::Class);
 	}
@@ -45,6 +47,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	else {
 		assert(0);
 	}
+
+	const auto structID = GetIDfromDecl(d);	
+
+	/*
+	TODO Early Exit
+	*/
 
 	if (isIgnoredDecl(d)) {
 		return;
@@ -60,7 +68,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			d = d->getDefinition();
 		}
 	}
-	
 
 	// Templates
 	if (d->getDescribedClassTemplate()) {	
@@ -87,8 +94,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 
-	auto structID = GetIDfromDecl(d);	
-
 	//assert(structID); 
 	structure.SetName(GetFullStructureName(d));
 	structure.SetID(structID);
@@ -99,7 +104,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		return;
 	}
 	structure.SetNamespace(fullEnclosingNamespace);
-
 
 	// Templates 
 	if (!d->hasDefinition()) {															// Templates that has Declaration only
@@ -271,6 +275,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Hanlde all the Fields in classes/structs (non structure fields)
 void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
+		const auto fieldID = GetIDfromDecl(d);
+
+		/*
+		TODO Early exit
+		*/
+
 		auto* parent = d->getParent();
 
 		// Ignored
@@ -301,7 +311,6 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		//if (!typeStructure)
 		//	typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-		auto fieldID = GetIDfromDecl(d);
 
 		//assert(fieldID);
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
@@ -317,6 +326,11 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 // Hanlde all the Fields in classes/structs (structure fields)
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
+		const auto fieldID = GetIDfromDecl(d);
+
+		/*
+		TODO Early exit
+		*/
 
 		auto* parent = d->getParent();
 
@@ -362,7 +376,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-			auto fieldID = GetIDfromDecl(d);
 
 			//assert(fieldID);
 			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
@@ -379,10 +392,15 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
+		const auto methodID = GetIDfromDecl(d);
+
+		/*
+		TODO Early exit
+		*/
+
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent);
 		auto parentID = GetIDfromDecl(parent);
-		auto methodID = GetIDfromDecl(d);
 		//assert(parentID);
 		//assert(methodID);
 
@@ -745,6 +763,12 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 // Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
+		const auto defID = GetIDfromDecl(d);
+
+		/*
+		TODO Early exit
+		*/
+
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
 		// Ignore the methods declarations 
@@ -785,7 +809,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 			std::string typeName;
 			ID_T typeID;
-			auto defID = GetIDfromDecl(d);
 			Definition* def = nullptr;
 
 			if (isStructureOrStructurePointerType(d->getType())) {
