@@ -61,6 +61,9 @@ namespace {
 		assert(std::filesystem::exists(jsonPath));
 	}
 
+	// Googletest cannot detect operator<< overloads :(
+	#define DUMP_INFO(imported, exported) "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported
+
 	TEST(ImportStashedST, Imports_nothing_from_non_existent_path) {
 		const auto path = ResolvePath("Out.json");
 		assert(!std::filesystem::exists(path));
@@ -91,7 +94,7 @@ namespace {
 
 		ImportStashedST(tmp, imported);
 
-		EXPECT_EQ(imported, exported) << "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported;
+		EXPECT_EQ(imported, exported) << DUMP_INFO(imported, exported);
 
 		std::remove(tmp.data());
 	}
@@ -107,7 +110,7 @@ namespace {
 
 		ImportStashedST(tmp, imported);
 
-		EXPECT_EQ(imported, exported) << "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported;
+		EXPECT_EQ(imported, exported) << DUMP_INFO(imported, exported);
 
 		std::remove(tmp.data());
 	}
