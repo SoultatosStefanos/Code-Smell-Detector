@@ -48,7 +48,6 @@ int main(int argc, char const *argv[]) {
 	}
 
 #ifdef INCREMENTAL_GENERATION
-
 	try {
 		incremental::ImportStashedST(argv[5],  dependenciesMining::structuresTable);
 
@@ -59,7 +58,6 @@ int main(int argc, char const *argv[]) {
 
 		return EXIT_FAILURE;
 	}
-
 #endif
 
 	std::string option1 = "--src";

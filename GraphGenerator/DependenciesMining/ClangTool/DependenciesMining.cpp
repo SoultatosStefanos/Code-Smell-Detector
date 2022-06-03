@@ -50,9 +50,10 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	const auto structID = GetIDfromDecl(d);	
 
-	/*
-	TODO Early Exit
-	*/
+#ifdef INCREMENTAL_GENERATION
+	if (structuresTable.Lookup(structID)) // Imported from json
+		return;
+#endif
 
 	if (isIgnoredDecl(d)) {
 		return;
@@ -277,9 +278,10 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
-		/*
-		TODO Early exit
-		*/
+#ifdef INCREMENTAL_GENERATION
+		if (structuresTable.Lookup(fieldID)) // Imported from json
+			return;
+#endif
 
 		auto* parent = d->getParent();
 
@@ -328,9 +330,10 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
-		/*
-		TODO Early exit
-		*/
+#ifdef INCREMENTAL_GENERATION
+		if (structuresTable.Lookup(fieldID)) // Imported from json
+			return;
+#endif
 
 		auto* parent = d->getParent();
 
@@ -394,9 +397,10 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
 		const auto methodID = GetIDfromDecl(d);
 
-		/*
-		TODO Early exit
-		*/
+#ifdef INCREMENTAL_GENERATION
+		if (structuresTable.Lookup(methodID)) // Imported from json
+			return;
+#endif
 
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent);
@@ -765,9 +769,10 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		const auto defID = GetIDfromDecl(d);
 
-		/*
-		TODO Early exit
-		*/
+#ifdef INCREMENTAL_GENERATION
+		if (structuresTable.Lookup(defID)) // Imported from json
+			return;
+#endif
 
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
