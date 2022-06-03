@@ -41,15 +41,6 @@ namespace {
 			f();
 	}
 
-	// Useful for out-of-source builds.
-	inline auto ResolvePath(const std::string& to, std::string from = __FILE__) {
-		const auto file_directory = std::string(dirname(from.data()));
-		auto resolved_path = file_directory + "/" + to;
-
-		assert((!from.empty() or !to.empty()) ? resolved_path.size() >= 2 : true);
-		return resolved_path;
-	}
-
 	inline void ExportST(SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
@@ -65,7 +56,7 @@ namespace {
 	#define DUMP_INFO(imported, exported) "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported
 
 	TEST(ImportStashedST, Imports_nothing_from_non_existent_path) {
-		const auto path = ResolvePath("Out.json");
+		constexpr auto path = "out.json";
 		assert(!std::filesystem::exists(path));
 		SymbolTable table;
 
@@ -75,7 +66,7 @@ namespace {
 	}
 
 	TEST(ImportStashedST, Imports_empty_symbol_table_correctly) {
-		const auto tmp = ResolvePath("Out.json");
+		constexpr auto tmp = "out.json";
 		SymbolTable table;
 		ExportST(table, tmp);
 
@@ -83,11 +74,11 @@ namespace {
 
 		EXPECT_TRUE(table.IsEmpty());
 
-		std::remove(tmp.data());
+		std::remove(tmp);
 	}
 
 	TEST(ImportStashedST, Imports_one_empty_structure_correctly) {
-		const auto tmp = ResolvePath("Out.json");
+		constexpr auto tmp = "out.json";
 		SymbolTable exported, imported;
 		exported.Install("A", Structure{"A", "a", "namespace", StructureType::Class, "papas.cpp", 69, 420});
 		ExportST(exported, tmp);
@@ -96,11 +87,11 @@ namespace {
 
 		EXPECT_EQ(imported, exported) << DUMP_INFO(imported, exported);
 
-		std::remove(tmp.data());
+		std::remove(tmp);
 	}
 
 	TEST(ImportStashedST, Imports_multiple_empty_structures_correctly) {
-		const auto tmp = ResolvePath("Out.json");
+		constexpr auto tmp = "out.json";
 		SymbolTable exported, imported;
 		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
 			const auto id = "A" + std::to_string(i++);
@@ -112,7 +103,7 @@ namespace {
 
 		EXPECT_EQ(imported, exported) << DUMP_INFO(imported, exported);
 
-		std::remove(tmp.data());
+		std::remove(tmp);
 	}
 
 } // namespace
