@@ -125,6 +125,11 @@ namespace dependenciesMining {
 		std::unordered_map<ID_T, Symbol*> byID;
 		std::unordered_map<std::string, std::list<Symbol*>> byName;
 	public:
+		using Size = std::unordered_map<ID_T, Symbol*>::size_type;
+
+		bool IsEmpty() const { return byID.empty(); }
+		Size GetSize() const { return byID.size(); }
+
 		Symbol* Install(const ID_T& id, const std::string& name, const ClassType& type = ClassType::Structure);		// TO FIX
 		Symbol* Install(const ID_T& id, const Symbol& symbol);
 		Symbol* Install(const ID_T& id, const Structure& symbol);
