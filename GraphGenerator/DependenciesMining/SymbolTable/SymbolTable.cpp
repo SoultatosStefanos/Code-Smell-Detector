@@ -936,22 +936,24 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 //}
 
 void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
+	assert(structure);
 	//Json::Value json_structure;
 
 
+	// json_structure["name"] = structure->GetName(); // TODO That simple
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
 	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
 	const auto bases = structure->GetBases();
 	for (const auto& base : bases) {
 		json_structure["bases"].append(base.second->GetID());
 	}
-	//structure->GetBases().AddJsonSymbolTable(json_structure["bases"]); // FIXME need only id
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
 	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]);
 	json_structure["src_info"] = GetJsonSourceInfo(structure);
 }
 
 void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) {
+	assert(method);
 	//Json::Value json_method;
 
 	/*auto iss = method->GetMemberExpr();
@@ -982,6 +984,8 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 }
 
 void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) {
+	assert(definition);
+
 	json_definition["type"] = definition->GetFullType();
 	if (definition->GetAccessType() != AccessType::unknown)
 		json_definition["access"] = definition->GetAccessTypeStr();

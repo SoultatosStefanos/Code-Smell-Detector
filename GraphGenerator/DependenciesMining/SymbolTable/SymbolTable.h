@@ -105,7 +105,7 @@ namespace dependenciesMining {
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
 		Symbol(const ID_T& id, const std::string& name, const std::string& nameSpace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1)
-			: id(id), name(name), nameSpace(nameSpace), classType(classType), srcInfo(SourceInfo(fileName, line, column)) {};
+			: id(id), name(name), nameSpace(nameSpace), classType(classType), srcInfo(fileName, line, column) {};
 
 		virtual ID_T GetID() const;
 		virtual std::string GetName() const;

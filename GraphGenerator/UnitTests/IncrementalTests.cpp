@@ -89,7 +89,7 @@ namespace {
 	TEST(ImportStashedST, Imports_one_empty_structure_correctly) {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
-		exported.Install("A", Structure{"A", "a", "namespace", StructureType::Class, "file", -1, -1});
+		exported.Install("A", Structure{"A", "a", "namespace", StructureType::Class, "papas.cpp", 69, 420});
 		ExportST(exported, tmp);
 
 		ImportStashedST(tmp, imported);
@@ -104,7 +104,7 @@ namespace {
 		SymbolTable exported, imported;
 		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
 			const auto id = "A" + std::to_string(i++);
-			exported.Install(id, Structure{id, id, "namespace", StructureType::Class, "file", -1, -1});
+			exported.Install(id, Structure{id, id, "namespace", StructureType::Class, "ballons.cpp", 69, 420});
 		});
 		ExportST(exported, tmp);
 
