@@ -39,7 +39,9 @@ namespace incremental {
 				f(iter.name(), *iter);
 		}
 
-		inline AccessType AccessTypeFromString(const JsonString& string) {
+		// TODO Clean up
+
+		inline AccessType FromStringGetAccessType(const JsonString& string) {
 			using AccessTable = std::unordered_map<JsonString, AccessType>;
 
 			static const auto table = AccessTable{ { "public", AccessType::_public },
@@ -52,6 +54,23 @@ namespace incremental {
 			return table.at(string);
 		}
 
+		inline StructureType FromStringGetStructureType(const JsonString& string) {
+			using StructureTable = std::unordered_map<JsonString, StructureType>;
+
+			static const auto table = StructureTable{	{ "Class", StructureType::Class },
+			 									   		{ "Struct", StructureType::Struct },
+												   		{ "TemplateDefinition", StructureType::TemplateDefinition },
+												  	 	{ "TemplateFullSpecialization", StructureType::TemplateFullSpecialization },
+														{ "TemplateInstantiationSpecialization", StructureType::TemplateInstantiationSpecialization },
+														{ "TemplatePartialSpecialization", StructureType::TemplatePartialSpecialization},
+														{ "Undefined", StructureType::Undefined} };
+
+			assert(table.find(string) != std::end(table));
+
+			return table.at(string);
+		}
+
+
 		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
 			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
 		}
@@ -59,7 +78,7 @@ namespace incremental {
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
 			if (val.isMember("access"))
-				d->SetAccessType(AccessTypeFromString(Get(val, "access").asString()));
+				d->SetAccessType(FromStringGetAccessType(Get(val, "access").asString()));
 			d->SetFullType(Get(val, "type").asString());
 		}
 
@@ -83,7 +102,7 @@ namespace incremental {
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
 			m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // will write nullptr in case of "void"
-			m->SetAccessType(AccessTypeFromString(Get(val, "access").asString()));
+			m->SetAccessType(FromStringGetAccessType(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
@@ -132,6 +151,9 @@ namespace incremental {
 
 		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
 			s->SetID(id);
+			s->SetName(Get(val, "name").asString());
+			s->SetNamespace(Get(val, "namespace").asString());
+			s->SetStructureType(FromStringGetStructureType(Get(val, "structure_type").asString()));
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
@@ -172,8 +194,8 @@ namespace incremental {
 			});
 		}
 
-		void ImportBases(const JsonVal& val, SymbolTable& table, Structure* s) {
-			if(val.isMember("bases")) {	// could not be at json file
+		void InstallBases(const JsonVal& val, SymbolTable& table, Structure* s) {
+			if (val.isMember("bases")) {
 				assert(Get(val, "bases").isArray());
 
 				for (const auto& base : Get(val, "bases")) {
@@ -181,6 +203,29 @@ namespace incremental {
 
 					const auto id = base.asString();
 					s->InstallBase(id, (Structure*) table.Lookup(id));
+				}
+			}
+		}
+
+		inline void InstalllTemplateParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+			if (val.isMember("template_parent"))
+				s->SetTemplateParent((Structure*) table.Lookup(Get(val, "template_parent").asString()));
+		}
+
+		inline void InstalllNestedParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+			if (val.isMember("nested_parent"))
+				s->SetNestedParent((Structure*) table.Lookup(Get(val, "nested_parent").asString()));
+		}
+
+		void InstallTemplateArguments(const JsonVal& val, SymbolTable& table, Structure* s) {
+			if (val.isMember("template_args")) {
+				assert(Get(val, "template_args").isArray());
+
+				for (const auto& arg : Get(val, "template_args")) {
+					assert(arg.isString());
+
+					const auto id = arg.asString();
+					s->InstallTemplateSpecializationArguments(id, (Structure*) table.Lookup(id));
 				}
 			}
 		}
@@ -195,7 +240,11 @@ namespace incremental {
 			ImportFields(val, table, s);
 			ImportFriends(val, table, s);
 			ImportMethods(val, table, s);
-			ImportBases(val, table, s);
+
+			InstallBases(val, table, s);
+			InstalllTemplateParent(val, table, s);
+			InstalllNestedParent(val, table, s);
+			InstallTemplateArguments(val, table, s);
 
 			return s;
 		}
