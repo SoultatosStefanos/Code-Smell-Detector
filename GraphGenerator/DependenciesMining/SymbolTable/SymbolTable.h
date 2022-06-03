@@ -30,7 +30,6 @@ namespace dependenciesMining {
 		TemplatePartialSpecialization
 	};
 
-
 	enum class MethodType {
 		Undefined = -1,
 		Constructor_Trivial,

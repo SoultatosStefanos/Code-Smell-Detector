@@ -937,19 +937,30 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 
 void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
 	assert(structure);
-	//Json::Value json_structure;
 
-
-	// json_structure["name"] = structure->GetName(); // TODO That simple
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
 	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
-	const auto bases = structure->GetBases();
+	const auto& bases = structure->GetBases();
 	for (const auto& base : bases) {
 		json_structure["bases"].append(base.second->GetID());
 	}
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
 	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]);
 	json_structure["src_info"] = GetJsonSourceInfo(structure);
+
+	json_structure["name"] = structure->GetName();
+	json_structure["namespace"] = structure->GetNamespace();
+	json_structure["class_type"] = structure->GetClassTypeAsString();
+	json_structure["structure_type"] = structure->GetStructureTypeAsString();
+
+	if (structure->GetTemplateParent())
+		json_structure["template_parent"] = structure->GetTemplateParent()->GetID();
+	if (structure->GetNestedParent())
+		json_structure["nested_parent"] = structure->GetNestedParent()->GetID();
+	
+	const auto& template_args = structure->GetTemplateArguments();
+	for (const auto& [id, arg] : template_args)
+		json_structure["template_args"].append(arg->GetID());
 }
 
 void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) {
