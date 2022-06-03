@@ -6,6 +6,7 @@
 #include <list>
 #include <cassert>
 #include <vector>
+#include <algorithm>
 #include "json/writer.h"
 
 #define ID_T std::string 
@@ -198,17 +199,7 @@ namespace dependenciesMining {
 		return os;
 	}
 
-	DEBUG_FRIENDLY inline bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) {
-		return	lhs.GetSize() == rhs.GetSize() ?
-		 		std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
-					const auto* lhs = lpair.second;
-					const auto* rhs = rpair.second;
-					assert(lhs and rhs);
-					
-					return *lhs == *rhs;
-				}) :
-				false;
-	}
+	DEBUG_FRIENDLY bool operator==(const SymbolTable& lhs, const SymbolTable& rhs); // Expensive, only for small tests
 
 	DEBUG_FRIENDLY inline bool operator!=(const SymbolTable& lhs, const SymbolTable& rhs) {
 		return	!(lhs == rhs);

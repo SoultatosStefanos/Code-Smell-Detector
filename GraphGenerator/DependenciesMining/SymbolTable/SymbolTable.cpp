@@ -1072,100 +1072,115 @@ void SymbolTable::Accept(STVisitor* visitor) const {
 // ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
 // ----------------------------------------------------------------------------- //
 
-bool Symbol::IsEqual(const Symbol& other) const {
-	return GetAccessType() == other.GetAccessType()
-			and GetID() == other.GetID() 
-			and GetName() == other.GetName() 
-			and GetNamespace() == other.GetNamespace() 
-			and GetSourceInfo() == other.GetSourceInfo();
-}
+namespace dependenciesMining {
 
-bool Structure::IsEqual(const Symbol& other) const {
-	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+	bool Symbol::IsEqual(const Symbol& other) const {
+		return GetAccessType() == other.GetAccessType()
+				and GetID() == other.GetID() 
+				and GetName() == other.GetName() 
+				and GetNamespace() == other.GetNamespace() 
+				and GetSourceInfo() == other.GetSourceInfo();
+	}
 
-	const auto& rhs = static_cast<const Structure&>(other);
+	bool Structure::IsEqual(const Symbol& other) const {
+		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
 
-	return Symbol::IsEqual(other)
-			and GetStructureType() == rhs.GetStructureType()
-	 		and GetTemplateParent() == rhs.GetTemplateParent()
-			and GetNestedParent() == rhs.GetNestedParent() 
-			and GetMethods() == rhs.GetMethods()
-			and GetFields() == rhs.GetFields()
-			and GetBases() == rhs.GetBases()
-			and GetContains() == rhs.GetContains()
-			and GetFriends() == rhs.GetFriends()
-			and GetTemplateArguments() == rhs.GetTemplateArguments();
-}
+		const auto& rhs = static_cast<const Structure&>(other);
 
-bool Method::IsEqual(const Symbol& other) const {
-	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+		return Symbol::IsEqual(other)
+				and GetStructureType() == rhs.GetStructureType()
+				and GetTemplateParent() == rhs.GetTemplateParent()
+				and GetNestedParent() == rhs.GetNestedParent() 
+				and GetMethods() == rhs.GetMethods()
+				and GetFields() == rhs.GetFields()
+				and GetBases() == rhs.GetBases()
+				and GetContains() == rhs.GetContains()
+				and GetFriends() == rhs.GetFriends()
+				and GetTemplateArguments() == rhs.GetTemplateArguments();
+	}
 
-	const auto& rhs = static_cast<const Method&>(other);
+	bool Method::IsEqual(const Symbol& other) const {
+		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
 
-	return Symbol::IsEqual(other)
-			and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
-			and GetReturnType() == rhs.GetReturnType()
-			and GetArguments() == rhs.GetArguments()
-			and GetDefinitions() == rhs.GetDefinitions()
-			and GetTemplateArguments() == rhs.GetTemplateArguments()
-			and GetLiterals() == rhs.GetLiterals()
-			and GetStatements() == rhs.GetStatements()
-			and GetBranches() == rhs.GetBranches()
-			and GetLoops() == rhs.GetLoops()
-			and GetMaxScopeDepth() == rhs.GetMaxScopeDepth()
-			and GetLineCount() == rhs.GetLineCount();
-}
+		const auto& rhs = static_cast<const Method&>(other);
 
-bool Definition::IsEqual(const Symbol& other) const {
-	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+		return Symbol::IsEqual(other)
+				and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
+				and GetReturnType() == rhs.GetReturnType()
+				and GetArguments() == rhs.GetArguments()
+				and GetDefinitions() == rhs.GetDefinitions()
+				and GetTemplateArguments() == rhs.GetTemplateArguments()
+				and GetLiterals() == rhs.GetLiterals()
+				and GetStatements() == rhs.GetStatements()
+				and GetBranches() == rhs.GetBranches()
+				and GetLoops() == rhs.GetLoops()
+				and GetMaxScopeDepth() == rhs.GetMaxScopeDepth()
+				and GetLineCount() == rhs.GetLineCount();
+	}
 
-	const auto& rhs = static_cast<const Definition&>(other);
+	bool Definition::IsEqual(const Symbol& other) const {
+		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
 
-	return Symbol::IsEqual(other) 
-			and GetType() == rhs.GetType() 
-			and GetFullType() == rhs.GetFullType();
-}
+		const auto& rhs = static_cast<const Definition&>(other);
 
-void Symbol::Output(std::ostream& os) const {
-	os 	<< " ID: " << GetID() << ','
-		<< " Name: " << GetName() << ','
-		<< " Access type: " << GetAccessTypeStr() << ','
-		<< " Class type: " << GetClassTypeAsString() << ','
-		<< " Source info: " << GetSourceInfo() << ',';
-}
+		return Symbol::IsEqual(other) 
+				and GetType() == rhs.GetType() 
+				and GetFullType() == rhs.GetFullType();
+	}
 
-void Definition::Output(std::ostream& os) const {
-	Symbol::Output(os);
-	os << " Full type: " << GetFullType();
-}
+	void Symbol::Output(std::ostream& os) const {
+		os 	<< " ID: " << GetID() << ','
+			<< " Name: " << GetName() << ','
+			<< " Access type: " << GetAccessTypeStr() << ','
+			<< " Class type: " << GetClassTypeAsString() << ','
+			<< " Source info: " << GetSourceInfo() << ',';
+	}
 
-void Method::Output(std::ostream& os) const {
-	Symbol::Output(os);
-	os 	<< " Method type: " << GetMethodTypeAsString() << ','
-		<< " Return type: " << [this]() { return GetReturnType() ? GetReturnType()->GetID() : "nullptr"; } () << '\n'
-		<< " Arguments: \n" << GetArguments() << '\n'
-		<< " Definitions: \n" << GetDefinitions() << '\n'
-		<< " Template arguments: \n" << GetTemplateArguments() << '\n'
-		<< " Literals: " << GetLiterals() << ','
-		<< " Statements: " << GetStatements() << ','
-		<< " Branches: " << GetBranches() << ','
-		<< " Loops: " << GetLoops() << ','
-		<< " Max scope depth: " << GetMaxScopeDepth() << ','
-		<< " Line count: " << GetLineCount();
-}
+	void Definition::Output(std::ostream& os) const {
+		Symbol::Output(os);
+		os << " Full type: " << GetFullType();
+	}
 
-void Structure::Output(std::ostream& os) const {
-	Symbol::Output(os);
-	os 	<< " Structure type: " << GetStructureTypeAsString()  << ','
-		<< " Template parent: " << [this]() { return GetTemplateParent() ? GetTemplateParent()->GetID() : "nullptr"; } ()  << ','
-		<< " Nested parent: " << [this]() { return GetNestedParent() ? GetNestedParent()->GetID() : "nullptr"; } () << '\n'
-		<< " Methods: \n" << GetMethods()
-		<< " Fields: \n" << GetFields()
-		<< " Bases: \n" << GetBases()
-		<< " Nested classes: \n" << GetContains()
-		<< " Friends: \n" << GetFriends()
-		<< " Template arguments: \n" << GetTemplateArguments();
-}
+	void Method::Output(std::ostream& os) const {
+		Symbol::Output(os);
+		os 	<< " Method type: " << GetMethodTypeAsString() << ','
+			<< " Return type: " << [this]() { return GetReturnType() ? GetReturnType()->GetID() : "nullptr"; } () << '\n'
+			<< " Arguments: \n" << GetArguments() << '\n'
+			<< " Definitions: \n" << GetDefinitions() << '\n'
+			<< " Template arguments: \n" << GetTemplateArguments() << '\n'
+			<< " Literals: " << GetLiterals() << ','
+			<< " Statements: " << GetStatements() << ','
+			<< " Branches: " << GetBranches() << ','
+			<< " Loops: " << GetLoops() << ','
+			<< " Max scope depth: " << GetMaxScopeDepth() << ','
+			<< " Line count: " << GetLineCount();
+	}
+
+	void Structure::Output(std::ostream& os) const {
+		Symbol::Output(os);
+		os 	<< " Structure type: " << GetStructureTypeAsString()  << ','
+			<< " Template parent: " << [this]() { return GetTemplateParent() ? GetTemplateParent()->GetID() : "nullptr"; } ()  << ','
+			<< " Nested parent: " << [this]() { return GetNestedParent() ? GetNestedParent()->GetID() : "nullptr"; } () << '\n'
+			<< " Methods: \n" << GetMethods()
+			<< " Fields: \n" << GetFields()
+			<< " Bases: \n" << GetBases()
+			<< " Nested classes: \n" << GetContains()
+			<< " Friends: \n" << GetFriends()
+			<< " Template arguments: \n" << GetTemplateArguments();
+	}
+
+	bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) { 
+		if (lhs.GetSize() != rhs.GetSize())
+			return false;
+
+		return std::all_of(std::begin(lhs), std::end(lhs), [&rhs](const auto& lpair) {
+			return std::find_if(std::begin(rhs), std::end(rhs), [&lpair](const auto& rpair) {
+				return *(lpair.second) == *(rpair.second);
+			}) != std::end(rhs);
+		});
+	}
+
+} // dependenciesMining
 
 // ----------------------------------------------------------------------------- //
 // ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
