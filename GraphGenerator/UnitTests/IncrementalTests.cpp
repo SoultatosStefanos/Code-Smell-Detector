@@ -83,7 +83,7 @@ namespace {
 		std::remove(tmp.data());
 	}
 
-	TEST(ImportStashedST, Imports_one_empty_structure_correctly) {
+	TEST(ImportStashedST, Imports_1_empty_structure_correctly) {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
 		exported.Install("A", Structure{"A", "a"});
@@ -96,10 +96,10 @@ namespace {
 		std::remove(tmp.data());
 	}
 
-	TEST(ImportStashedST, Imports_n_up_to_10_empty_structures_correctly) {
+	TEST(ImportStashedST, Imports_from_2_to_10_empty_structures_correctly) {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
-		Repeat(URandom(1, 10), [i = 1, &exported]() mutable { 
+		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
 			const auto id = "A" + i++;
 			exported.Install(id, Structure{id, id});
 		});
