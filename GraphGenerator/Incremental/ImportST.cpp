@@ -1,3 +1,6 @@
+// Contains functions to import a Symbol Table from a json file.
+// Soultatos Stefanos 2022
+
 #include "ImportST.h"
 #include <cassert>
 #include <iostream>

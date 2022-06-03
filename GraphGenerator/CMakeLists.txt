@@ -19,11 +19,10 @@ add_executable(${PROJECT_NAME} )
 
 add_definitions("-fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 
-#target_compile_definitions(${PROJECT_NAME} PRIVATE INCREMENTAL_GENERATION=1)
+target_compile_definitions(${PROJECT_NAME} PRIVATE INCREMENTAL_GENERATION=1)
 
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
-
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS})
 
