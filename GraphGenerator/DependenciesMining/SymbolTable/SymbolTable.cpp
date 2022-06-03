@@ -165,6 +165,9 @@ void Symbol::SetAccessType(const AccessType& access_type) {
 	this->access_type = access_type;
 }
 
+bool Symbol::operator==(const Symbol& rhs) const {
+	return GetClassType() == rhs.GetClassType() and IsEqual(rhs);
+}
 
 // Template 
 template<typename Parent_T> Parent_T* Template<Parent_T>::GetParent() const {
@@ -1052,4 +1055,46 @@ void SymbolTable::Accept(STVisitor* visitor) const {
 			assert(0);
 		}
 	}
+}
+
+bool Structure::IsEqual(const Symbol& other) const {
+	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+
+	const auto& rhs = static_cast<const Structure&>(other);
+
+	return GetStructureType() == rhs.GetStructureType()
+	 		and GetTemplateParent() == rhs.GetTemplateParent()
+			and GetNestedParent() == rhs.GetNestedParent() 
+			and GetMethods() == rhs.GetMethods()
+			and GetFields() == rhs.GetFields()
+			and GetBases() == rhs.GetBases()
+			and GetContains() == rhs.GetContains()
+			and GetFriends() == rhs.GetFriends()
+			and GetTemplateArguments() == rhs.GetTemplateArguments();
+}
+
+bool Method::IsEqual(const Symbol& other) const {
+	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+
+	const auto& rhs = static_cast<const Method&>(other);
+
+	return GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
+			and GetReturnType() == rhs.GetReturnType()
+			and GetArguments() == rhs.GetArguments()
+			and GetDefinitions() == rhs.GetDefinitions()
+			and GetTemplateArguments() == rhs.GetTemplateArguments()
+			and GetLiterals() == rhs.GetLiterals()
+			and GetStatements() == rhs.GetStatements()
+			and GetBranches() == rhs.GetBranches()
+			and GetLoops() == rhs.GetLoops()
+			and GetMaxScopeDepth() == rhs.GetMaxScopeDepth()
+			and GetLineCount() == rhs.GetLineCount();
+}
+
+bool Definition::IsEqual(const Symbol& other) const {
+	assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
+
+	const auto& rhs = static_cast<const Definition&>(other);
+
+	return GetType() == rhs.GetType();
 }

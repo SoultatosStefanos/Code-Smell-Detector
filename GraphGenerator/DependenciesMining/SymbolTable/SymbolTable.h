@@ -93,6 +93,8 @@ namespace dependenciesMining {
 		ClassType classType = ClassType::Undefined;
 		AccessType access_type = AccessType::unknown;
 
+		virtual bool IsEqual(const Symbol& other) const { assert(false); return false; /* cannot make pure virtual due to breaking changes */ };
+
 	public:
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
@@ -116,7 +118,12 @@ namespace dependenciesMining {
 		virtual void SetNamespace(const std::string& nameSpace);
 		void SetAccessType(const AccessType& access_type);
 		
+		bool operator==(const Symbol& rhs) const;
 	};
+
+	inline bool operator!=(const Symbol& lhs, const Symbol& rhs) {
+		return !(lhs == rhs);
+	}
 
 	// ----------------------------------------------------------------------------------------
 
@@ -167,19 +174,14 @@ namespace dependenciesMining {
 
 	};
 
-	// For Debugging
 	inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
 		for (const auto& [id, symbol] : t) 
 			os << "ID: " << id << '\n';
 		return os;
 	}
 
-	// For Debugging, ID based equality checking
 	inline bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) {
-		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
-			const auto& lID = lpair.first, &rID = rpair.first;
-			return lID == rID;
-		});
+		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs));
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -204,6 +206,9 @@ namespace dependenciesMining {
 	private:
 		Structure* type = nullptr;
 		std::string full_type = "";
+
+	protected:
+		virtual bool IsEqual(const Symbol& other) const override;
 
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
@@ -279,6 +284,10 @@ namespace dependenciesMining {
 		int max_scope_depth = 0;
 		int line_count = 0;
 		bool is_virtual;
+	
+	protected:
+		virtual bool IsEqual(const Symbol& other) const override;
+
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
@@ -343,6 +352,10 @@ namespace dependenciesMining {
 		SymbolTable contains; 
 		SymbolTable friends;	// About Structures: Key->structureID, Value->Structure*
 								// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
+	
+	protected:
+		virtual bool IsEqual(const Symbol& other) const override;
+
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
