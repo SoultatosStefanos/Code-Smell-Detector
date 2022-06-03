@@ -815,13 +815,13 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 
 	return json_src_info;
 }
-//
-//void SymbolTable::Print() {
-//	for (auto& t : byName) {
-//		std::cout << "Name: " << t.first << std::endl;
-//		std::cout << "--------------------------------------------\n";
-//	}
-//}
+
+// void SymbolTable::Print() const {
+// 	for (auto& t : byName) {
+// 		std::cout << "Name: " << t.first << std::endl;
+// 		std::cout << "--------------------------------------------\n";
+// 	}
+// }
 //
 //// Testing purpose.
 //void SymbolTable::Print2(int level) {

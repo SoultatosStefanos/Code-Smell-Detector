@@ -118,16 +118,6 @@ namespace dependenciesMining {
 		
 	};
 
-	// For Debugging, TODO: Remove
-	// inline bool operator==(const Symbol& lhs, const Symbol& rhs) {
-	// 	return lhs.GetID() == rhs.GetID() 
-	// 			and lhs.GetName() == rhs.GetName() 
-	// 			and lhs.GetClassType() == rhs.GetClassType() 
-	// 			and lhs.GetSourceInfo() == rhs.GetSourceInfo() 
-	// 			and lhs.GetNamespace() == rhs.GetNamespace() 
-	// 			and lhs.GetAccessType() == rhs.GetAccessType(); 
-	// }
-
 	// ----------------------------------------------------------------------------------------
 
 	class SymbolTable {
@@ -171,6 +161,21 @@ namespace dependenciesMining {
 		const_iterator end() const { return byID.end(); }
 
 	};
+
+	// For Debugging
+	inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
+		for (const auto& [id, symbol] : t) 
+			os << "ID: " << id << '\n';
+		return os;
+	}
+
+	// For Debugging, ID based equality checking
+	inline bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) {
+		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
+			const auto& lID = lpair.first, &rID = rpair.first;
+			return lID == rID;
+		});
+	}
 
 	// ----------------------------------------------------------------------------------------
 

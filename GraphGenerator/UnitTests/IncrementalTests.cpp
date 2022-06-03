@@ -68,4 +68,15 @@ namespace {
 		ASSERT_TRUE(IsEmpty(table));
 	}
 
+	TEST(ImportStashedST, Imports_one_empty_structure_correctly) {
+		const auto tmp = MakeTempFile(ResolvePath("Out.json"));
+		SymbolTable exported, imported;
+		exported.Install("A", Structure{"A", "a"});
+		ExportST(exported, tmp);
+
+		ImportStashedST(tmp, imported);
+
+		ASSERT_EQ(imported, exported);
+	}
+
 } // namespace
