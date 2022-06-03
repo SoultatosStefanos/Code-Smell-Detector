@@ -96,7 +96,7 @@ namespace {
 		std::remove(tmp.data());
 	}
 
-	TEST(ImportStashedST, Imports_multple_empty_structures_correctly) {
+	TEST(ImportStashedST, Imports_multiple_empty_structures_correctly) {
 		const auto tmp = ResolvePath("Out.json");
 		SymbolTable exported, imported;
 		Repeat(URandom(2, 10), [i = 1, &exported]() mutable { 
