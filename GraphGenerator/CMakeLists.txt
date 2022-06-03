@@ -34,8 +34,8 @@ set(SUBDIRECTORIES
 	Incremental
 	Main
 	SourceLoader
+	Tests
 	ThirdParty
-	UnitTests
 	Utilities
 )
 
