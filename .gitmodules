@@ -1,0 +1,3 @@
+[submodule "GraphGenerator/ThirdParty/googletest"]
+	path = GraphGenerator/ThirdParty/googletest
+	url = https://github.com/google/googletest

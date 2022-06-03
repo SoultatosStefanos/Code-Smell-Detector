@@ -118,6 +118,16 @@ namespace dependenciesMining {
 		
 	};
 
+	// For Debugging, TODO: Remove
+	// inline bool operator==(const Symbol& lhs, const Symbol& rhs) {
+	// 	return lhs.GetID() == rhs.GetID() 
+	// 			and lhs.GetName() == rhs.GetName() 
+	// 			and lhs.GetClassType() == rhs.GetClassType() 
+	// 			and lhs.GetSourceInfo() == rhs.GetSourceInfo() 
+	// 			and lhs.GetNamespace() == rhs.GetNamespace() 
+	// 			and lhs.GetAccessType() == rhs.GetAccessType(); 
+	// }
+
 	// ----------------------------------------------------------------------------------------
 
 	class SymbolTable {

@@ -15,7 +15,7 @@ else()
 )
 endif()
 
-add_executable(${PROJECT_NAME} )
+add_library(${PROJECT_NAME} )
 
 add_definitions("-fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 
@@ -34,6 +34,8 @@ set(SUBDIRECTORIES
 	Incremental
 	Main
 	SourceLoader
+	ThirdParty
+	UnitTests
 	Utilities
 )
 

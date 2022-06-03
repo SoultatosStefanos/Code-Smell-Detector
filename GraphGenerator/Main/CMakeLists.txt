@@ -1,13 +1,12 @@
-set(FILES 
-	ArchitectureMining.cpp
-)
+set(FILES ArchitectureMining.cpp)
 set(SUBDIRECTORIES )
+set(EXECUTABLE ArchitectureMining)
 
 foreach(VAR ${SUBDIRECTORIES})
-	target_include_directories(${PROJECT_NAME} PUBLIC ${VAR})
 	add_subdirectory(${VAR})
 endforeach()
 
 if(FILES)
-	target_sources(${PROJECT_NAME} PUBLIC ${FILES})
+	add_executable(${EXECUTABLE} ${FILES})
+	target_link_libraries(${EXECUTABLE} PUBLIC ${PROJECT_NAME})
 endif()
