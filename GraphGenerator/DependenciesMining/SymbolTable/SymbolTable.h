@@ -419,6 +419,7 @@ namespace dependenciesMining {
 
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
+		Structure(const ID_T& id) : Symbol{id, "", "",  ClassType::Structure} {}
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
 			: Symbol(id, name, nameSpace, ClassType::Structure), structureType(structureType) {};
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)

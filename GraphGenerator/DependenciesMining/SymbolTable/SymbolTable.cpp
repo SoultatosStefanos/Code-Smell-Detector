@@ -935,30 +935,47 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 //	return vec;
 //}
 
+namespace {
+
+	inline void Put(Json::Value &val, const char* key) {
+		val[key];
+	}
+
+} // namespace
+
+
 void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
 	assert(structure);
 
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
 	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
-	const auto& bases = structure->GetBases();
-	for (const auto& base : bases) {
-		json_structure["bases"].append(base.second->GetID());
-	}
+
+	Put(json_structure, "bases");
+	for (const auto& [id, base] : structure->GetBases()) 
+		json_structure["bases"].append(id);
+
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
-	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]); // TODO Serialize only IDs for friends ??????
+
+	Put(json_structure, "friends");
+	for (const auto& [id, buddy] : structure->GetFriends())
+		json_structure["friends"].append(id);
+
 	json_structure["src_info"] = GetJsonSourceInfo(structure);
 
 	json_structure["namespace"] = structure->GetNamespace();
 	json_structure["structure_type"] = structure->GetStructureTypeAsString();
 
+	Put(json_structure, "template_parent");
 	if (structure->GetTemplateParent())
 		json_structure["template_parent"] = structure->GetTemplateParent()->GetID();
+
+	Put(json_structure, "nested_parent");
 	if (structure->GetNestedParent())
 		json_structure["nested_parent"] = structure->GetNestedParent()->GetID();
 	
-	const auto& template_args = structure->GetTemplateArguments();
-	for (const auto& [id, arg] : template_args)
-		json_structure["template_args"].append(arg->GetID());
+	Put(json_structure, "template_args");
+	for (const auto& [id, arg] : structure->GetTemplateArguments())
+		json_structure["template_args"].append(id);
 }
 
 void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) {
@@ -976,9 +993,16 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 		json_method["ret_type"] = "void";
 	else
 		json_method["ret_type"] = ret_type->GetID();
+
+	
+
 	method->GetArguments().AddJsonSymbolTable(json_method["args"]);
 	method->GetDefinitions().AddJsonSymbolTable(json_method["definitions"]);
-	method->GetTemplateArguments().AddJsonSymbolTable(json_method["template_args"]);
+
+	Put(json_method, "template_args");
+	for (const auto& [id, arg] : method->GetTemplateArguments())
+		json_method["template_args"].append(id);
+
 	json_method["literals"] = method->GetLiterals();
 	json_method["statements"] = method->GetStatements();
 	json_method["branches"] = method->GetBranches();
