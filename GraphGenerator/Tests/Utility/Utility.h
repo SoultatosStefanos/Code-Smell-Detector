@@ -7,6 +7,7 @@
 #include <libgen.h>
 #include <cassert>
 #include <random>
+#include "DependenciesMining.h"
 
 namespace tests::utility {
 
@@ -40,6 +41,9 @@ namespace tests::utility {
 		for (T i = 0; i < times; ++i)
 			f();
 	}
+
+	bool AreEqual(const dependenciesMining::Symbol& lhs, const dependenciesMining::Symbol& rhs);
+	bool AreEqual(const dependenciesMining::SymbolTable& lhs, const dependenciesMining::SymbolTable& rhs);
 
 } // tests::utility
 

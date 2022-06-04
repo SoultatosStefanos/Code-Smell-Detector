@@ -103,13 +103,13 @@ namespace dependenciesMining {
 		ClassType classType = ClassType::Undefined;
 		AccessType access_type = AccessType::unknown;
 
-		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const;
-
 	public:
 		Symbol() = default; 
 		Symbol(ClassType classType) : classType(classType) {};
 		Symbol(const ID_T& id, const std::string& name, const std::string& nameSpace = "", ClassType classType = ClassType::Undefined, const std::string& fileName = "", int line = -1, int column = -1)
 			: id(id), name(name), nameSpace(nameSpace), classType(classType), srcInfo(fileName, line, column) {};
+		
+		virtual ~Symbol() = default;
 
 		virtual ID_T GetID() const;
 		virtual std::string GetName() const;
@@ -128,23 +128,11 @@ namespace dependenciesMining {
 		virtual void SetNamespace(const std::string& nameSpace);
 		void SetAccessType(const AccessType& access_type);
 
-		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const;
-		
-		DEBUG_FRIENDLY bool operator==(const Symbol& rhs) const;
+		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const;
 	};
 
-	DEBUG_FRIENDLY inline bool Symbol::operator==(const Symbol& rhs) const {
-		// GetClassType() == rhs.GetClassType() ensures safe static casting down the line.
-		// God knows why clang links only with -fno-rtti.
-		return GetClassType() == rhs.GetClassType() and IsEqual(rhs); 
-	}
-
-	DEBUG_FRIENDLY inline bool operator!=(const Symbol& lhs, const Symbol& rhs) {
-		return !(lhs == rhs);
-	}
-
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Symbol& s) {
-		s.Output(os);
+		s.Print(os);
 		return os;
 	}
 
@@ -194,21 +182,12 @@ namespace dependenciesMining {
 		iterator end() { return byID.end(); }
 
 		const_iterator end() const { return byID.end(); }
-
-		void Clear() { byID.clear(); byName.clear(); }
-
 	};
 
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
 		for (const auto& [id, symbol] : t) 
 			os << *symbol << '\n';
 		return os;
-	}
-
-	DEBUG_FRIENDLY bool operator==(const SymbolTable& lhs, const SymbolTable& rhs); // Expensive, only for small tests
-
-	DEBUG_FRIENDLY inline bool operator!=(const SymbolTable& lhs, const SymbolTable& rhs) {
-		return	!(lhs == rhs);
 	}
 
 	// ----------------------------------------------------------------------------------------
@@ -234,9 +213,6 @@ namespace dependenciesMining {
 		Structure* type = nullptr;	// Structure type for fields, nullptr for in-method definitions.
 		std::string full_type = "";	// Definition type.
 
-	protected:
-		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
-
 	public:
 		Definition() : Symbol(ClassType::Definition) {};
 		Definition(const ID_T& id, const std::string& name, const std::string& nameSpace = "", Structure* type = nullptr)
@@ -244,27 +220,19 @@ namespace dependenciesMining {
 		Definition(const ID_T& id, const std::string& name, const std::string& nameSpace, Structure* type, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Definition, fileName, line, column), type(type) {};
 
+		virtual ~Definition() override = default;
+
 		bool isStructure() const;
 		const Structure* GetType() const;
 		std::string GetFullType() const;
 		void SetType(Structure* structure);
 		void SetFullType(const std::string& type);
 
-		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
-
-		DEBUG_FRIENDLY bool operator==(const Definition& rhs) const;
+		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
 
-	DEBUG_FRIENDLY inline bool Definition::operator==(const Definition& rhs) const {
-		return IsEqual(rhs);
-	}
-
-	DEBUG_FRIENDLY inline bool operator!=(const Definition& lhs, const Definition& rhs) {
-		return !(lhs == rhs);
-	}
-
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Definition& d) {
-		d.Output(os);
+		d.Print(os);
 		return os;
 	}
 
@@ -329,15 +297,14 @@ namespace dependenciesMining {
 		int line_count = 0;
 		bool is_virtual;
 	
-	protected:
-		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
-
 	public:
 		Method() : Symbol(ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace = "") : Symbol(id, name, nameSpace, ClassType::Method) {};
 		Method(const ID_T& id, const std::string& name, const std::string& nameSpace, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Method, fileName, line, column) {};
 
+		virtual ~Method() override = default;
+		
 		MethodType GetMethodType() const;
 		std::string GetMethodTypeAsString() const;
 		Structure* GetReturnType() const;
@@ -381,21 +348,11 @@ namespace dependenciesMining {
 		bool IsTrivial() const;
 		bool IsVirtual() const;
 
-		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
-
-		DEBUG_FRIENDLY bool operator==(const Method& rhs) const;
+		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
 
-	DEBUG_FRIENDLY inline bool Method::operator==(const Method& rhs) const {
-		return IsEqual(rhs);
-	}
-
-	DEBUG_FRIENDLY inline bool operator!=(const Method& lhs, const Method& rhs) {
-		return !(lhs == rhs);
-	}
-
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Method& m) {
-		m.Output(os);
+		m.Print(os);
 		return os;
 	}
 
@@ -414,9 +371,6 @@ namespace dependenciesMining {
 		SymbolTable friends;	// About Structures: Key->structureID, Value->Structure*
 								// About Methods: Key->methodID, Value->Structure* (the parent Class which owns this method)
 	
-	protected:
-		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
-
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
 		Structure(const ID_T& id) : Symbol{id, "", "",  ClassType::Structure} {}
@@ -425,6 +379,8 @@ namespace dependenciesMining {
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)
 			: Symbol(id, name, nameSpace, ClassType::Structure, fileName, line, column), structureType(structureType) {};
 		Structure(const Structure& s); 
+
+		virtual ~Structure() override = default;
 		
 		StructureType GetStructureType() const;
 		std::string GetStructureTypeAsString() const;
@@ -459,28 +415,16 @@ namespace dependenciesMining {
 		bool IsUndefined() const;
 		bool IsNestedClass() const;
 
-		DEBUG_FRIENDLY virtual void Output(std::ostream& os) const override;
-
-		DEBUG_FRIENDLY bool operator==(const Structure& rhs) const;
+		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
 
-	DEBUG_FRIENDLY inline bool Structure::operator==(const Structure& rhs) const {
-		return IsEqual(rhs);
-	}
-
-	DEBUG_FRIENDLY inline bool operator!=(const Structure& lhs, const Structure& rhs) {
-		return !(lhs == rhs);
-	}
-
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Structure& s) {
-		s.Output(os);
+		s.Print(os);
 		return os;
 	}
 
 	/*class Fundamental : public Symbol {
 
 	};*/
-
-	
 
 }

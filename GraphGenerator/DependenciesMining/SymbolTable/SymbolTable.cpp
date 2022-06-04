@@ -1099,61 +1099,7 @@ void SymbolTable::Accept(STVisitor* visitor) const {
 
 namespace dependenciesMining {
 
-	bool Symbol::IsEqual(const Symbol& other) const {
-		return GetAccessType() == other.GetAccessType()
-				and GetID() == other.GetID() 
-				and GetName() == other.GetName() 
-				and GetNamespace() == other.GetNamespace() 
-				and GetSourceInfo() == other.GetSourceInfo();
-	}
-
-	bool Structure::IsEqual(const Symbol& other) const {
-		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
-
-		const auto& rhs = static_cast<const Structure&>(other);
-
-		return Symbol::IsEqual(other)
-				and GetStructureType() == rhs.GetStructureType()
-				and (!GetTemplateParent() or !rhs.GetTemplateParent())? (!GetTemplateParent() and !rhs.GetTemplateParent()) : *GetTemplateParent() == *rhs.GetTemplateParent()
-				and (!GetNestedParent() or !rhs.GetNestedParent())? (!GetNestedParent() and !rhs.GetNestedParent()) : *GetNestedParent() == *rhs.GetNestedParent()
-				and GetMethods() == rhs.GetMethods()
-				and GetFields() == rhs.GetFields()
-				and GetBases() == rhs.GetBases()
-				and GetContains() == rhs.GetContains()
-				and GetFriends() == rhs.GetFriends()
-				and GetTemplateArguments() == rhs.GetTemplateArguments();
-	}
-
-	bool Method::IsEqual(const Symbol& other) const {
-		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
-
-		const auto& rhs = static_cast<const Method&>(other);
-
-		return Symbol::IsEqual(other)
-				and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr
-				and (!GetReturnType() or !rhs.GetReturnType())? (!GetReturnType() and !rhs.GetReturnType()) : *GetReturnType() == *rhs.GetReturnType()
-				and GetArguments() == rhs.GetArguments()
-				and GetDefinitions() == rhs.GetDefinitions()
-				and GetTemplateArguments() == rhs.GetTemplateArguments()
-				and GetLiterals() == rhs.GetLiterals()
-				and GetStatements() == rhs.GetStatements()
-				and GetBranches() == rhs.GetBranches()
-				and GetLoops() == rhs.GetLoops()
-				and GetMaxScopeDepth() == rhs.GetMaxScopeDepth()
-				and GetLineCount() == rhs.GetLineCount();
-	}
-
-	bool Definition::IsEqual(const Symbol& other) const {
-		assert(other.GetClassType() == GetClassType()); // Mind the Symbol's operator== overload
-
-		const auto& rhs = static_cast<const Definition&>(other);
-
-		return Symbol::IsEqual(other) 
-				and *GetType() == *rhs.GetType() 
-				and GetFullType() == rhs.GetFullType();
-	}
-
-	void Symbol::Output(std::ostream& os) const {
+	void Symbol::Print(std::ostream& os) const {
 		os 	<< " ID: " << GetID() << ','
 			<< " Name: " << GetName() << ','
 			<< " Access type: " << GetAccessTypeStr() << ','
@@ -1161,13 +1107,13 @@ namespace dependenciesMining {
 			<< " Source info: " << GetSourceInfo() << ',';
 	}
 
-	void Definition::Output(std::ostream& os) const {
-		Symbol::Output(os);
+	void Definition::Print(std::ostream& os) const {
+		Symbol::Print(os);
 		os << " Full type: " << GetFullType();
 	}
 
-	void Method::Output(std::ostream& os) const {
-		Symbol::Output(os);
+	void Method::Print(std::ostream& os) const {
+		Symbol::Print(os);
 		os 	<< " Method type: " << GetMethodTypeAsString() << ','
 			<< " Return type: " << [this]() { return GetReturnType() ? GetReturnType()->GetID() : "nullptr"; } () << '\n'
 			<< " Arguments: \n" << GetArguments() << '\n'
@@ -1181,8 +1127,8 @@ namespace dependenciesMining {
 			<< " Line count: " << GetLineCount();
 	}
 
-	void Structure::Output(std::ostream& os) const {
-		Symbol::Output(os);
+	void Structure::Print(std::ostream& os) const {
+		Symbol::Print(os);
 		os 	<< " Structure type: " << GetStructureTypeAsString()  << ','
 			<< " Template parent: " << [this]() { return GetTemplateParent() ? GetTemplateParent()->GetID() : "nullptr"; } ()  << ','
 			<< " Nested parent: " << [this]() { return GetNestedParent() ? GetNestedParent()->GetID() : "nullptr"; } () << '\n'
@@ -1192,17 +1138,6 @@ namespace dependenciesMining {
 			<< " Nested classes: \n" << GetContains()
 			<< " Friends: \n" << GetFriends()
 			<< " Template arguments: \n" << GetTemplateArguments();
-	}
-
-	bool operator==(const SymbolTable& lhs, const SymbolTable& rhs) { 
-		if (lhs.GetSize() != rhs.GetSize())
-			return false;
-
-		return std::all_of(std::begin(lhs), std::end(lhs), [&rhs](const auto& lpair) {
-			return std::find_if(std::begin(rhs), std::end(rhs), [&lpair](const auto& rpair) {
-				return *(lpair.second) == *(rpair.second);
-			}) != std::end(rhs);
-		});
 	}
 
 } // dependenciesMining

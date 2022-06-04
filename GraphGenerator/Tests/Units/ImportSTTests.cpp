@@ -107,7 +107,7 @@ namespace {
 
 		ImportStashedST(path, actual);
 
-		ASSERT_EQ(expected, actual) << DUMP_INFO(expected, actual);
+		ASSERT_TRUE(AreEqual(expected, actual)) << DUMP_INFO(expected, actual);
 	}
 
 } // namespace

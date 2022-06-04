@@ -21,11 +21,6 @@ namespace {
 	// Googletest cannot detect operator<< overloads :(
 	#define DUMP_INFO(exported, imported) "\n-----\n" << "\nExported: \n\n" << exported << "\nImported: \n\n" << imported
 
-	class IncrementalTests : public testing::Test {
-	protected:
-		void TearDown() override { structuresTable.Clear(); } // because global
-	};
-
 	void ExportST(SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
@@ -37,7 +32,7 @@ namespace {
 		assert(std::filesystem::exists(jsonPath));
 	}
 
-	TEST_F(IncrementalTests, Importing_after_exporting_ST) {
+	TEST(IncrementalTests, Importing_after_exporting_ST) {
 		const auto tmp = RESOLVE_PATH("out.json");
 		const auto cmp_db = RESOLVE_PATH("compile_commands.json");
 		std::vector<std::string> srcs;
@@ -48,7 +43,7 @@ namespace {
 		SymbolTable imported;
 		ImportStashedST(tmp.c_str(), imported);
 
-		EXPECT_EQ(imported, structuresTable) << DUMP_INFO(structuresTable, imported);
+		EXPECT_TRUE(AreEqual(imported, structuresTable)) << DUMP_INFO(structuresTable, imported);
 
 		std::remove(tmp.c_str());
 	}
