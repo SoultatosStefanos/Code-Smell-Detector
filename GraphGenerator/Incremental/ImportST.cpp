@@ -86,6 +86,8 @@ namespace incremental {
 		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
 
 		inline void InstallMethodArg(const SymbolID& id, const JsonVal& val, Method* m) {
+			assert(!m->GetArguments().Lookup(id));
+
 			auto* d = (Definition*) m->InstallArg(id, {});
 			assert(d);
 
@@ -99,6 +101,8 @@ namespace incremental {
 		}
 
 		inline void InstallMethodDefinition(const SymbolID& id, const JsonVal& val, Method* m) {
+			assert(!m->GetDefinitions().Lookup(id));
+
 			auto* d = (Definition*) m->InstallDefinition(id, {});
 			assert(d);
 
@@ -118,6 +122,8 @@ namespace incremental {
 		}
 
 		inline void InstallStructureMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
+			assert(!s->GetMethods().Lookup(id));
+
 			auto* m = (Method*) s->InstallMethod(id, {});
 			assert(m);
 
@@ -135,6 +141,8 @@ namespace incremental {
 		}
 
 		inline void InstallStructureField(const SymbolID& id, const JsonVal& val, Structure* s) {
+			assert(!s->GetFields().Lookup(id));
+
 			auto* f = (Definition*) s->InstallField(id, {});
 			assert(f);
 
@@ -170,6 +178,9 @@ namespace incremental {
 					assert(base.isString());
 
 					const auto id = base.asString();
+
+					assert(!s->GetBases().Lookup(id));
+
 					s->InstallBase(id, (Structure*) table.Lookup(id));
 				}
 			}
@@ -193,6 +204,9 @@ namespace incremental {
 					assert(arg.isString());
 
 					const auto id = arg.asString();
+
+					assert(!s->GetTemplateArguments().Lookup(id));
+
 					s->InstallTemplateSpecializationArgument(id, (Structure*) table.Lookup(id));
 				}
 			}
