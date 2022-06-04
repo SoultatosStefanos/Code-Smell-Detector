@@ -195,6 +195,8 @@ namespace dependenciesMining {
 
 		const_iterator end() const { return byID.end(); }
 
+		void Clear() { byID.clear(); byName.clear(); }
+
 	};
 
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
@@ -399,7 +401,7 @@ namespace dependenciesMining {
 
 	// ----------------------------------------------------------------------------------------
 
-	class Structure : public Symbol { // TODO Remove name??
+	class Structure : public Symbol {
 	private:
 		
 		StructureType structureType = StructureType::Undefined;
