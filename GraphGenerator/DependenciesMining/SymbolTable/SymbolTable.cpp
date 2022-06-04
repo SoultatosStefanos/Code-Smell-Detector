@@ -1090,8 +1090,8 @@ namespace dependenciesMining {
 
 		return Symbol::IsEqual(other)
 				and GetStructureType() == rhs.GetStructureType()
-				and GetTemplateParent() == rhs.GetTemplateParent()
-				and GetNestedParent() == rhs.GetNestedParent() 
+				and (!GetTemplateParent() or !rhs.GetTemplateParent())? (!GetTemplateParent() and !rhs.GetTemplateParent()) : *GetTemplateParent() == *rhs.GetTemplateParent()
+				and (!GetNestedParent() or !rhs.GetNestedParent())? (!GetNestedParent() and !rhs.GetNestedParent()) : *GetNestedParent() == *rhs.GetNestedParent()
 				and GetMethods() == rhs.GetMethods()
 				and GetFields() == rhs.GetFields()
 				and GetBases() == rhs.GetBases()
@@ -1106,8 +1106,8 @@ namespace dependenciesMining {
 		const auto& rhs = static_cast<const Method&>(other);
 
 		return Symbol::IsEqual(other)
-				and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr, it appears to be bugged
-				and GetReturnType() == rhs.GetReturnType()
+				and GetMethodType() == rhs.GetMethodType() // NOTE: No check for GetMemberExpr
+				and (!GetReturnType() or !rhs.GetReturnType())? (!GetReturnType() and !rhs.GetReturnType()) : *GetReturnType() == *rhs.GetReturnType()
 				and GetArguments() == rhs.GetArguments()
 				and GetDefinitions() == rhs.GetDefinitions()
 				and GetTemplateArguments() == rhs.GetTemplateArguments()
@@ -1125,7 +1125,7 @@ namespace dependenciesMining {
 		const auto& rhs = static_cast<const Definition&>(other);
 
 		return Symbol::IsEqual(other) 
-				and GetType() == rhs.GetType() 
+				and *GetType() == *rhs.GetType() 
 				and GetFullType() == rhs.GetFullType();
 	}
 

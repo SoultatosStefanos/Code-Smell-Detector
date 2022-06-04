@@ -84,6 +84,10 @@ namespace dependenciesMining {
 		bool  operator==(SourceInfo const& loc) const;		
 	};
 
+	inline bool operator!=(const SourceInfo& lhs, const SourceInfo& rhs) {
+		return !(lhs == rhs);
+	}
+
 	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SourceInfo& src) {
 		return os << src.toString();
 	}
