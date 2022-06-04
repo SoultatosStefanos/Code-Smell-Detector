@@ -1,0 +1,1658 @@
+{
+	"structures" : 
+	{
+		"CS::CS_1::class_A" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"CS::CS_1::class_A::b" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 29,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"type" : "class CS::CS_1::class_B"
+				}
+			},
+			"friends" : null,
+			"methods" : 
+			{
+				"CS::CS_1::class_A::class_A(class CS::CS_1::class_A &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_A::class_A(const class CS::CS_1::class_A &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_A::class_A(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_A::~class_A(void)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Destructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "CS::CS_1::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "classes_simple.cpp",
+				"line" : 11
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"CS::CS_1::class_B" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"CS::CS_1::class_B::b" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 29,
+						"file" : "classes_simple.cpp",
+						"line" : 10
+					},
+					"type" : "class CS::CS_1::class_B *"
+				}
+			},
+			"friends" : null,
+			"methods" : 
+			{
+				"CS::CS_1::class_B::class_B(class CS::CS_1::class_B &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 10
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_B::class_B(const class CS::CS_1::class_B &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 10
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_B::class_B(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 10
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_B::~class_B(void)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Destructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 10
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "CS::CS_1::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "classes_simple.cpp",
+				"line" : 10
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"CS::CS_1::class_X" : 
+		{
+			"bases" : 
+			[
+				"CS::CS_1::class_B",
+				"CS::CS_1::class_A"
+			],
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"CS::CS_1::class_X::class_X(class CS::CS_1::class_X &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_X::class_X(const class CS::CS_1::class_X &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::class_X::class_X(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "CS::CS_1::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "classes_simple.cpp",
+				"line" : 13
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"CS::CS_1::struct_S" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"CS::CS_1::struct_S::struct_S(const struct CS::CS_1::struct_S &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "classes_simple.cpp",
+						"line" : 12
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::struct_S::struct_S(struct CS::CS_1::struct_S &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "classes_simple.cpp",
+						"line" : 12
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"CS::CS_1::struct_S::struct_S(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "classes_simple.cpp",
+						"line" : 12
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "CS::CS_1::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 12,
+				"file" : "classes_simple.cpp",
+				"line" : 12
+			},
+			"structure_type" : "Struct",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"N_2::class_A" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "N_2::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 9,
+				"file" : "classes_simple.cpp",
+				"line" : 18
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"fields::class_A" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::class_A::c" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 14,
+						"file" : "fields.cpp",
+						"line" : 10
+					},
+					"type" : "char"
+				}
+			},
+			"friends" : null,
+			"methods" : 
+			{
+				"fields::class_A::class_A(class fields::class_A &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "fields.cpp",
+						"line" : 9
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::class_A::class_A(const class fields::class_A &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "fields.cpp",
+						"line" : 9
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::class_A::class_A(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "fields.cpp",
+						"line" : 9
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::class_A::~class_A(void)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Destructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "fields.cpp",
+						"line" : 9
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "fields.cpp",
+				"line" : 9
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"fields::class_B" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::class_B::a" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 18,
+						"file" : "fields.cpp",
+						"line" : 38
+					},
+					"type" : "class fields::class_A *"
+				},
+				"fields::class_B::pi" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 14,
+						"file" : "fields.cpp",
+						"line" : 37
+					},
+					"type" : "int *"
+				},
+				"fields::class_B::s" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 19,
+						"file" : "fields.cpp",
+						"line" : 39
+					},
+					"type" : "struct fields::struct_S *"
+				},
+				"fields::class_B::z" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 34,
+						"file" : "fields.cpp",
+						"line" : 40
+					},
+					"type" : "template_Z<float, int> *"
+				}
+			},
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "fields.cpp",
+				"line" : 36
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"fields::struct_S" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::struct_S::a" : 
+				{
+					"access" : "public",
+					"src_info" : 
+					{
+						"col" : 17,
+						"file" : "fields.cpp",
+						"line" : 15
+					},
+					"type" : "class fields::class_A"
+				},
+				"fields::struct_S::a2" : 
+				{
+					"access" : "public",
+					"src_info" : 
+					{
+						"col" : 17,
+						"file" : "fields.cpp",
+						"line" : 16
+					},
+					"type" : "class fields::class_A"
+				},
+				"fields::struct_S::i" : 
+				{
+					"access" : "public",
+					"src_info" : 
+					{
+						"col" : 13,
+						"file" : "fields.cpp",
+						"line" : 14
+					},
+					"type" : "int"
+				}
+			},
+			"friends" : null,
+			"methods" : 
+			{
+				"fields::struct_S::struct_S(const struct fields::struct_S &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "fields.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::struct_S::struct_S(struct fields::struct_S &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "fields.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::struct_S::struct_S(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "fields.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::struct_S::~struct_S(void)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Destructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "fields.cpp",
+						"line" : 13
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 12,
+				"file" : "fields.cpp",
+				"line" : 13
+			},
+			"structure_type" : "Struct",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"fields::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::template_Z::temp_s" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 18,
+						"file" : "fields.cpp",
+						"line" : 20
+					},
+					"type" : "struct fields::struct_S"
+				}
+			},
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 46,
+				"file" : "fields.cpp",
+				"line" : 19
+			},
+			"structure_type" : "TemplateDefinition",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"fields::template_Z<float,float>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"fields::template_Z<float, float>::template_Z(class fields::template_Z<float, float> &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 46,
+						"file" : "fields.cpp",
+						"line" : 19
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::template_Z<float, float>::template_Z(const class fields::template_Z<float, float> &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 46,
+						"file" : "fields.cpp",
+						"line" : 19
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"fields::template_Z<float, float>::template_Z(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 46,
+						"file" : "fields.cpp",
+						"line" : 19
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 46,
+				"file" : "fields.cpp",
+				"line" : 19
+			},
+			"structure_type" : "TemplateInstantiationSpecialization",
+			"template_args" : null,
+			"template_parent" : "fields::template_Z"
+		},
+		"fields::template_Z<float,int>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::template_Z<float, int>::temp_a" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 17,
+						"file" : "fields.cpp",
+						"line" : 26
+					},
+					"type" : "class fields::class_A"
+				}
+			},
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "fields.cpp",
+				"line" : 24
+			},
+			"structure_type" : "TemplateFullSpecialization",
+			"template_args" : null,
+			"template_parent" : "fields::template_Z"
+		},
+		"fields::template_Z<int,int>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"fields::template_Z<int, int>::temp_t" : 
+				{
+					"access" : "private",
+					"src_info" : 
+					{
+						"col" : 33,
+						"file" : "fields.cpp",
+						"line" : 32
+					},
+					"type" : "template_Z<float, int>"
+				}
+			},
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "fields::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "fields.cpp",
+				"line" : 30
+			},
+			"structure_type" : "TemplateFullSpecialization",
+			"template_args" : null,
+			"template_parent" : "fields::template_Z"
+		},
+		"friends::(anonymous)" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : 
+			{
+				"friends::(anonymous struct)::a" : 
+				{
+					"access" : "public",
+					"src_info" : 
+					{
+						"col" : 20,
+						"file" : "friends.cpp",
+						"line" : 22
+					},
+					"type" : "friends::Anonymous1"
+				}
+			},
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 14,
+				"file" : "friends.cpp",
+				"line" : 17
+			},
+			"structure_type" : "Struct",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::A" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"friends::A::A(class friends::A &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 7
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::A::A(const class friends::A &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 7
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::A::A(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 7
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::A::method<TemplateTypeParm>(void)" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : 
+					{
+						"b" : 
+						{
+							"src_info" : 
+							{
+								"col" : 11,
+								"file" : "friends.cpp",
+								"line" : 55
+							},
+							"type" : "friends::B"
+						},
+						"t" : 
+						{
+							"src_info" : 
+							{
+								"col" : 29,
+								"file" : "friends.cpp",
+								"line" : 54
+							},
+							"type" : "friends::template_Z<int,int>::template_Z"
+						}
+					},
+					"lines" : 3,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "TemplateDefinition",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 31,
+						"file" : "friends.cpp",
+						"line" : 53
+					},
+					"statements" : 2,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::A::method<friends::template_Z<B, float>>(void)" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : 
+					{
+						"b" : 
+						{
+							"src_info" : 
+							{
+								"col" : 11,
+								"file" : "friends.cpp",
+								"line" : 55
+							},
+							"type" : "friends::B"
+						},
+						"t" : 
+						{
+							"src_info" : 
+							{
+								"col" : 29,
+								"file" : "friends.cpp",
+								"line" : 54
+							},
+							"type" : "friends::template_Z<int,int>::template_Z"
+						}
+					},
+					"lines" : 3,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "TemplateInstantiationSpecialization",
+					"ret_type" : "friends::template_Z<B,float>::template_Z",
+					"src_info" : 
+					{
+						"col" : 31,
+						"file" : "friends.cpp",
+						"line" : 53
+					},
+					"statements" : 2,
+					"template_args" : 
+					[
+						"friends::template_Z<B,float>::template_Z"
+					],
+					"virtual" : false
+				}
+			},
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "friends.cpp",
+				"line" : 7
+			},
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::B" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"friends::B::B(const struct friends::B &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "friends.cpp",
+						"line" : 4
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::B::B(struct friends::B &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "friends.cpp",
+						"line" : 4
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::B::B(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 12,
+						"file" : "friends.cpp",
+						"line" : 4
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::B::method(struct friends::B)" : 
+				{
+					"access" : "public",
+					"args" : 
+					{
+						"b" : 
+						{
+							"src_info" : 
+							{
+								"col" : 23,
+								"file" : "friends.cpp",
+								"line" : 58
+							},
+							"type" : "friends::B"
+						}
+					},
+					"branches" : 1,
+					"definitions" : 
+					{
+						"a" : 
+						{
+							"src_info" : 
+							{
+								"col" : 11,
+								"file" : "friends.cpp",
+								"line" : 59
+							},
+							"type" : "friends::A"
+						}
+					},
+					"lines" : 3,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "UserMethod",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 13,
+						"file" : "friends.cpp",
+						"line" : 58
+					},
+					"statements" : 2,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 12,
+				"file" : "friends.cpp",
+				"line" : 4
+			},
+			"structure_type" : "Struct",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::S" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : 
+			[
+				"friends::B",
+				"friends::template_Z<int,float>::template_Z",
+				"friends::template_Z",
+				"friends::A",
+				"friends::X",
+				"friends::template_Z<int,int>::template_Z",
+				"friends::(anonymous)"
+			],
+			"methods" : null,
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 12,
+				"file" : "friends.cpp",
+				"line" : 31
+			},
+			"structure_type" : "Struct",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "friends.cpp",
+				"line" : 45
+			},
+			"structure_type" : "TemplateDefinition",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::template_Z2" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : null,
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 57,
+				"file" : "friends.cpp",
+				"line" : 37
+			},
+			"structure_type" : "Undefined",
+			"template_args" : null,
+			"template_parent" : null
+		},
+		"friends::template_Z<B,float>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : 
+			[
+				"friends::B"
+			],
+			"methods" : 
+			{
+				"friends::template_Z<friends::B, float>::template_Z(class friends::template_Z<struct friends::B, float> &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<friends::B, float>::template_Z(const class friends::template_Z<struct friends::B, float> &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<friends::B, float>::template_Z(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<friends::B, float>::~template_Z(void) noexcept" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Destructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "friends.cpp",
+				"line" : 45
+			},
+			"structure_type" : "TemplateInstantiationSpecialization",
+			"template_args" : 
+			[
+				"friends::B"
+			],
+			"template_parent" : "friends::template_Z"
+		},
+		"friends::template_Z<int,float>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"friends::template_Z<int, float>::template_Z(class friends::template_Z<int, float> &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<int, float>::template_Z(const class friends::template_Z<int, float> &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<int, float>::template_Z(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 45
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "friends.cpp",
+				"line" : 45
+			},
+			"structure_type" : "TemplateInstantiationSpecialization",
+			"template_args" : null,
+			"template_parent" : "friends::template_Z"
+		},
+		"friends::template_Z<int,int>::template_Z" : 
+		{
+			"bases" : null,
+			"contains" : null,
+			"fields" : null,
+			"friends" : null,
+			"methods" : 
+			{
+				"friends::template_Z<int, int>::template_Z(class friends::template_Z<int, int> &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 50
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<int, int>::template_Z(const class friends::template_Z<int, int> &)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 50
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				},
+				"friends::template_Z<int, int>::template_Z(void) noexcept" : 
+				{
+					"access" : "public",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type" : "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "friends.cpp",
+						"line" : 50
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "friends::",
+			"nested_parent" : null,
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "friends.cpp",
+				"line" : 50
+			},
+			"structure_type" : "TemplateFullSpecialization",
+			"template_args" : null,
+			"template_parent" : "friends::template_Z"
+		}
+	}
+}

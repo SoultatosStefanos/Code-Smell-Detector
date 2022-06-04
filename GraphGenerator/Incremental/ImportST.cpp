@@ -11,7 +11,7 @@
 #include <sstream>
 
 namespace incremental {
-	
+
 	using namespace details;
 
 	namespace {
@@ -21,11 +21,7 @@ namespace incremental {
 		using SymbolID = JsonString;
 		using namespace dependenciesMining;
 
-		inline JsonVal GetArchiveRoot(JsonArchive& from) {
-			JsonVal root;
-			from >> root;
-			return root;
-		}
+		// -------------------------- Json Utilities --------------------------------------- //
 
 		// Utility for safe json access.
 		inline auto Get(const JsonVal& val, const char* at) { 
@@ -41,6 +37,10 @@ namespace incremental {
 			for (auto iter = std::begin(val); iter != std::end(val); ++iter)
 				f(iter.name(), *iter);
 		}
+
+		// --------------------------------------------------------------------------------- //
+
+		// -------------------------- Deserializers ---------------------------------------- //
 
 		inline SourceInfo DeserializeSrcInfo(const JsonVal& val) {
 			return { Get(val, "file").asString(), Get(val, "line").asInt(), Get(val, "col").asInt() };
@@ -58,7 +58,7 @@ namespace incremental {
 			d->SetAccessType(ToAccessType(Get(val, "access").asString()));
 		}
 
-		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, const SymbolTable& table, const Structure* s, Method* m) {
+		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, Method* m) {
 			m->SetID(id);
 			m->SetName(id);
 			m->SetBranches(Get(val, "branches").asInt());
@@ -66,13 +66,11 @@ namespace incremental {
 			m->SetLiterals(Get(val, "literals").asInt());
 			m->SetLoops(Get(val, "loops").asInt());
 			m->SetMaxScopeDepth(Get(val, "max_scope").asInt());
-			m->SetReturnType( (Structure*) table.Lookup(Get(val, "ret_type").asString()) ); // will write nullptr in case of "void"
 			m->SetAccessType(ToAccessType(Get(val, "access").asString()));
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
 			m->SetMethodType(ToMethodType(Get(val, "method_type").asString()));
-			m->SetNamespace(s->GetNamespace());
 		}
 
 		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
@@ -83,153 +81,179 @@ namespace incremental {
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
+		// --------------------------------------------------------------------------------- //
+
+		// --------------------------- Generic Dependency Installers ----------------------- //
+
+		template <typename Installer>
+		void InstallDependency(const JsonVal& val, SymbolTable& table, Installer install) {
+			static_assert(std::is_invocable_v<Installer, Structure*>, "Invalid installer.");
+
+			assert(!val.isArray());
+
+			if (val.isNull()) {
+				install((Structure*) nullptr);
+			}
+			else {
+				assert(val.isString());
+
+				const auto id = val.asString();
+
+				install((Structure*) table.Install(id, Structure{ id }));
+			}
+		}
+
+		template <typename Installer>
+		void InstallDependencies(const JsonVal& val, SymbolTable& table, Installer install) {
+			static_assert(std::is_invocable_v<Installer, const SymbolID&, Structure*>, "Invalid installer.");
+
+			for (const auto& v : val) {
+				assert(v.isString());
+
+				const auto id = v.asString();
+
+				install(id, (Structure*) table.Install(id, Structure{ id }));
+			}
+		}
+
+		// --------------------------------------------------------------------------------- //
+
+		// ------------------------------ Importers/Installers ----------------------------- //
+
 		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
-
-		inline void InstallMethodArg(const SymbolID& id, const JsonVal& val, Method* m) {
-			assert(!m->GetArguments().Lookup(id));
-
-			auto* d = (Definition*) m->InstallArg(id, {});
-			assert(d);
-
-			DeserializeDefinition(id, val, d);
-		}
-
-		inline void InstallMethodArgs(const JsonVal& val, Method* m) {
-			ForEach(Get(val, "args"), [m](const auto& id, const auto& val) { 
-				InstallMethodArg(id, val, m);
-			});
-		}
-
-		inline void InstallMethodDefinition(const SymbolID& id, const JsonVal& val, Method* m) {
-			assert(!m->GetDefinitions().Lookup(id));
-
-			auto* d = (Definition*) m->InstallDefinition(id, {});
-			assert(d);
-
-			DeserializeDefinition(id, val, d);
-		}
-
-		inline void InstallMethodDefinitions(const JsonVal& val, Method* m) {
-			ForEach(Get(val, "definitions"), [m](const auto& id, const auto& val) {
-				InstallMethodDefinition(id, val, m);
-			});
-		}
-
-		inline void ImportMethodTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) { // Why are we storing them like this?
-			ForEach(Get(val, "template_args"), [m, &table](const auto& id, const auto& val) { 
-				m->InstallTemplateSpecializationArgument(id, ImportStructure(id, val, table)); 
-			});
-		}
-
-		inline void InstallStructureMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
-			assert(!s->GetMethods().Lookup(id));
-
-			auto* m = (Method*) s->InstallMethod(id, {});
-			assert(m);
-
-			DeserializeMethod(id, val,  table, s, m);
-
-			InstallMethodArgs(val, m);
-			InstallMethodDefinitions(val, m);
-			ImportMethodTemplateArgs(val, table, m);
-		}
 
 		inline void ImportStructureNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) {
+				assert(!s->GetContains().Lookup(id));
+
 				s->InstallNestedClass(id, ImportStructure(id, val, table)); 
 			});
 		}
 
-		inline void InstallStructureField(const SymbolID& id, const JsonVal& val, Structure* s) {
-			assert(!s->GetFields().Lookup(id));
-
-			auto* f = (Definition*) s->InstallField(id, {});
-			assert(f);
-
-			DeserializeDefinitionWithAccessSpecifier(id, val, f);
-
-			f->SetType(s);
-			f->SetNamespace(s->GetNamespace());
-		}
-
 		inline void InstallStructureFields(const JsonVal& val, Structure* s) {
 			ForEach(Get(val, "fields"), [s](const auto& id, const auto& val) { 
-				InstallStructureField(id, val, s);
+				assert(!s->GetFields().Lookup(id));
+
+				auto* f = (Definition*) s->InstallField(id, {});
+				assert(f);
+
+				DeserializeDefinitionWithAccessSpecifier(id, val, f);
+
+				f->SetType(s);
+				f->SetNamespace(s->GetNamespace());
 			});
 		}
 
-		inline void ImportStructureFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
-			ForEach(Get(val, "friends"), [&table, s](const auto& id, const auto& val) {
-				s->InstallFriend(id, ImportStructure(id, val, table)); 
+		inline void InstallMethodReturnType(const JsonVal& val, SymbolTable& table, Method* m) {
+			assert(!Get(val, "ret_type").isNull());
+			assert(Get(val, "ret_type").isString());
+
+			const auto id = Get(val, "ret_type").asString();
+
+			m->SetReturnType(id == "void" ? nullptr : (Structure*) table.Install(id, Structure{ id }));
+		}
+		
+		inline void InstallMethodArgs(const JsonVal& val, Method* m) {
+			ForEach(Get(val, "args"), [m](const auto& id, const auto& val) { 
+				assert(!m->GetArguments().Lookup(id));
+
+				auto* d = (Definition*) m->InstallArg(id, {});
+				assert(d);
+
+				DeserializeDefinition(id, val, d);
+			});
+		}
+
+		inline void InstallMethodDefinitions(const JsonVal& val, Method* m) {
+			ForEach(Get(val, "definitions"), [m](const auto& id, const auto& val) {
+				assert(!m->GetDefinitions().Lookup(id));
+
+				auto* d = (Definition*) m->InstallDefinition(id, {});
+				assert(d);
+
+				DeserializeDefinition(id, val, d);
+			});
+		}
+
+		inline void InstallMethodTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) {
+			InstallDependencies(Get(val, "template_args"), table, [m](const auto& id, auto* arg) {
+				assert(!m->GetTemplateArguments().Lookup(id));
+
+				m->InstallTemplateSpecializationArgument(id, arg);
+			});
+		}
+
+		inline void InstallStructureFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependencies(Get(val, "friends"), table, [s](const auto& id, auto* f) {
+				assert(f);
+				assert(!s->GetFriends().Lookup(id));
+
+				s->InstallFriend(id, f);
 			});
 		}
 
 		inline void InstallStructureMethods(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "methods"), [&table, s](const auto& id, const auto& val) {
-				InstallStructureMethod(id, val, table, s);
+				assert(!s->GetMethods().Lookup(id));
+
+				auto* m = (Method*) s->InstallMethod(id, {});
+				assert(m);
+
+				DeserializeMethod(id, val, m);
+
+				m->SetNamespace(s->GetNamespace());
+
+				InstallMethodReturnType(val, table, m);
+				InstallMethodArgs(val, m);
+				InstallMethodDefinitions(val, m);
+				InstallMethodTemplateArgs(val, table, m);
 			});
 		}
 
-		void InstallStructureBases(const JsonVal& val, const SymbolTable& table, Structure* s) {
-			if (val.isMember("bases")) {
-				assert(Get(val, "bases").isArray());
+		inline void InstallStructureBases(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependencies(Get(val, "bases"), table, [s](const auto& id, auto* base) {
+				assert(base);
+				assert(!s->GetBases().Lookup(id));
 
-				for (const auto& base : Get(val, "bases")) {
-					assert(base.isString());
-
-					const auto id = base.asString();
-
-					assert(!s->GetBases().Lookup(id));
-
-					s->InstallBase(id, (Structure*) table.Lookup(id));
-				}
-			}
+				s->InstallBase(id, base);
+			});
 		}
 
-		inline void InstalllStructureTemplateParent(const JsonVal& val, const SymbolTable& table, Structure* s) {
-			if (val.isMember("template_parent"))
-				s->SetTemplateParent((Structure*) table.Lookup(Get(val, "template_parent").asString()));
+		inline void InstalllStructureTemplateParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependency(Get(val, "template_parent"), table, [s](auto* parent) { 
+				s->SetTemplateParent(parent); 
+			});
 		}
 
-		inline void InstalllStructureNestedParent(const JsonVal& val, const SymbolTable& table, Structure* s) {
-			if (val.isMember("nested_parent"))
-				s->SetNestedParent((Structure*) table.Lookup(Get(val, "nested_parent").asString()));
+		inline void InstalllStructureNestedParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependency(Get(val, "nested_parent"), table, [s](auto* parent) { 
+				s->SetNestedParent(parent); 
+			});
 		}
 
-		void InstallStructureTemplateArguments(const JsonVal& val, const SymbolTable& table, Structure* s) {
-			if (val.isMember("template_args")) {
-				assert(Get(val, "template_args").isArray());
+		inline void InstallStructureTemplateArguments(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependencies(Get(val, "template_args"), table, [s](const auto& id, auto* arg) {
+				assert(arg);
+				assert(!s->GetTemplateArguments().Lookup(id));
 
-				for (const auto& arg : Get(val, "template_args")) {
-					assert(arg.isString());
-
-					const auto id = arg.asString();
-
-					assert(!s->GetTemplateArguments().Lookup(id));
-
-					s->InstallTemplateSpecializationArgument(id, (Structure*) table.Lookup(id));
-				}
-			}
+				s->InstallTemplateSpecializationArgument(id, arg);
+			});
 		}
 
-		inline Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* found = (Structure*) table.Lookup(id); // could already have been inserted (importing from bases, friend, etc.)
-			if (found) // to avoid further deserialization
-				return found; 
-
-			auto* s = (Structure*) table.Install(id, Structure{});
+		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* s = (Structure*) table.Install(id, Structure{}); // Might return structure that was installed as a dependency.
 			assert(s);
 
 			DeserializeStructure(id, val, s);
 
 			ImportStructureNestedClasses(val, table, s);
-			InstallStructureFields(val, s);
-			ImportStructureFriends(val, table, s);
-			InstallStructureMethods(val, table, s);
 
 			InstallStructureBases(val, table, s);
-			InstalllStructureTemplateParent(val, table, s);
+			InstallStructureFields(val, s);
+			InstallStructureFriends(val, table, s);
+			InstallStructureMethods(val, table, s);
 			InstalllStructureNestedParent(val, table, s);
+			InstalllStructureTemplateParent(val, table, s);
 			InstallStructureTemplateArguments(val, table, s);
 
 			return s;
@@ -239,6 +263,14 @@ namespace incremental {
 			ForEach(Get(val, "structures"), [&table](const auto& id, const auto& val) { 
 				ImportStructure(id, val, table); 
 			});
+		}
+
+		// --------------------------------------------------------------------------------- //
+
+		inline JsonVal GetArchiveRoot(JsonArchive& from) {
+			JsonVal root;
+			from >> root;
+			return root;
 		}
 
 	} // namespace

@@ -3,6 +3,7 @@
 	{
 		"CS::CS_1::class_A" : 
 		{
+			"bases": null,
 			"contains" : null,
 			"fields" : 
 			{
@@ -45,13 +46,16 @@
 				}
 			},
 			"namespace" : "CS::CS_1::",
+			"nested_parent" : null,
 			"src_info" : 
 			{
 				"col" : 11,
 				"file" : "classes_simple.cpp",
 				"line" : 11
 			},
-			"structure_type" : "Class"
+			"structure_type" : "Class",
+			"template_args" : null,
+			"template_parent" : null
 		}
 	}
 }
