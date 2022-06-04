@@ -88,6 +88,7 @@ namespace {
 		m->SetMaxScopeDepth(0);
 		m->SetStatements(0);
 		m->SetVirtual(false);
+		m->SetMethodType(MethodType::Constructor_Trivial);
 	}
 
 	void Prepare(SymbolTable& expected) {

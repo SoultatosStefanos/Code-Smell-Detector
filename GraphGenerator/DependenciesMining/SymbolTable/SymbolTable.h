@@ -218,7 +218,7 @@ namespace dependenciesMining {
 		Parent_T* GetParent() const;
 		SymbolTable GetArguments() const;
 		void SetParent(Parent_T* structure); 
-		Symbol* InstallArguments(const ID_T& id, Structure* structure);
+		Symbol* InstallArgument(const ID_T& id, Structure* structure);
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -358,9 +358,9 @@ namespace dependenciesMining {
 		void SetLineCount(int line_count);
 		void SetVirtual(bool is_virtual);
 
-		void InstallArg(const ID_T& id, const Definition& definition);
-		void InstallDefinition(const ID_T& id, const Definition& definition);
-		void InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure);
+		Symbol* InstallArg(const ID_T& id, const Definition& definition);
+		Symbol* InstallDefinition(const ID_T& id, const Definition& definition);
+		Symbol* InstallTemplateSpecializationArgument(const ID_T& id, Structure* structure);
 
 		void InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin);
 		void UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& locBegin);
@@ -442,7 +442,7 @@ namespace dependenciesMining {
 		Symbol* InstallBase(const ID_T& id, Structure* structure);
 		Symbol* InstallNestedClass(const ID_T& id, Structure* structure);
 		Symbol* InstallFriend(const ID_T& id, Structure* structure);
-		Symbol* InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure);
+		Symbol* InstallTemplateSpecializationArgument(const ID_T& id, Structure* structure);
 
 		bool IsTemplateDefinition() const;
 		bool IsTemplateFullSpecialization() const;

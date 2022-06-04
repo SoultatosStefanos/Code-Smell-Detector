@@ -178,7 +178,7 @@ template<typename Parent_T> void Template<Parent_T>::SetParent(Parent_T* parent)
 	this->parent = parent;
 }
 
-template<typename Parent_T> Symbol* Template<Parent_T>::InstallArguments(const ID_T& id, Structure* structure) {
+template<typename Parent_T> Symbol* Template<Parent_T>::InstallArgument(const ID_T& id, Structure* structure) {
 	return arguments.Install(id, structure);
 }
 
@@ -332,16 +332,16 @@ void Method::SetVirtual(bool is_virtual) {
 	this->is_virtual = is_virtual;
 }
 
-void Method::InstallArg(const ID_T& id, const Definition& definition) {
-	arguments.Install(id, definition);
+Symbol* Method::InstallArg(const ID_T& id, const Definition& definition) {
+	return arguments.Install(id, definition);
 }
 
-void Method::InstallDefinition(const ID_T& id, const Definition& definition) {
-	definitions.Install(id, definition);
+Symbol* Method::InstallDefinition(const ID_T& id, const Definition& definition) {
+	return definitions.Install(id, definition);
 }
 
-void Method::InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure) {
-	templateInfo.InstallArguments(id, structure);
+Symbol* Method::InstallTemplateSpecializationArgument(const ID_T& id, Structure* structure) {
+	return templateInfo.InstallArgument(id, structure);
 }
 
 void Method::InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin) {
@@ -600,8 +600,8 @@ Symbol* Structure::InstallFriend(const ID_T& id, Structure* structure) {
 	return friends.Install(id, structure);
 }
 
-Symbol* Structure::InstallTemplateSpecializationArguments(const ID_T& id, Structure* structure) {
-	return templateInfo.InstallArguments(id, structure);
+Symbol* Structure::InstallTemplateSpecializationArgument(const ID_T& id, Structure* structure) {
+	return templateInfo.InstallArgument(id, structure);
 }
 
 bool Structure::IsTemplateDefinition() const {

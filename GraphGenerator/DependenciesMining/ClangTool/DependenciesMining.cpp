@@ -159,7 +159,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
 						if(argStruct == nullptr)
 							argStruct = (Structure*)structuresTable.Install(argStructID, argStructName);
-						structure->InstallTemplateSpecializationArguments(argStructID, argStruct);
+						structure->InstallTemplateSpecializationArgument(argStructID, argStruct);
 					}
 				}, &structure);			
 		}
@@ -521,7 +521,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 						Structure* argStruct = (Structure*)structuresTable.Lookup(argStructID);
 						if (argStruct == nullptr)
 							argStruct = (Structure*)structuresTable.Install(argStructID, argStructName);
-						method->InstallTemplateSpecializationArguments(argStructID, argStruct);
+						method->InstallTemplateSpecializationArgument(argStructID, argStruct);
 					}
 					}, &method);
 			}

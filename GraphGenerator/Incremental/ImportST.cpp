@@ -10,8 +10,6 @@
 #include <algorithm>
 #include <sstream>
 
-// TODO Deserialize rest of symbols
-
 namespace incremental {
 	
 	using namespace details;
@@ -51,26 +49,18 @@ namespace incremental {
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
 			d->SetName(id);
-			if (val.isMember("access")) // cause of non member definitions
-				d->SetAccessType(ToAccessType(Get(val, "access").asString()));
 			d->SetFullType(Get(val, "type").asString());
 			d->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
-
-		inline Definition* ImportDefinition(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* d = (Definition*) table.Install(id, Definition{});
-			assert(d);
-
-			DeserializeDefinition(id, val ,d);
-
-			return d;
+		inline void DeserializeDefinitionWithAccessSpecifier(const SymbolID& id, const JsonVal& val, Definition* d) {
+			DeserializeDefinition(id, val, d);
+			d->SetAccessType(ToAccessType(Get(val, "access").asString()));
 		}
 
-		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
-
-		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table, Method* m) {
+		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, const SymbolTable& table, const Structure* s, Method* m) {
 			m->SetID(id);
+			m->SetName(id);
 			m->SetBranches(Get(val, "branches").asInt());
 			m->SetLineCount(Get(val, "lines").asInt());
 			m->SetLiterals(Get(val, "literals").asInt());
@@ -82,49 +72,8 @@ namespace incremental {
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
 			m->SetMethodType(ToMethodType(Get(val, "method_type").asString()));
+			m->SetNamespace(s->GetNamespace());
 		}
-
-		inline void ImportArgs(const JsonVal& val, SymbolTable& table, Method* m) {
-			ForEach(Get(val, "args"), [m, &table](const auto& id, const auto& val) { 
-				auto* arg = ImportDefinition(id, val, table);
-				assert(arg);
-
-				m->InstallArg(id, *arg); 
-			});
-		}
-
-		inline void ImportDefinitions(const JsonVal& val, SymbolTable& table, Method* m) {
-			ForEach(Get(val, "definitions"), [m, &table](const auto& id, const auto& val) {
-				auto* def = ImportDefinition(id, val, table);
-				assert(def);
-
-				m->InstallDefinition(id, *def); 
-			});
-		}
-
-		inline void ImportTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) {
-			ForEach(Get(val, "template_args"), [m, &table](const auto& id, const auto& val) { 
-				auto* s = ImportStructure(id, val, table);
-				assert(s);
-
-				m->InstallTemplateSpecializationArguments(id, s); 
-			});
-		}
-
-		inline Method* ImportMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* m = (Method*) table.Install(id, Method{});
-			assert(m);
-
-			DeserializeMethod(id, val,  table, m);
-
-			ImportArgs(val, table, m);
-			ImportDefinitions(val, table, m);
-			ImportTemplateArgs(val, table, m);
-
-			return m;
-		}
-
-		// TODO Optimize on Install
 
 		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
 			s->SetID(id);
@@ -134,46 +83,86 @@ namespace incremental {
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
-		inline void ImportNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
-			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) { 
-				auto* c = ImportStructure(id, val, table);
-				assert(c);
+		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
 
-				s->InstallNestedClass(id, c); 
+		inline void InstallMethodArg(const SymbolID& id, const JsonVal& val, Method* m) {
+			auto* d = (Definition*) m->InstallArg(id, {});
+			assert(d);
+
+			DeserializeDefinition(id, val, d);
+		}
+
+		inline void InstallMethodArgs(const JsonVal& val, Method* m) {
+			ForEach(Get(val, "args"), [m](const auto& id, const auto& val) { 
+				InstallMethodArg(id, val, m);
 			});
 		}
 
-		inline void ImportFields(const JsonVal& val, SymbolTable& table, Structure* s) {
-			ForEach(Get(val, "fields"), [&table, s](const auto& id, const auto& val) { 
-				auto* f = ImportDefinition(id, val, table);
-				assert(f);
+		inline void InstallMethodDefinition(const SymbolID& id, const JsonVal& val, Method* m) {
+			auto* d = (Definition*) m->InstallDefinition(id, {});
+			assert(d);
 
-				f->SetType(s);
-				f->SetNamespace(s->GetNamespace());
-				s->InstallField(id, *f);
+			DeserializeDefinition(id, val, d);
+		}
+
+		inline void InstallMethodDefinitions(const JsonVal& val, Method* m) {
+			ForEach(Get(val, "definitions"), [m](const auto& id, const auto& val) {
+				InstallMethodDefinition(id, val, m);
 			});
 		}
 
-		inline void ImportFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
+		inline void ImportMethodTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) { // Why are we storing them like this?
+			ForEach(Get(val, "template_args"), [m, &table](const auto& id, const auto& val) { 
+				m->InstallTemplateSpecializationArgument(id, ImportStructure(id, val, table)); 
+			});
+		}
+
+		inline void InstallStructureMethod(const SymbolID& id, const JsonVal& val, SymbolTable& table, Structure* s) {
+			auto* m = (Method*) s->InstallMethod(id, {});
+			assert(m);
+
+			DeserializeMethod(id, val,  table, s, m);
+
+			InstallMethodArgs(val, m);
+			InstallMethodDefinitions(val, m);
+			ImportMethodTemplateArgs(val, table, m);
+		}
+
+		inline void ImportStructureNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
+			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) {
+				s->InstallNestedClass(id, ImportStructure(id, val, table)); 
+			});
+		}
+
+		inline void InstallStructureField(const SymbolID& id, const JsonVal& val, Structure* s) {
+			auto* f = (Definition*) s->InstallField(id, {});
+			assert(f);
+
+			DeserializeDefinitionWithAccessSpecifier(id, val, f);
+
+			f->SetType(s);
+			f->SetNamespace(s->GetNamespace());
+		}
+
+		inline void InstallStructureFields(const JsonVal& val, Structure* s) {
+			ForEach(Get(val, "fields"), [s](const auto& id, const auto& val) { 
+				InstallStructureField(id, val, s);
+			});
+		}
+
+		inline void ImportStructureFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "friends"), [&table, s](const auto& id, const auto& val) {
-				auto* f = ImportStructure(id, val, table);
-				assert(f);
-
-				s->InstallFriend(id, f); 
+				s->InstallFriend(id, ImportStructure(id, val, table)); 
 			});
 		}
 
-		inline void ImportMethods(const JsonVal& val, SymbolTable& table, Structure* s) {
+		inline void InstallStructureMethods(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "methods"), [&table, s](const auto& id, const auto& val) {
-				auto* m = ImportMethod(id, val, table);
-				assert(m);
-
-				m->SetNamespace(s->GetNamespace());
-				s->InstallMethod(id, *m);
+				InstallStructureMethod(id, val, table, s);
 			});
 		}
 
-		void InstallBases(const JsonVal& val, SymbolTable& table, Structure* s) {
+		void InstallStructureBases(const JsonVal& val, const SymbolTable& table, Structure* s) {
 			if (val.isMember("bases")) {
 				assert(Get(val, "bases").isArray());
 
@@ -186,17 +175,17 @@ namespace incremental {
 			}
 		}
 
-		inline void InstalllTemplateParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+		inline void InstalllStructureTemplateParent(const JsonVal& val, const SymbolTable& table, Structure* s) {
 			if (val.isMember("template_parent"))
 				s->SetTemplateParent((Structure*) table.Lookup(Get(val, "template_parent").asString()));
 		}
 
-		inline void InstalllNestedParent(const JsonVal& val, SymbolTable& table, Structure* s) {
+		inline void InstalllStructureNestedParent(const JsonVal& val, const SymbolTable& table, Structure* s) {
 			if (val.isMember("nested_parent"))
 				s->SetNestedParent((Structure*) table.Lookup(Get(val, "nested_parent").asString()));
 		}
 
-		void InstallTemplateArguments(const JsonVal& val, SymbolTable& table, Structure* s) {
+		void InstallStructureTemplateArguments(const JsonVal& val, const SymbolTable& table, Structure* s) {
 			if (val.isMember("template_args")) {
 				assert(Get(val, "template_args").isArray());
 
@@ -204,26 +193,30 @@ namespace incremental {
 					assert(arg.isString());
 
 					const auto id = arg.asString();
-					s->InstallTemplateSpecializationArguments(id, (Structure*) table.Lookup(id));
+					s->InstallTemplateSpecializationArgument(id, (Structure*) table.Lookup(id));
 				}
 			}
 		}
 
 		inline Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
+			auto* found = (Structure*) table.Lookup(id); // could already have been inserted (importing from bases, friend, etc.)
+			if (found) // to avoid further deserialization
+				return found; 
+
 			auto* s = (Structure*) table.Install(id, Structure{});
 			assert(s);
 
 			DeserializeStructure(id, val, s);
 
-			ImportNestedClasses(val, table, s);
-			ImportFields(val, table, s);
-			ImportFriends(val, table, s);
-			ImportMethods(val, table, s);
+			ImportStructureNestedClasses(val, table, s);
+			InstallStructureFields(val, s);
+			ImportStructureFriends(val, table, s);
+			InstallStructureMethods(val, table, s);
 
-			InstallBases(val, table, s);
-			InstalllTemplateParent(val, table, s);
-			InstalllNestedParent(val, table, s);
-			InstallTemplateArguments(val, table, s);
+			InstallStructureBases(val, table, s);
+			InstalllStructureTemplateParent(val, table, s);
+			InstalllStructureNestedParent(val, table, s);
+			InstallStructureTemplateArguments(val, table, s);
 
 			return s;
 		}
