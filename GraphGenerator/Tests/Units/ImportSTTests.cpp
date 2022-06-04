@@ -18,7 +18,7 @@ namespace {
 	using namespace tests::utility;
 
 	// Googletest cannot detect operator<< overloads :(
-	#define DUMP_INFO(imported, exported) "\n-----\n" << "\nImported: \n\n" << imported << "\nExported: \n\n" << exported
+	#define DUMP_INFO(expected, actual) "\n-----\n" << "\nExpected: \n\n" << expected << "\nActual: \n\n" << actual
 
 	TEST(ImportStashedST, Imports_nothing_from_non_existent_path) {
 		constexpr auto path = "out.json";
@@ -40,6 +40,73 @@ namespace {
 		ASSERT_TRUE(table.IsEmpty());
 	}
 
-	// TODO Imports_non_empty_symbol_table_correctly
+	// --------------------- sample_non_empty.json hardcoded ----------------- //
+
+	Structure* PrepareStructure(SymbolTable& expected) {
+		auto* s = (Structure*) expected.Install("CS::CS_1::class_A", Structure{});
+		assert(s);
+
+		s->SetID("CS::CS_1::class_A");
+		s->SetName("CS::CS_1::class_A");
+		s->SetNamespace("CS::CS_1::");
+		s->SetSourceInfo({"classes_simple.cpp", 11, 11});
+		s->SetStructureType(StructureType::Class);
+
+		return s;
+	}
+
+	void PrepareField(SymbolTable& expected, Structure* s) {
+		assert(s);
+
+		auto* f = (Definition*) s->InstallField("CS::CS_1::class_A::b", {});
+		assert(f);
+
+		f->SetID("CS::CS_1::class_A::b");
+		f->SetName("CS::CS_1::class_A::b");
+		f->SetNamespace(s->GetNamespace());
+		f->SetSourceInfo({"classes_simple.cpp", 34, 2});
+		f->SetAccessType(AccessType::_private);
+		f->SetFullType("class CS::CS_1::class_B");
+		f->SetType(s);
+	}
+
+	void PrepareMethod(SymbolTable& expected, Structure* s) {
+		assert(s);
+
+		auto* m = (Method*) s->InstallMethod("CS::CS_1::class_A::class_A(class CS::CS_1::class_A &&)", {});
+		assert(m);
+
+		m->SetID("CS::CS_1::class_A::class_A(class CS::CS_1::class_A &&)");
+		m->SetName("CS::CS_1::class_A::class_A(class CS::CS_1::class_A &&)");
+		m->SetNamespace(s->GetNamespace());
+		m->SetSourceInfo({"classes_simple.cpp", 11, 11});
+		m->SetAccessType(AccessType::unknown);
+		m->SetBranches(0);
+		m->SetLineCount(0);
+		m->SetLiterals(0);
+		m->SetLoops(0);
+		m->SetMaxScopeDepth(0);
+		m->SetStatements(0);
+		m->SetVirtual(false);
+	}
+
+	void Prepare(SymbolTable& expected) {
+		auto* s = PrepareStructure(expected);
+		PrepareField(expected, s);
+		PrepareMethod(expected, s);
+	}
+
+	// -------------------------------------------------------------------- //
+
+	TEST(ImportStashedST, Imports_non_empty_symbol_table_correctly) {
+		const auto path = RESOLVE_PATH("sample_non_empty.json");
+		assert(std::filesystem::exists(path));
+		SymbolTable actual, expected;
+		Prepare(expected);
+
+		ImportStashedST(path, actual);
+
+		ASSERT_EQ(expected, actual) << DUMP_INFO(expected, actual);
+	}
 
 } // namespace

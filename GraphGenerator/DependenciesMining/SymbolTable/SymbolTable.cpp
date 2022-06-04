@@ -807,7 +807,7 @@ const Symbol* SymbolTable::Lookup(const ID_T& id) const {
 
 static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 	Json::Value json_src_info;
-	auto src_info = symbol->GetSourceInfo();
+	const auto& src_info = symbol->GetSourceInfo();
 	json_src_info["file"] = src_info.GetFileName();
 	json_src_info["line"] = src_info.GetLine();
 	json_src_info["col"] = src_info.GetColumn();
@@ -945,12 +945,10 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 		json_structure["bases"].append(base.second->GetID());
 	}
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
-	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]);
+	structure->GetFriends().AddJsonSymbolTable(json_structure["friends"]); // TODO Serialize only IDs for friends ??????
 	json_structure["src_info"] = GetJsonSourceInfo(structure);
 
-	json_structure["name"] = structure->GetName();
 	json_structure["namespace"] = structure->GetNamespace();
-	json_structure["class_type"] = structure->GetClassTypeAsString();
 	json_structure["structure_type"] = structure->GetStructureTypeAsString();
 
 	if (structure->GetTemplateParent())
@@ -991,6 +989,8 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 	json_method["access"] = method->GetAccessTypeStr();
 	json_method["virtual"] = method->IsVirtual();
 
+	json_method["method_type"] = method->GetMethodTypeAsString();
+
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }
 
@@ -998,6 +998,7 @@ void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, 
 	assert(definition);
 
 	json_definition["type"] = definition->GetFullType();
+	json_definition["src_info"] = GetJsonSourceInfo(definition);
 	if (definition->GetAccessType() != AccessType::unknown)
 		json_definition["access"] = definition->GetAccessTypeStr();
 

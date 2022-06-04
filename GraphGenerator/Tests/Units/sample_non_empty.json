@@ -1,0 +1,57 @@
+{
+	"structures" : 
+	{
+		"CS::CS_1::class_A" : 
+		{
+			"contains" : null,
+			"fields" : 
+			{
+				"CS::CS_1::class_A::b" : 
+				{
+					"access" : "private",
+					"type" : "class CS::CS_1::class_B",
+					"src_info" : 
+					{
+						"col" : 2,
+						"file" : "classes_simple.cpp",
+						"line" : 34
+					}
+				}
+			},
+			"friends" : null,
+			"methods" : 
+			{
+				"CS::CS_1::class_A::class_A(class CS::CS_1::class_A &&)" : 
+				{
+					"access" : "unknown",
+					"args" : null,
+					"branches" : 0,
+					"definitions" : null,
+					"lines" : 0,
+					"literals" : 0,
+					"loops" : 0,
+					"max_scope" : 0,
+					"method_type": "Constructor_Trivial",
+					"ret_type" : "void",
+					"src_info" : 
+					{
+						"col" : 11,
+						"file" : "classes_simple.cpp",
+						"line" : 11
+					},
+					"statements" : 0,
+					"template_args" : null,
+					"virtual" : false
+				}
+			},
+			"namespace" : "CS::CS_1::",
+			"src_info" : 
+			{
+				"col" : 11,
+				"file" : "classes_simple.cpp",
+				"line" : 11
+			},
+			"structure_type" : "Class"
+		}
+	}
+}

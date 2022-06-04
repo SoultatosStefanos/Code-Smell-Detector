@@ -225,8 +225,8 @@ namespace dependenciesMining {
 
 	class Definition : public Symbol {
 	private:
-		Structure* type = nullptr;
-		std::string full_type = "";
+		Structure* type = nullptr;	// Structure type for fields, nullptr for in-method definitions.
+		std::string full_type = "";	// Definition type.
 
 	protected:
 		DEBUG_FRIENDLY virtual bool IsEqual(const Symbol& other) const override;
@@ -395,7 +395,7 @@ namespace dependenciesMining {
 
 	// ----------------------------------------------------------------------------------------
 
-	class Structure : public Symbol {
+	class Structure : public Symbol { // TODO Remove name??
 	private:
 		
 		StructureType structureType = StructureType::Undefined;

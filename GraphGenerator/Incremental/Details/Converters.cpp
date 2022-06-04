@@ -44,4 +44,20 @@ namespace incremental::details {
 		return Get(table, str);
 	}
 
+	MethodType ToMethodType(const std::string& str) {
+		static const EnumTable<MethodType> table {{"Constructor_UserDefined", MethodType::Constructor_UserDefined },
+												  {"Constructor_Trivial", MethodType::Constructor_Trivial },
+												  {"Destructor_UserDefined", MethodType::Constructor_UserDefined },
+												  {"Destructor_Trivial", MethodType::Destructor_Trivial },
+												  {"OverloadedOperator_UserDefined", MethodType::OverloadedOperator_UserDefined },
+												  {"OverloadedOperator_Trivial", MethodType::OverloadedOperator_Trivial },
+												  {"UserMethod", MethodType::UserMethod },
+												  {"TemplateDefinition", MethodType::TemplateDefinition },
+												  {"TemplateFullSpecialization", MethodType::TemplateFullSpecialization },
+												  {"TemplateInstantiationSpecialization", MethodType::TemplateInstantiationSpecialization },
+												  {"Undefined", MethodType::Undefined } };
+
+		return Get(table, str);
+	}
+
 } // incremental::details

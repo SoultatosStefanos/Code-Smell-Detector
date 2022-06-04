@@ -10,7 +10,10 @@
 #include <algorithm>
 #include <sstream>
 
+// TODO Deserialize rest of symbols
+
 namespace incremental {
+	
 	using namespace details;
 
 	namespace {
@@ -47,9 +50,11 @@ namespace incremental {
 
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
-			if (val.isMember("access"))
+			d->SetName(id);
+			if (val.isMember("access")) // cause of non member definitions
 				d->SetAccessType(ToAccessType(Get(val, "access").asString()));
 			d->SetFullType(Get(val, "type").asString());
+			d->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
 
@@ -76,7 +81,7 @@ namespace incremental {
 			m->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 			m->SetStatements(Get(val, "statements").asInt());
 			m->SetVirtual(Get(val, "virtual").asBool());
-			// m->SetMethodType(MethodType::UserMethod); // FIXME? Doesn't seem to matter, can't know from json
+			m->SetMethodType(ToMethodType(Get(val, "method_type").asString()));
 		}
 
 		inline void ImportArgs(const JsonVal& val, SymbolTable& table, Method* m) {
@@ -119,9 +124,11 @@ namespace incremental {
 			return m;
 		}
 
+		// TODO Optimize on Install
+
 		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
 			s->SetID(id);
-			s->SetName(Get(val, "name").asString());
+			s->SetName(id);
 			s->SetNamespace(Get(val, "namespace").asString());
 			s->SetStructureType(ToStructureType(Get(val, "structure_type").asString()));
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
@@ -142,6 +149,7 @@ namespace incremental {
 				assert(f);
 
 				f->SetType(s);
+				f->SetNamespace(s->GetNamespace());
 				s->InstallField(id, *f);
 			});
 		}
@@ -160,6 +168,7 @@ namespace incremental {
 				auto* m = ImportMethod(id, val, table);
 				assert(m);
 
+				m->SetNamespace(s->GetNamespace());
 				s->InstallMethod(id, *m);
 			});
 		}

@@ -12,4 +12,6 @@ namespace incremental::details {
 	
 	dependenciesMining::StructureType ToStructureType(const std::string& str);
 
+	dependenciesMining::MethodType ToMethodType(const std::string& str);
+
 } // incremental::details
