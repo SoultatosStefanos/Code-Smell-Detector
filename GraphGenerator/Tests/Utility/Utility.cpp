@@ -47,10 +47,10 @@ namespace tests::utility {
 
 	static bool AreEqual(const Method& lhs, const Method& rhs) { // NOTE: No check for GetMemberExpr
 		return  lhs.GetMethodType() == rhs.GetMethodType()
-				and AreEqualOrNullptr(lhs.GetReturnType(), rhs.GetReturnType())
+				and AreIDBasedEqualOrNullptr(lhs.GetReturnType(), rhs.GetReturnType())
 				and AreEqual(lhs.GetArguments(), rhs.GetArguments())
 				and AreEqual(lhs.GetDefinitions(), rhs.GetDefinitions())
-				and AreEqual(lhs.GetTemplateArguments(), rhs.GetTemplateArguments())
+				and AreEqualIDBased(lhs.GetTemplateArguments(), rhs.GetTemplateArguments())
 				and lhs.GetLiterals() == rhs.GetLiterals()
 				and lhs.GetStatements() == rhs.GetStatements()
 				and lhs.GetBranches() == rhs.GetBranches()
@@ -65,10 +65,10 @@ namespace tests::utility {
 				and AreEqualOrNullptr(lhs.GetNestedParent(), rhs.GetNestedParent())
 				and AreEqual(lhs.GetMethods(), rhs.GetMethods())
 				and AreEqual(lhs.GetFields(), rhs.GetFields())
-				and AreEqual(lhs.GetBases(), rhs.GetBases())
+				and AreEqualIDBased(lhs.GetBases(), rhs.GetBases())
 				and AreEqual(lhs.GetContains(), rhs.GetContains())
-				and AreEqual(lhs.GetFriends(), rhs.GetFriends())
-				and AreEqual(lhs.GetTemplateArguments(), rhs.GetTemplateArguments());
+				and AreEqualIDBased(lhs.GetFriends(), rhs.GetFriends())
+				and AreEqualIDBased(lhs.GetTemplateArguments(), rhs.GetTemplateArguments());
 	}
 
 	static bool DispatchAreEqual(const Symbol& lhs, const Symbol& rhs) {
@@ -91,11 +91,11 @@ namespace tests::utility {
 	}
 
 	bool AreEqual(const Symbol& lhs, const Symbol& rhs) {
-		return 	lhs.GetClassType() == rhs.GetClassType()
+		return  	lhs.GetClassType() == rhs.GetClassType()
 				and lhs.GetAccessType() == rhs.GetAccessType()
-				and lhs.GetID() == rhs.GetID() 
-				and lhs.GetName() == rhs.GetName() 
-				and lhs.GetNamespace() == rhs.GetNamespace() 
+				and lhs.GetID() == rhs.GetID()
+				and lhs.GetName() == rhs.GetName()
+				and lhs.GetNamespace() == rhs.GetNamespace()
 				and lhs.GetSourceInfo() == rhs.GetSourceInfo()
 				and DispatchAreEqual(lhs, rhs);
 		
@@ -108,6 +108,17 @@ namespace tests::utility {
 		return 	lhsSorted.size() == rhsSorted.size() ? 
 				std::equal(std::begin(lhsSorted), std::end(lhsSorted), std::begin(rhsSorted), [](const auto& lpair, const auto& rpair) {
 					return lpair.first == rpair.first and AreEqual(*lpair.second, *rpair.second);
+				}) :
+				false;
+	}
+
+	bool AreEqualIDBased(const SymbolTable& lhs, const SymbolTable& rhs) {
+		const auto lhsSorted = Sort(lhs);
+		const auto rhsSorted = Sort(rhs);
+
+		return 	lhsSorted.size() == rhsSorted.size() ? 
+				std::equal(std::begin(lhsSorted), std::end(lhsSorted), std::begin(rhsSorted), [](const auto& lpair, const auto& rpair) {
+					return lpair.first == rpair.first;
 				}) :
 				false;
 	}

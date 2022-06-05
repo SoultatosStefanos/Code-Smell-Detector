@@ -11,6 +11,8 @@
 
 #define ID_T std::string 
 
+#define DEBUG_FRIENDLY
+
 namespace dependenciesMining {
 
 	class SymbolTable;
@@ -82,6 +84,10 @@ namespace dependenciesMining {
 		bool  operator==(SourceInfo const& loc) const;		
 	};
 
+	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SourceInfo& s) {
+		return os << s.toString();
+	}
+
 	inline bool operator!=(const SourceInfo& lhs, const SourceInfo& rhs) {
 		return !(lhs == rhs);
 	}
@@ -121,6 +127,8 @@ namespace dependenciesMining {
 		virtual void SetSourceInfo(const std::string& fileName, int line, int column);
 		virtual void SetNamespace(const std::string& nameSpace);
 		void SetAccessType(const AccessType& access_type);
+
+		DEBUG_FRIENDLY void Print(std::ostream& os) const;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -174,6 +182,8 @@ namespace dependenciesMining {
 		const_iterator end() const { return byID.end(); }
 	};
 
+	DEBUG_FRIENDLY std::ostream& operator<<(std::ostream& os, const SymbolTable& s);
+
 	// ----------------------------------------------------------------------------------------
 
 	template<typename Parent_T> class Template {
@@ -211,6 +221,8 @@ namespace dependenciesMining {
 		std::string GetFullType() const;
 		void SetType(Structure* structure);
 		void SetFullType(const std::string& type);
+
+		DEBUG_FRIENDLY void Print(std::ostream& os) const;
 	};
 
 	#define Value_mem_t "Value"
@@ -324,6 +336,8 @@ namespace dependenciesMining {
 		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTrivial() const;
 		bool IsVirtual() const;
+
+		DEBUG_FRIENDLY void Print(std::ostream& os) const;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -343,7 +357,7 @@ namespace dependenciesMining {
 	
 	public:
 		Structure() : Symbol(ClassType::Structure) {};
-		Structure(const ID_T& id) : Symbol{id, "", "",  ClassType::Structure} {}
+		Structure(const ID_T& id) : Symbol{id, id, "",  ClassType::Structure} {}
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace = "", StructureType structureType = StructureType::Undefined)
 			: Symbol(id, name, nameSpace, ClassType::Structure), structureType(structureType) {};
 		Structure(const ID_T& id, const std::string& name, const std::string& nameSpace, StructureType structureType, const std::string& fileName, int line, int column)
@@ -384,6 +398,8 @@ namespace dependenciesMining {
 		bool IsTemplate() const;
 		bool IsUndefined() const;
 		bool IsNestedClass() const;
+
+		DEBUG_FRIENDLY void Print(std::ostream& os) const;
 	};
 
 	/*class Fundamental : public Symbol {

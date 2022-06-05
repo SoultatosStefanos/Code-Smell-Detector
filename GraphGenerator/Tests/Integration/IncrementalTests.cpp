@@ -18,6 +18,9 @@ namespace {
 	using namespace tests::utility;
 	using namespace incremental;
 
+	// Googletest cannot detect operator<< overloads :(
+    #define DUMP_INFO(exported, imported) "\n-----\n" << "\nExported: \n\n" << exported << "\nImported: \n\n" << imported
+
 	void ExportST(const SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
@@ -40,7 +43,7 @@ namespace {
 		SymbolTable imported;
 		ImportStashedST(tmp, imported);
 
-		EXPECT_TRUE(AreEqual(imported, structuresTable));
+		EXPECT_TRUE(AreEqual(imported, structuresTable)) << DUMP_INFO(structuresTable, imported);
 
 		std::remove(tmp);
 	}
