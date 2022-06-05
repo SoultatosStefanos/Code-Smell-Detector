@@ -105,7 +105,7 @@ namespace tests::utility {
 		const auto lhsSorted = Sort(lhs);
 		const auto rhsSorted = Sort(rhs);
 
-		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
+		return std::equal(std::begin(lhsSorted), std::end(lhsSorted), std::begin(rhsSorted), [](const auto& lpair, const auto& rpair) {
 			return lpair.first == rpair.first and AreEqual(*lpair.second, *rpair.second);
 		});
 	}

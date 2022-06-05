@@ -99,7 +99,7 @@ namespace incremental {
 
 				const auto id = val.asString();
 
-				install((Structure*) table.Install(id, Structure{ id }));
+				install((Structure*) table.Install2(id, Structure{ id }));
 			}
 		}
 
@@ -112,7 +112,7 @@ namespace incremental {
 
 				const auto id = v.asString();
 
-				install(id, (Structure*) table.Install(id, Structure{ id }));
+				install(id, (Structure*) table.Install2(id, Structure{ id }));
 			}
 		}
 
@@ -150,7 +150,7 @@ namespace incremental {
 
 			const auto id = Get(val, "ret_type").asString();
 
-			m->SetReturnType(id == "void" ? nullptr : (Structure*) table.Install(id, Structure{ id }));
+			m->SetReturnType(id == "void" ? nullptr : (Structure*) table.Install2(id, Structure{ id }));
 		}
 		
 		inline void InstallMethodArgs(const JsonVal& val, Method* m) {
@@ -241,7 +241,7 @@ namespace incremental {
 		}
 
 		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table) {
-			auto* s = (Structure*) table.Install(id, Structure{}); // Might return structure that was installed as a dependency.
+			auto* s = (Structure*) table.Install2(id, Structure{}); // Might return structure that was installed as a dependency.
 			assert(s);
 
 			DeserializeStructure(id, val, s);

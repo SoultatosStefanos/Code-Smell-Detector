@@ -11,8 +11,6 @@
 
 #define ID_T std::string 
 
-#define DEBUG_FRIENDLY
-
 namespace dependenciesMining {
 
 	class SymbolTable;
@@ -88,10 +86,6 @@ namespace dependenciesMining {
 		return !(lhs == rhs);
 	}
 
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SourceInfo& src) {
-		return os << src.toString();
-	}
-
 	// ----------------------------------------------------------------------------------------
 
 	class Symbol {
@@ -127,14 +121,7 @@ namespace dependenciesMining {
 		virtual void SetSourceInfo(const std::string& fileName, int line, int column);
 		virtual void SetNamespace(const std::string& nameSpace);
 		void SetAccessType(const AccessType& access_type);
-
-		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const;
 	};
-
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Symbol& s) {
-		s.Print(os);
-		return os;
-	}
 
 	// ----------------------------------------------------------------------------------------
 
@@ -154,6 +141,9 @@ namespace dependenciesMining {
 		Symbol* Install(const ID_T& id, const Method& symbol);
 		Symbol* Install(const ID_T& id, const Definition& symbol);
 		Symbol* Install(const ID_T& id, Symbol* symbol);
+
+		Symbol* Install2(const ID_T& id, const Structure& symbol); // cause of Install implementation, didnt want to break anything
+
 		Symbol* Lookup(const ID_T& id);
 		//Symbol* Lookup(const std::string& name);
 		const Symbol* Lookup(const ID_T& id) const;
@@ -183,12 +173,6 @@ namespace dependenciesMining {
 
 		const_iterator end() const { return byID.end(); }
 	};
-
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const SymbolTable& t) {
-		for (const auto& [id, symbol] : t) 
-			os << *symbol << '\n';
-		return os;
-	}
 
 	// ----------------------------------------------------------------------------------------
 
@@ -227,14 +211,7 @@ namespace dependenciesMining {
 		std::string GetFullType() const;
 		void SetType(Structure* structure);
 		void SetFullType(const std::string& type);
-
-		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
-
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Definition& d) {
-		d.Print(os);
-		return os;
-	}
 
 	#define Value_mem_t "Value"
 	#define ClassField_mem_t "ClassField"
@@ -347,14 +324,7 @@ namespace dependenciesMining {
 		bool IsTemplateInstantiationSpecialization() const;
 		bool IsTrivial() const;
 		bool IsVirtual() const;
-
-		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
-
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Method& m) {
-		m.Print(os);
-		return os;
-	}
 
 	// ----------------------------------------------------------------------------------------
 
@@ -414,14 +384,7 @@ namespace dependenciesMining {
 		bool IsTemplate() const;
 		bool IsUndefined() const;
 		bool IsNestedClass() const;
-
-		DEBUG_FRIENDLY virtual void Print(std::ostream& os) const override;
 	};
-
-	DEBUG_FRIENDLY inline std::ostream& operator<<(std::ostream& os, const Structure& s) {
-		s.Print(os);
-		return os;
-	}
 
 	/*class Fundamental : public Symbol {
 

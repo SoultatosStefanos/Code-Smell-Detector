@@ -17,9 +17,6 @@ namespace {
 	using namespace dependenciesMining;
 	using namespace tests::utility;
 
-	// Googletest cannot detect operator<< overloads :(
-	#define DUMP_INFO(expected, actual) "\n-----\n" << "\nExpected: \n\n" << expected << "\nActual: \n\n" << actual
-
 	TEST(ImportStashedST, Imports_nothing_from_non_existent_path) {
 		constexpr auto path = "out.json";
 		assert(!std::filesystem::exists(path));
@@ -107,7 +104,7 @@ namespace {
 
 		ImportStashedST(path, actual);
 
-		ASSERT_TRUE(AreEqual(expected, actual)) << DUMP_INFO(expected, actual);
+		ASSERT_TRUE(AreEqual(expected, actual));
 	}
 
 } // namespace
