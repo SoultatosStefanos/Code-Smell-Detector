@@ -161,6 +161,8 @@ namespace incremental {
 				assert(d);
 
 				DeserializeDefinition(id, val, d);
+
+				d->SetNamespace(m->GetNamespace());
 			});
 		}
 
@@ -172,6 +174,8 @@ namespace incremental {
 				assert(d);
 
 				DeserializeDefinition(id, val, d);
+
+				d->SetNamespace(m->GetNamespace());
 			});
 		}
 

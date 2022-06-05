@@ -34,7 +34,7 @@ namespace tests::utility {
 			return (!lhs or !rhs) ? (!lhs and !rhs) : AreEqual(*lhs, *rhs);
 		}
 
-		constexpr bool AreIDBasedEqualOrNullptr(const Structure* lhs, const Structure* rhs) {
+		inline bool AreIDBasedEqualOrNullptr(const Structure* lhs, const Structure* rhs) {
 			return (!lhs or !rhs) ? (!lhs and !rhs) : lhs->GetID() == rhs->GetID();
 		}
 
@@ -105,9 +105,11 @@ namespace tests::utility {
 		const auto lhsSorted = Sort(lhs);
 		const auto rhsSorted = Sort(rhs);
 
-		return std::equal(std::begin(lhsSorted), std::end(lhsSorted), std::begin(rhsSorted), [](const auto& lpair, const auto& rpair) {
-			return lpair.first == rpair.first and AreEqual(*lpair.second, *rpair.second);
-		});
+		return 	lhsSorted.size() == rhsSorted.size() ? 
+				std::equal(std::begin(lhsSorted), std::end(lhsSorted), std::begin(rhsSorted), [](const auto& lpair, const auto& rpair) {
+					return lpair.first == rpair.first and AreEqual(*lpair.second, *rpair.second);
+				}) :
+				false;
 	}
 
 } // tests::utils
