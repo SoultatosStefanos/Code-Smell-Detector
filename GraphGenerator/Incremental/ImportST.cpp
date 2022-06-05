@@ -49,7 +49,7 @@ namespace incremental {
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
 			d->SetName(id);
-			d->SetFullType(Get(val, "type").asString());
+			d->SetFullType(Get(val, "full_type").asString());
 			d->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
 
@@ -130,8 +130,8 @@ namespace incremental {
 			});
 		}
 
-		inline void InstallStructureFields(const JsonVal& val, Structure* s) {
-			ForEach(Get(val, "fields"), [s](const auto& id, const auto& val) { 
+		inline void InstallStructureFields(const JsonVal& val, SymbolTable& table, Structure* s) {
+			ForEach(Get(val, "fields"), [s, &table](const auto& id, const auto& val) { 
 				assert(!s->GetFields().Lookup(id));
 
 				auto* f = (Definition*) s->InstallField(id, {});
@@ -139,7 +139,10 @@ namespace incremental {
 
 				DeserializeDefinitionWithAccessSpecifier(id, val, f);
 
-				f->SetType(s);
+				InstallDependency(Get(val, "type"), table, [f](auto* t) {
+					f->SetType(t);
+				});
+
 				f->SetNamespace(s->GetNamespace());
 			});
 		}
@@ -153,8 +156,8 @@ namespace incremental {
 			m->SetReturnType(id == "void" ? nullptr : (Structure*) table.Install2(id, Structure{ id }));
 		}
 		
-		inline void InstallMethodArgs(const JsonVal& val, Method* m) {
-			ForEach(Get(val, "args"), [m](const auto& id, const auto& val) { 
+		inline void InstallMethodArgs(const JsonVal& val, SymbolTable& table, Method* m) {
+			ForEach(Get(val, "args"), [m, &table](const auto& id, const auto& val) { 
 				assert(!m->GetArguments().Lookup(id));
 
 				auto* d = (Definition*) m->InstallArg(id, {});
@@ -162,18 +165,26 @@ namespace incremental {
 
 				DeserializeDefinition(id, val, d);
 
+				InstallDependency(Get(val, "type"), table, [d](auto* t) {
+					d->SetType(t);
+				});
+
 				d->SetNamespace(m->GetNamespace());
 			});
 		}
 
-		inline void InstallMethodDefinitions(const JsonVal& val, Method* m) {
-			ForEach(Get(val, "definitions"), [m](const auto& id, const auto& val) {
+		inline void InstallMethodDefinitions(const JsonVal& val, SymbolTable& table, Method* m) {
+			ForEach(Get(val, "definitions"), [m, &table](const auto& id, const auto& val) {
 				assert(!m->GetDefinitions().Lookup(id));
 
 				auto* d = (Definition*) m->InstallDefinition(id, {});
 				assert(d);
 
 				DeserializeDefinition(id, val, d);
+
+				InstallDependency(Get(val, "type"), table, [d](auto* t) {
+					d->SetType(t);
+				});
 
 				d->SetNamespace(m->GetNamespace());
 			});
@@ -208,8 +219,8 @@ namespace incremental {
 				m->SetNamespace(s->GetNamespace());
 
 				InstallMethodReturnType(val, table, m);
-				InstallMethodArgs(val, m);
-				InstallMethodDefinitions(val, m);
+				InstallMethodArgs(val, table, m);
+				InstallMethodDefinitions(val, table, m);
 				InstallMethodTemplateArgs(val, table, m);
 			});
 		}
@@ -253,7 +264,7 @@ namespace incremental {
 			ImportStructureNestedClasses(val, table, s);
 
 			InstallStructureBases(val, table, s);
-			InstallStructureFields(val, s);
+			InstallStructureFields(val, table, s);
 			InstallStructureFriends(val, table, s);
 			InstallStructureMethods(val, table, s);
 			InstalllStructureNestedParent(val, table, s);

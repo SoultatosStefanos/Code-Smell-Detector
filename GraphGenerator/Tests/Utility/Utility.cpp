@@ -34,8 +34,13 @@ namespace tests::utility {
 			return (!lhs or !rhs) ? (!lhs and !rhs) : AreEqual(*lhs, *rhs);
 		}
 
+		inline bool AreIDBasedEqual(const Structure* lhs, const Structure* rhs) {
+			assert(lhs and rhs);
+			return lhs->GetID() == rhs->GetID();
+		}
+
 		inline bool AreIDBasedEqualOrNullptr(const Structure* lhs, const Structure* rhs) {
-			return (!lhs or !rhs) ? (!lhs and !rhs) : lhs->GetID() == rhs->GetID();
+			return (!lhs or !rhs) ? (!lhs and !rhs) : AreIDBasedEqual(lhs, rhs);
 		}
 
 	} // namespace

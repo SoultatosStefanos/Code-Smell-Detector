@@ -64,7 +64,7 @@ namespace {
 		f->SetSourceInfo({"classes_simple.cpp", 34, 2});
 		f->SetAccessType(AccessType::_private);
 		f->SetFullType("class CS::CS_1::class_B");
-		f->SetType(s);
+		f->SetType( (Structure* ) expected.Install2("CS::CS_1::class_B", Structure{ "CS::CS_1::class_B" }));
 	}
 
 	void PrepareMethod(SymbolTable& expected, Structure* s) {

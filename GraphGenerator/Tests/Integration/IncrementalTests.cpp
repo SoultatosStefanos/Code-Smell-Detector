@@ -18,9 +18,6 @@ namespace {
 	using namespace tests::utility;
 	using namespace incremental;
 
-	// Googletest cannot detect operator<< overloads :(
-    #define DUMP_INFO(exported, imported) "\n-----\n" << "\nExported: \n\n" << exported << "\nImported: \n\n" << imported
-
 	void ExportST(const SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
@@ -33,7 +30,7 @@ namespace {
 	}
 
 	TEST(IncrementalTests, Importing_after_exporting_ST) {
-		constexpr auto tmp = "out.json";
+		const auto tmp = RESOLVE_PATH("out.json");
 		const auto cmp_db = RESOLVE_PATH("compile_commands.json");
 		std::vector<std::string> srcs;
 		std::vector<std::string> headers;
@@ -41,11 +38,11 @@ namespace {
 		ExportST(structuresTable, tmp);
 
 		SymbolTable imported;
-		ImportStashedST(tmp, imported);
+		ImportStashedST(tmp.c_str(), imported);
 
-		EXPECT_TRUE(AreEqual(imported, structuresTable)) << DUMP_INFO(structuresTable, imported);
+		EXPECT_TRUE(AreEqual(imported, structuresTable));
 
-		std::remove(tmp);
+		std::remove(tmp.c_str());
 	}
 
 

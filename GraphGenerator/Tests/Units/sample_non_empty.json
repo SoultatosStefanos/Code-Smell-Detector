@@ -10,13 +10,14 @@
 				"CS::CS_1::class_A::b" : 
 				{
 					"access" : "private",
-					"type" : "class CS::CS_1::class_B",
+					"full_type" : "class CS::CS_1::class_B",
 					"src_info" : 
 					{
 						"col" : 2,
 						"file" : "classes_simple.cpp",
 						"line" : 34
-					}
+					},
+					"type" : "CS::CS_1::class_B"
 				}
 			},
 			"friends" : null,

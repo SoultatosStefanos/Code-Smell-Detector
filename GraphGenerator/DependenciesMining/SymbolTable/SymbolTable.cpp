@@ -1036,7 +1036,12 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) const {
 	assert(definition);
 
-	json_definition["type"] = definition->GetFullType();
+	json_definition["full_type"] = definition->GetFullType();
+
+	Put(json_definition, "type");
+	if(definition->GetType())
+		json_definition["type"] = definition->GetType()->GetID();
+
 	json_definition["src_info"] = GetJsonSourceInfo(definition);
 	if (definition->GetAccessType() != AccessType::unknown)
 		json_definition["access"] = definition->GetAccessTypeStr();
@@ -1107,81 +1112,3 @@ void SymbolTable::Accept(STVisitor* visitor) const {
 		}
 	}
 }
-
-// ----------------------------------------------------------------------------- //
-// ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
-// ----------------------------------------------------------------------------- //
-
-namespace dependenciesMining {
-
-		namespace {
-
-			inline auto Sort(const SymbolTable& table) {
-				using Range = std::vector<std::pair<ID_T, Symbol*>>;
-
-				Range range{std::begin(table), std::end(table)};
-				std::sort(std::begin(range), std::end(range), [](const auto& lhs, const auto& rhs) {
-					return lhs.first < rhs.first; 
-				});
-
-				return range;
-			}
-
-		} // namespace
-
-        void Symbol::Print(std::ostream& os) const {
-                os      << " ID: " << GetID() << ','
-                        << " Name: " << GetName() << ','
-						<< " Namespace: " << GetNamespace() << ','
-                        << " Access type: " << GetAccessTypeStr() << ','
-                        << " Class type: " << GetClassTypeAsString() << ','
-                        << " Source info: " << GetSourceInfo() << ',';
-        }
-
-        void Definition::Print(std::ostream& os) const {
-                Symbol::Print(os);
-				if(GetType())
-					os << " Type: " << GetType()->GetID();
-                os << " Full type: " << GetFullType();
-        }
-
-        void Method::Print(std::ostream& os) const {
-                Symbol::Print(os);
-                os      << " Method type: " << GetMethodTypeAsString() << ','
-                        << " Return type: " << [this]() { return GetReturnType() ? GetReturnType()->GetID() : "nullptr"; } () << '\n'
-                        << " Arguments: \n" << GetArguments() << '\n'
-                        << " Definitions: \n" << GetDefinitions() << '\n'
-                        << " Template arguments: \n" << GetTemplateArguments() << '\n'
-                        << " Literals: " << GetLiterals() << ','
-                        << " Statements: " << GetStatements() << ','
-                        << " Branches: " << GetBranches() << ','
-                        << " Loops: " << GetLoops() << ','
-                        << " Max scope depth: " << GetMaxScopeDepth() << ','
-                        << " Line count: " << GetLineCount();
-        }
-
-        void Structure::Print(std::ostream& os) const {
-                Symbol::Print(os);
-                os      << " Structure type: " << GetStructureTypeAsString()  << ','
-                        << " Template parent: " << [this]() { return GetTemplateParent() ? GetTemplateParent()->GetID() : "nullptr"; } ()  << ','
-                        << " Nested parent: " << [this]() { return GetNestedParent() ? GetNestedParent()->GetID() : "nullptr"; } () << '\n'
-                        << " Methods: \n" << GetMethods()
-                        << " Fields: \n" << GetFields()
-                        << " Bases: \n" << GetBases()
-                        << " Nested classes: \n" << GetContains()
-                        << " Friends: \n" << GetFriends()
-                        << " Template arguments: \n" << GetTemplateArguments();
-        }
-
-        std::ostream& operator<<(std::ostream& os, const SymbolTable& s) {
-        	const auto sorted = Sort(s);
-			for (const auto& [id, symbol] : sorted)
-				symbol->Print(os);
-			return os;
-        }
-
-} // dependenciesMining
-
-// ----------------------------------------------------------------------------- //
-// ------------------ DEBUG_FRIENDLY ------------------------------------------- // 
-// ----------------------------------------------------------------------------- //
