@@ -19,20 +19,20 @@ namespace tests::utility {
 	namespace {
 
 		template <typename T>
-		constexpr bool EqualOrNullptr(const T* lhs, const T* rhs) {
+		constexpr bool AreEqualOrNullptr(const T* lhs, const T* rhs) {
 			return (!lhs or !rhs) ? (!lhs and !rhs) : AreEqual(*lhs, *rhs);
 		}
 
 	} // namespace
 
 	static bool AreEqual(const Definition& lhs, const Definition& rhs) {
-		return	EqualOrNullptr(lhs.GetType(), rhs.GetType())
+		return	AreEqualOrNullptr(lhs.GetType(), rhs.GetType())
 				and lhs.GetFullType() == rhs.GetFullType();
 	}
 
 	static bool AreEqual(const Method& lhs, const Method& rhs) { // NOTE: No check for GetMemberExpr
 		return  lhs.GetMethodType() == rhs.GetMethodType()
-				and EqualOrNullptr(lhs.GetReturnType(), rhs.GetReturnType())
+				and AreEqualOrNullptr(lhs.GetReturnType(), rhs.GetReturnType())
 				and AreEqual(lhs.GetArguments(), rhs.GetArguments())
 				and AreEqual(lhs.GetDefinitions(), rhs.GetDefinitions())
 				and AreEqual(lhs.GetTemplateArguments(), rhs.GetTemplateArguments())
@@ -46,8 +46,8 @@ namespace tests::utility {
 
 	static bool AreEqual(const Structure& lhs, const Structure& rhs) {
 		return 	lhs.GetStructureType() == rhs.GetStructureType()
-				and EqualOrNullptr(lhs.GetTemplateParent(), rhs.GetTemplateParent())
-				and EqualOrNullptr(lhs.GetNestedParent(), rhs.GetNestedParent())
+				and AreEqualOrNullptr(lhs.GetTemplateParent(), rhs.GetTemplateParent())
+				and AreEqualOrNullptr(lhs.GetNestedParent(), rhs.GetNestedParent())
 				and AreEqual(lhs.GetMethods(), rhs.GetMethods())
 				and AreEqual(lhs.GetFields(), rhs.GetFields())
 				and AreEqual(lhs.GetBases(), rhs.GetBases())
@@ -77,7 +77,6 @@ namespace tests::utility {
 
 	bool AreEqual(const Symbol& lhs, const Symbol& rhs) {
 		return 	lhs.GetClassType() == rhs.GetClassType()
-				and lhs.GetClassType() != rhs.GetClassType()
 				and lhs.GetAccessType() == rhs.GetAccessType()
 				and lhs.GetID() == rhs.GetID() 
 				and lhs.GetName() == rhs.GetName() 
