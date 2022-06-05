@@ -363,10 +363,10 @@ namespace dependenciesMining {
 
 		const SymbolTable& GetMethods() const; 
 		const SymbolTable& GetFields() const; 
-		const SymbolTable&  GetBases() const; 
-		const SymbolTable&  GetContains() const;
-		const SymbolTable&  GetFriends() const;
-		const SymbolTable&  GetTemplateArguments() const; 
+		const SymbolTable& GetBases() const; 
+		const SymbolTable& GetContains() const;
+		const SymbolTable& GetFriends() const;
+		const SymbolTable& GetTemplateArguments() const; 
 
 		void SetStructureType(const StructureType& structureType);
 		void SetTemplateParent(Structure* structure);

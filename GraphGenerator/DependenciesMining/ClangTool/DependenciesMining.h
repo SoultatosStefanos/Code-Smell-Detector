@@ -20,6 +20,7 @@ using namespace clang::tooling;
 namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
+	extern SymbolTable cache;
 	extern std::unordered_map<std::string, Ignored*> ignored; 
 	
 	// ----------------------------------------------------------------------------------

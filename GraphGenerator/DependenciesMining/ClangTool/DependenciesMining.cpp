@@ -13,9 +13,6 @@
 
 using namespace dependenciesMining;
 
-// TODO Can pre-load much more!
-// FIXME Global structures table contains only structures!!
-
 // ----------------------------------------------------------------------------------------------
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
@@ -26,6 +23,7 @@ DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
 // ----------------------------------------------------------------------------------------------
 
 SymbolTable dependenciesMining::structuresTable;
+SymbolTable dependenciesMining::cache;
 std::unordered_map<std::string, Ignored*> dependenciesMining::ignored;
 
 void initializeIgnored(const std::string& ignoredFiles, const std::string& ignoredNamespaces = "") {
@@ -54,7 +52,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	const auto structID = GetIDfromDecl(d);	
 
 #ifdef INCREMENTAL_GENERATION
-	if (structuresTable.Lookup(structID)) {
+	if (cache.Lookup(structID)) {
 		std::cout << "Loaded " << structID << '\n';
 		return;
 	} else {
@@ -286,7 +284,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (structuresTable.Lookup(fieldID)) {
+	if (cache.Lookup(fieldID)) {
 		std::cout << "Loaded " << fieldID << '\n';
 		return;
 	} else {
@@ -342,14 +340,12 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-
-	if (structuresTable.Lookup(fieldID)) {
+	if (cache.Lookup(fieldID)) {
 		std::cout << "Loaded " << fieldID << '\n';
 		return;
 	} else {
 		std::cout << "Compiling " << fieldID << '\n';
 	}
-
 #endif
 
 		auto* parent = d->getParent();
@@ -415,7 +411,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto methodID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (structuresTable.Lookup(methodID)) { 
+	if (cache.Lookup(methodID)) { 
 		std::cout << "Loaded " << methodID << '\n';
 		return;
 	} else {
@@ -791,7 +787,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto defID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (structuresTable.Lookup(defID)) {
+	if (cache.Lookup(defID)) {
 		std::cout << "Loaded " << defID << '\n';
 		return;
 	} else {

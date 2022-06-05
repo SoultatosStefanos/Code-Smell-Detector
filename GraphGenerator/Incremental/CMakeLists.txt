@@ -1,6 +1,8 @@
 set(FILES 
 	ImportST.cpp
 	ImportST.h
+	LoadGlobalCache.cpp
+	LoadGlobalCache.hpp
 )
 set(SUBDIRECTORIES Details)
 

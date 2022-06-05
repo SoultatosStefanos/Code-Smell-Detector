@@ -8,6 +8,7 @@
 #include "GraphToJson.h"
 #include "json/writer.h"
 #include "ImportST.h"
+#include "LoadGlobalCache.h"
 
 static void PrintMainArgInfo(void) {
 	std::cout << "MAIN ARGUMENTS:\n\n";
@@ -50,6 +51,8 @@ int main(int argc, char const *argv[]) {
 #ifdef INCREMENTAL_GENERATION
 	try {
 		incremental::ImportStashedST(argv[5],  dependenciesMining::structuresTable);
+
+		incremental::LoadGlobalCache(dependenciesMining::structuresTable, dependenciesMining::cache);
 
 	} catch (const Json::RuntimeError& ) {
 		std::cerr <<	"INVALID OUTPUT PATH\n\n"
