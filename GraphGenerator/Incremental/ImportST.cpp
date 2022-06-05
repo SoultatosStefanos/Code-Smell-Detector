@@ -124,16 +124,12 @@ namespace incremental {
 
 		inline void ImportStructureNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) {
-				assert(!s->GetContains().Lookup(id));
-
 				s->InstallNestedClass(id, ImportStructure(id, val, table)); 
 			});
 		}
 
 		inline void InstallStructureFields(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "fields"), [s, &table](const auto& id, const auto& val) { 
-				assert(!s->GetFields().Lookup(id));
-
 				auto* f = (Definition*) s->InstallField(id, {});
 				assert(f);
 
@@ -158,8 +154,6 @@ namespace incremental {
 		
 		inline void InstallMethodArgs(const JsonVal& val, SymbolTable& table, Method* m) {
 			ForEach(Get(val, "args"), [m, &table](const auto& id, const auto& val) { 
-				assert(!m->GetArguments().Lookup(id));
-
 				auto* d = (Definition*) m->InstallArg(id, {});
 				assert(d);
 
@@ -175,8 +169,6 @@ namespace incremental {
 
 		inline void InstallMethodDefinitions(const JsonVal& val, SymbolTable& table, Method* m) {
 			ForEach(Get(val, "definitions"), [m, &table](const auto& id, const auto& val) {
-				assert(!m->GetDefinitions().Lookup(id));
-
 				auto* d = (Definition*) m->InstallDefinition(id, {});
 				assert(d);
 
@@ -192,8 +184,6 @@ namespace incremental {
 
 		inline void InstallMethodTemplateArgs(const JsonVal& val, SymbolTable& table, Method* m) {
 			InstallDependencies(Get(val, "template_args"), table, [m](const auto& id, auto* arg) {
-				assert(!m->GetTemplateArguments().Lookup(id));
-
 				m->InstallTemplateSpecializationArgument(id, arg);
 			});
 		}
@@ -201,7 +191,6 @@ namespace incremental {
 		inline void InstallStructureFriends(const JsonVal& val, SymbolTable& table, Structure* s) {
 			InstallDependencies(Get(val, "friends"), table, [s](const auto& id, auto* f) {
 				assert(f);
-				assert(!s->GetFriends().Lookup(id));
 
 				s->InstallFriend(id, f);
 			});
@@ -209,8 +198,6 @@ namespace incremental {
 
 		inline void InstallStructureMethods(const JsonVal& val, SymbolTable& table, Structure* s) {
 			ForEach(Get(val, "methods"), [&table, s](const auto& id, const auto& val) {
-				assert(!s->GetMethods().Lookup(id));
-
 				auto* m = (Method*) s->InstallMethod(id, {});
 				assert(m);
 
@@ -228,7 +215,6 @@ namespace incremental {
 		inline void InstallStructureBases(const JsonVal& val, SymbolTable& table, Structure* s) {
 			InstallDependencies(Get(val, "bases"), table, [s](const auto& id, auto* base) {
 				assert(base);
-				assert(!s->GetBases().Lookup(id));
 
 				s->InstallBase(id, base);
 			});
@@ -249,8 +235,6 @@ namespace incremental {
 		inline void InstallStructureTemplateArguments(const JsonVal& val, SymbolTable& table, Structure* s) {
 			InstallDependencies(Get(val, "template_args"), table, [s](const auto& id, auto* arg) {
 				assert(arg);
-				assert(!s->GetTemplateArguments().Lookup(id));
-
 				s->InstallTemplateSpecializationArgument(id, arg);
 			});
 		}

@@ -66,12 +66,12 @@ namespace tests::utility {
 
 	static bool AreEqual(const Structure& lhs, const Structure& rhs) {
 		return 	lhs.GetStructureType() == rhs.GetStructureType()
-				and AreEqualOrNullptr(lhs.GetTemplateParent(), rhs.GetTemplateParent())
-				and AreEqualOrNullptr(lhs.GetNestedParent(), rhs.GetNestedParent())
+				and AreIDBasedEqualOrNullptr(lhs.GetTemplateParent(), rhs.GetTemplateParent())
+				and AreIDBasedEqualOrNullptr(lhs.GetNestedParent(), rhs.GetNestedParent())
 				and AreEqual(lhs.GetMethods(), rhs.GetMethods())
 				and AreEqual(lhs.GetFields(), rhs.GetFields())
 				and AreEqualIDBased(lhs.GetBases(), rhs.GetBases())
-				and AreEqual(lhs.GetContains(), rhs.GetContains())
+				and AreEqualIDBased(lhs.GetContains(), rhs.GetContains())
 				and AreEqualIDBased(lhs.GetFriends(), rhs.GetFriends())
 				and AreEqualIDBased(lhs.GetTemplateArguments(), rhs.GetTemplateArguments());
 	}
