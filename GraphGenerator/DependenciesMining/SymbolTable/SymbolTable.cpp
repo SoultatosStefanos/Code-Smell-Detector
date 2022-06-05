@@ -170,7 +170,7 @@ template<typename Parent_T> Parent_T* Template<Parent_T>::GetParent() const {
 	return parent;
 }
 
-template<typename Parent_T> SymbolTable Template<Parent_T>::GetArguments() const {
+template<typename Parent_T> const SymbolTable& Template<Parent_T>::GetArguments() const {
 	return arguments;
 }
 
@@ -252,15 +252,15 @@ Structure* Method::GetReturnType() const {
 	return returnType;
 }
 
-SymbolTable Method::GetArguments() const {
+const SymbolTable& Method::GetArguments() const {
 	return arguments;
 }
 
-SymbolTable Method::GetDefinitions() const {
+const SymbolTable& Method::GetDefinitions() const {
 	return definitions;
 }
 
-SymbolTable Method::GetTemplateArguments() const {
+const SymbolTable& Method::GetTemplateArguments() const {
 	return templateInfo.GetArguments();
 }
 
@@ -539,27 +539,27 @@ Structure* Structure::GetNestedParent() const {
 	return nestedParent;
 }
 
-SymbolTable Structure::GetMethods() const {
+const SymbolTable& Structure::GetMethods() const {
 	return methods;
 }
 
-SymbolTable Structure::GetFields() const {
+const SymbolTable& Structure::GetFields() const {
 	return fields;
 }
 
-SymbolTable Structure::GetBases() const {
+const SymbolTable& Structure::GetBases() const {
 	return bases;
 }
 
-SymbolTable Structure::GetContains() const {
+const SymbolTable& Structure::GetContains() const {
 	return contains;
 }
 
-SymbolTable Structure::GetFriends() const {
+const SymbolTable& Structure::GetFriends() const {
 	return friends;
 }
 
-SymbolTable Structure::GetTemplateArguments() const {
+const SymbolTable& Structure::GetTemplateArguments() const {
 	return templateInfo.GetArguments(); 
 }
 
@@ -944,7 +944,7 @@ namespace {
 } // namespace
 
 
-void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) {
+void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) const {
 	assert(structure);
 
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
@@ -978,7 +978,7 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 		json_structure["template_args"].append(id);
 }
 
-void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) {
+void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) const {
 	assert(method);
 	//Json::Value json_method;
 
@@ -1018,7 +1018,7 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }
 
-void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) {
+void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition) const {
 	assert(definition);
 
 	json_definition["type"] = definition->GetFullType();
@@ -1028,7 +1028,7 @@ void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, 
 
 }
 
-void SymbolTable::AddJsonSymbolTable(Json::Value& st) {
+void SymbolTable::AddJsonSymbolTable(Json::Value& st) const {
 
 	for (auto& t : byID) {
 		Json::Value new_obj;

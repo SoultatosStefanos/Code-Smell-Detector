@@ -161,13 +161,13 @@ namespace dependenciesMining {
 
 		void Print();
 		void Print2(int level);
-		Json::Value GetJsonStructure(dependenciesMining::Structure* structure);
-		Json::Value GetJsonMethod(dependenciesMining::Method* method);
-		Json::Value GetJsonDefinition(dependenciesMining::Definition* definition);
-		void AddJsonStructure(dependenciesMining::Structure* structure, Json::Value& json_structure);
-		void AddJsonMethod(dependenciesMining::Method* method, Json::Value& json_method);
-		void AddJsonDefinition(dependenciesMining::Definition* definition, Json::Value& json_definition);
-		void AddJsonSymbolTable(Json::Value& st);
+		Json::Value GetJsonStructure(Structure* structure);
+		Json::Value GetJsonMethod(Method* method);
+		Json::Value GetJsonDefinition(Definition* definition);
+		void AddJsonStructure(Structure* structure, Json::Value& json_structure) const;
+		void AddJsonMethod(Method* method, Json::Value& json_method) const;
+		void AddJsonDefinition(Definition* definition, Json::Value& json_definition) const;
+		void AddJsonSymbolTable(Json::Value& st) const;
 		Json::Value GetJsonSymbolTable(void);
 		void Accept(STVisitor* visitor);
 		void Accept(STVisitor* visitor) const;
@@ -201,7 +201,7 @@ namespace dependenciesMining {
 		Template() = default;
 
 		Parent_T* GetParent() const;
-		SymbolTable GetArguments() const;
+		const SymbolTable& GetArguments() const;
 		void SetParent(Parent_T* structure); 
 		Symbol* InstallArgument(const ID_T& id, Structure* structure);
 	};
@@ -309,9 +309,9 @@ namespace dependenciesMining {
 		std::string GetMethodTypeAsString() const;
 		Structure* GetReturnType() const;
 
-		SymbolTable GetArguments() const;
-		SymbolTable GetDefinitions() const;
-		SymbolTable GetTemplateArguments() const;
+		const SymbolTable& GetArguments() const;
+		const SymbolTable& GetDefinitions() const;
+		const SymbolTable& GetTemplateArguments() const;
 		std::map<std::string, MemberExpr> GetMemberExpr() const;
 		int GetLiterals() const;
 		int GetStatements() const;
@@ -387,12 +387,12 @@ namespace dependenciesMining {
 		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
 
-		SymbolTable GetMethods() const; 
-		SymbolTable GetFields() const; 
-		SymbolTable GetBases() const; 
-		SymbolTable GetContains() const;
-		SymbolTable GetFriends() const;
-		SymbolTable GetTemplateArguments() const; 
+		const SymbolTable& GetMethods() const; 
+		const SymbolTable& GetFields() const; 
+		const SymbolTable&  GetBases() const; 
+		const SymbolTable&  GetContains() const;
+		const SymbolTable&  GetFriends() const;
+		const SymbolTable&  GetTemplateArguments() const; 
 
 		void SetStructureType(const StructureType& structureType);
 		void SetTemplateParent(Structure* structure);
