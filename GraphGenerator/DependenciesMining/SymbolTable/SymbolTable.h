@@ -66,7 +66,7 @@ namespace dependenciesMining {
 	public:
 		SourceInfo() = default;
 		SourceInfo(const std::string& fileName, int line, int column) : fileName(fileName), line(line), column(column) {};
-		std::string GetFileName() const;
+		const std::string& GetFileName() const;
 		int GetLine() const;
 		int GetColumn() const;
 		std::string toString() const;
@@ -105,12 +105,12 @@ namespace dependenciesMining {
 		
 		virtual ~Symbol() = default;
 
-		virtual ID_T GetID() const;
-		virtual std::string GetName() const;
+		virtual const ID_T& GetID() const;
+		virtual const std::string& GetName() const;
 		virtual ClassType GetClassType() const;
-		virtual std::string GetClassTypeAsString() const;
+		virtual const char* GetClassTypeAsString() const;
 		virtual const SourceInfo& GetSourceInfo() const;
-		virtual std::string GetNamespace() const;
+		virtual const std::string& GetNamespace() const;
 		const char* GetAccessTypeStr() const;
 		AccessType GetAccessType() const;
 
@@ -151,14 +151,18 @@ namespace dependenciesMining {
 
 		void Print();
 		void Print2(int level);
+
 		Json::Value GetJsonStructure(Structure* structure);
 		Json::Value GetJsonMethod(Method* method);
 		Json::Value GetJsonDefinition(Definition* definition);
+
 		void AddJsonStructure(Structure* structure, Json::Value& json_structure) const;
 		void AddJsonMethod(Method* method, Json::Value& json_method) const;
 		void AddJsonDefinition(Definition* definition, Json::Value& json_definition) const;
 		void AddJsonSymbolTable(Json::Value& st) const;
+
 		Json::Value GetJsonSymbolTable(void);
+
 		void Accept(STVisitor* visitor);
 		void Accept(STVisitor* visitor) const;
 
@@ -208,7 +212,7 @@ namespace dependenciesMining {
 
 		bool isStructure() const;
 		const Structure* GetType() const;
-		std::string GetFullType() const;
+		const std::string& GetFullType() const;
 		void SetType(Structure* structure);
 		void SetFullType(const std::string& type);
 	};
@@ -232,7 +236,7 @@ namespace dependenciesMining {
 		public:
 			Member() = default;
 			Member(const std::string& name, Structure* type, SourceInfo locEnd, MemberType memType = Value_mem_t) : name(name), type(type), locEnd(locEnd), memType(memType) {};
-			std::string GetName() const;
+			const std::string& GetName() const;
 			SourceInfo GetLocEnd() const;
 			Structure* GetType() const;
 			MemberType GetMemberType() const;
@@ -283,13 +287,13 @@ namespace dependenciesMining {
 		virtual ~Method() override = default;
 		
 		MethodType GetMethodType() const;
-		std::string GetMethodTypeAsString() const;
+		const char* GetMethodTypeAsString() const;
 		Structure* GetReturnType() const;
 
 		const SymbolTable& GetArguments() const;
 		const SymbolTable& GetDefinitions() const;
 		const SymbolTable& GetTemplateArguments() const;
-		std::map<std::string, MemberExpr> GetMemberExpr() const;
+		const std::map<std::string, MemberExpr>& GetMemberExpr() const;
 		int GetLiterals() const;
 		int GetStatements() const;
 		int GetBranches() const;
@@ -353,7 +357,7 @@ namespace dependenciesMining {
 		virtual ~Structure() override = default;
 		
 		StructureType GetStructureType() const;
-		std::string GetStructureTypeAsString() const;
+		const char* GetStructureTypeAsString() const;
 		Structure* GetTemplateParent() const;
 		Structure* GetNestedParent() const;
 

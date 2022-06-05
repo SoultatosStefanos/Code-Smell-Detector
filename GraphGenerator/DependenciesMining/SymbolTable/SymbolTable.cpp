@@ -5,7 +5,7 @@
 using namespace dependenciesMining;
 
 // SourceInfo 
-std::string SourceInfo::GetFileName() const {
+const std::string& SourceInfo::GetFileName() const {
 	return fileName;
 }
 
@@ -84,11 +84,11 @@ bool SourceInfo::operator==(SourceInfo const& loc) const {
 
 
 // Symbol 
-ID_T Symbol::GetID() const {
+const ID_T& Symbol::GetID() const {
 	return id;
 }
 
-std::string Symbol::GetName() const {
+const std::string& Symbol::GetName() const {
 	return name;
 }
 
@@ -96,7 +96,7 @@ ClassType Symbol::GetClassType() const {
 	return classType;
 }
 
-std::string Symbol::GetClassTypeAsString() const {
+const char* Symbol::GetClassTypeAsString() const {
 	if (classType == ClassType::Structure) {
 		return "Structure";
 	}
@@ -116,7 +116,7 @@ const SourceInfo& Symbol::GetSourceInfo() const {
 	return srcInfo;
 }
 
-std::string Symbol::GetNamespace() const {
+const std::string& Symbol::GetNamespace() const {
 	return nameSpace;
 }
 
@@ -193,7 +193,7 @@ const Structure* Definition::GetType() const {
 	return type;
 }
 
-std::string Definition::GetFullType() const {
+const std::string& Definition::GetFullType() const {
 	return full_type;
 }
 
@@ -210,7 +210,7 @@ MethodType Method::GetMethodType() const {
 	return methodType;
 }
 
-std::string Method::GetMethodTypeAsString() const {
+const char* Method::GetMethodTypeAsString() const {
 	if (methodType == MethodType::Constructor_UserDefined) {
 		return "Constructor_UserDefined";
 	}
@@ -264,7 +264,7 @@ const SymbolTable& Method::GetTemplateArguments() const {
 	return templateInfo.GetArguments();
 }
 
-std::map<std::string, Method::MemberExpr>  Method::GetMemberExpr() const {
+const std::map<std::string, Method::MemberExpr>&  Method::GetMemberExpr() const {
 	return memberExprs;
 }
 
@@ -427,7 +427,7 @@ bool Method::IsVirtual() const {
 }
 
 // Member
-std::string Method::Member::GetName() const {
+const std::string& Method::Member::GetName() const {
 	return name;
 }
 
@@ -507,7 +507,7 @@ StructureType Structure::GetStructureType() const {
 	return structureType;
 }
 
-std::string Structure::GetStructureTypeAsString() const{
+const char* Structure::GetStructureTypeAsString() const{
 	if (structureType == StructureType::Class) {
 		return "Class";
 	}
