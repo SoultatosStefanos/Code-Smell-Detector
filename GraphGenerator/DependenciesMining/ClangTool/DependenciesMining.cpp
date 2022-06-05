@@ -13,6 +13,9 @@
 
 using namespace dependenciesMining;
 
+// TODO Can pre-load much more!
+// FIXME Global structures table contains only structures!!
+
 // ----------------------------------------------------------------------------------------------
 
 DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
@@ -51,8 +54,12 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	const auto structID = GetIDfromDecl(d);	
 
 #ifdef INCREMENTAL_GENERATION
-	if (structuresTable.Lookup(structID)) // Imported from json
+	if (structuresTable.Lookup(structID)) {
+		std::cout << "Loaded " << structID << '\n';
 		return;
+	} else {
+		std::cout << "Compiling " << structID << '\n';
+	}
 #endif
 
 	if (isIgnoredDecl(d)) {
@@ -279,8 +286,12 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-		if (structuresTable.Lookup(fieldID)) // Imported from json
-			return;
+	if (structuresTable.Lookup(fieldID)) {
+		std::cout << "Loaded " << fieldID << '\n';
+		return;
+	} else {
+		std::cout << "Compiling " << fieldID << '\n';
+	}
 #endif
 
 		auto* parent = d->getParent();
@@ -331,8 +342,14 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-		if (structuresTable.Lookup(fieldID)) // Imported from json
-			return;
+
+	if (structuresTable.Lookup(fieldID)) {
+		std::cout << "Loaded " << fieldID << '\n';
+		return;
+	} else {
+		std::cout << "Compiling " << fieldID << '\n';
+	}
+
 #endif
 
 		auto* parent = d->getParent();
@@ -398,8 +415,12 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto methodID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-		if (structuresTable.Lookup(methodID)) // Imported from json
-			return;
+	if (structuresTable.Lookup(methodID)) { 
+		std::cout << "Loaded " << methodID << '\n';
+		return;
+	} else {
+		std::cout << "Compiling " << methodID << '\n';
+	}
 #endif
 
 		const RecordDecl* parent = d->getParent();
@@ -770,8 +791,12 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto defID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-		if (structuresTable.Lookup(defID)) // Imported from json
-			return;
+	if (structuresTable.Lookup(defID)) {
+		std::cout << "Loaded " << defID << '\n';
+		return;
+	} else {
+		std::cout << "Compiling " << defID << '\n';
+	}
 #endif
 
 		auto* parentMethodDecl = d->getParentFunctionOrMethod();
