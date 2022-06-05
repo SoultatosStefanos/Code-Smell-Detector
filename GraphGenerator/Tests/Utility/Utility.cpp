@@ -18,15 +18,30 @@ namespace tests::utility {
 
 	namespace {
 
+		inline auto Sort(const SymbolTable& table) {
+			using Range = std::vector<std::pair<ID_T, Symbol*>>;
+
+			Range range{std::begin(table), std::end(table)};
+			std::sort(std::begin(range), std::end(range), [](const auto& lhs, const auto& rhs) {
+				return lhs.first < rhs.first; 
+			});
+
+			return range;
+		}
+
 		template <typename T>
 		constexpr bool AreEqualOrNullptr(const T* lhs, const T* rhs) {
 			return (!lhs or !rhs) ? (!lhs and !rhs) : AreEqual(*lhs, *rhs);
 		}
 
+		constexpr bool AreIDBasedEqualOrNullptr(const Structure* lhs, const Structure* rhs) {
+			return (!lhs or !rhs) ? (!lhs and !rhs) : lhs->GetID() == rhs->GetID();
+		}
+
 	} // namespace
 
 	static bool AreEqual(const Definition& lhs, const Definition& rhs) {
-		return	AreEqualOrNullptr(lhs.GetType(), rhs.GetType())
+		return	AreIDBasedEqualOrNullptr(lhs.GetType(), rhs.GetType())
 				and lhs.GetFullType() == rhs.GetFullType();
 	}
 
@@ -87,14 +102,11 @@ namespace tests::utility {
 	}
 
 	bool AreEqual(const SymbolTable& lhs, const SymbolTable& rhs) {
-		if (lhs.GetSize() != rhs.GetSize())
-			return false;
+		const auto lhsSorted = Sort(lhs);
+		const auto rhsSorted = Sort(rhs);
 
-		return std::all_of(std::begin(lhs), std::end(lhs), [&rhs](const auto& lpair) {
-			return std::find_if(std::begin(rhs), std::end(rhs), [&lpair](const auto& rpair) {
-				assert(lpair.second and rpair.second);
-				return AreEqual(*lpair.second, *rpair.second);
-			}) != std::end(rhs);
+		return std::equal(std::begin(lhs), std::end(lhs), std::begin(rhs), [](const auto& lpair, const auto& rpair) {
+			return lpair.first == rpair.first and AreEqual(*lpair.second, *rpair.second);
 		});
 	}
 
