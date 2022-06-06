@@ -2,7 +2,7 @@ set(FILES
 	ImportST.cpp
 	ImportST.h
 	LoadGlobalCache.cpp
-	LoadGlobalCache.hpp
+	LoadGlobalCache.h
 )
 set(SUBDIRECTORIES Details)
 

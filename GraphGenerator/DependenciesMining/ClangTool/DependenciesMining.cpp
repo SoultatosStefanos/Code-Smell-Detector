@@ -34,7 +34,7 @@ void initializeIgnored(const std::string& ignoredFiles, const std::string& ignor
 // ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
-void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
+void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO Clean up, do less work before returning fromincremental
 	const CXXRecordDecl* d;
 
 	Structure structure;
@@ -49,21 +49,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
-	const auto structID = GetIDfromDecl(d);	
-
-#ifdef INCREMENTAL_GENERATION
-	if (cache.Lookup(structID)) {
-		std::cout << "Loaded " << structID << '\n';
-		return;
-	} else {
-		std::cout << "Compiling " << structID << '\n';
-	}
-#endif
-
-	if (isIgnoredDecl(d)) {
-		return;
-	}
-
 	// gia ta declarations
 	if (!(d->isCompleteDefinition())) {
 		if (!d->hasDefinition()){									// for templateDefinition Declarations only
@@ -74,6 +59,18 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			d = d->getDefinition();
 		}
 	}
+
+	const auto structID = GetIDfromDecl(d);	
+
+#ifdef INCREMENTAL_GENERATION
+	if (cache.Lookup(structID)) {
+		std::cout << "Loaded struct: " << structID << '\n';
+		return;
+	}
+#endif
+
+	if (isIgnoredDecl(d))
+		return;
 
 	// Templates
 	if (d->getDescribedClassTemplate()) {	
@@ -284,12 +281,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (cache.Lookup(fieldID)) {
-		std::cout << "Loaded " << fieldID << '\n';
-		return;
-	} else {
-		std::cout << "Compiling " << fieldID << '\n';
-	}
+	assert(!cache.Lookup(fieldID)); // already checked
 #endif
 
 		auto* parent = d->getParent();
@@ -310,18 +302,14 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		//}
 
 
-
-
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 
 		//Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-
 
 		//if (parentStructure->IsTemplateInstantiationSpecialization())		// insertion speciallization inherit its dependencies from the parent template
 		//	return;
 		//if (!typeStructure)
 		//	typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
-
 
 		//assert(fieldID);
 		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
@@ -337,18 +325,22 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 // Hanlde all the Fields in classes/structs (structure fields)
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
+		assert(d);
+
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
 	if (cache.Lookup(fieldID)) {
-		std::cout << "Loaded " << fieldID << '\n';
+		std::cout << "Loaded field: " << fieldID << '\n';
 		return;
-	} else {
-		std::cout << "Compiling " << fieldID << '\n';
 	}
 #endif
 
-		auto* parent = d->getParent();
+		const auto* parent = d->getParent();
+		assert(parent);
+
+		if (!parent->isClass() and !parent->isStruct())
+			return;
 
 		// Ignored
 		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
@@ -412,11 +404,9 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef INCREMENTAL_GENERATION
 	if (cache.Lookup(methodID)) { 
-		std::cout << "Loaded " << methodID << '\n';
+		std::cout << "Loaded method: " << methodID << '\n';
 		return;
-	} else {
-		std::cout << "Compiling " << methodID << '\n';
-	}
+	} 
 #endif
 
 		const RecordDecl* parent = d->getParent();
@@ -784,97 +774,93 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 // Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
+		assert(d);
+
 		const auto defID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (cache.Lookup(defID)) {
-		std::cout << "Loaded " << defID << '\n';
-		return;
-	} else {
-		std::cout << "Compiling " << defID << '\n';
-	}
+		if (cache.Lookup(defID)) {
+			std::cout << "Loaded definition: " << defID << '\n';
+			return;
+		}
 #endif
-
-		auto* parentMethodDecl = d->getParentFunctionOrMethod();
+		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
 		// Ignore the methods declarations 
-		if (!parentMethodDecl || !(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition())) {
+		if (!parentMethodDecl || !(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition()))
+			return;
+
+		// Ignore non method declarations
+		if (!d->isLocalVarDeclOrParm() or parentMethodDecl->getDeclKind() != d->CXXMethod)
+			return;
+
+		auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
+
+		if (isIgnoredDecl(parentClass)) {
 			return;
 		}
 
-		if (d->isLocalVarDeclOrParm() && parentMethodDecl->getDeclKind() == d->CXXMethod) {	// including params
-		//if(d->isFunctionOrMethodVarDecl() && parentMethod->getDeclKind() == d->CXXMethod){		// excluding params	- d->isFunctionOrMethodVarDecl()-> like isLocalVarDecl() but excludes variables declared in blocks?.		
-			auto* parentClass = (CXXRecordDecl*)parentMethodDecl->getParent();
-
-			if (isIgnoredDecl(parentClass)) {
-				return;
-			}
-
-			auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-			if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
-				return;
-			}
-			if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parentClass))) {
-				return;
-			}
-			
-			auto parentClassName = GetFullStructureName(parentClass);
-			auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
-			auto parentClassID = GetIDfromDecl(parentClass);
-			auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
-			//assert(parentClassID);
-			//assert(parentMethodID);
-			Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
-			Method* parentMethod = (Method*)parentStructure->LookupMethod(parentMethodID);
-			//assert(parentMethod);
-			
-			// remove from TemplateInstantiationSpecialization methods the decletarions and arguments 
-			//if (parentMethod->isTemplateInstantiationSpecialization()) {
-			//	return;
-			//}
-
-			std::string typeName;
-			ID_T typeID;
-			Definition* def = nullptr;
-
-			if (isStructureOrStructurePointerType(d->getType())) {
-				if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
-					typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-					typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsCXXRecordDecl());
-				}
-				else {
-					typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
-					typeID = GetIDfromDecl(d->getType()->getAsCXXRecordDecl());
-				}
-				//assert(typeID);
-				Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
-				if (!typeStructure)
-					typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
-				//assert(defID);
-				def = new Definition (defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
-				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-				def->SetFullType(typeName);
-			}
-			else {
-
-				typeName = d->getType().getAsString();
-				def = new Definition (defID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
-				def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-				def->SetFullType(typeName);
-			}
-
-
-			
-			
-			if (d->isLocalVarDecl()) {
-				parentMethod->InstallDefinition(defID, *def);
-			}
-			else {
-				parentMethod->InstallArg(defID, *def);
-			}
-
-			delete def;
+		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+			return;
 		}
+		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parentClass))) {
+			return;
+		}
+		
+		auto parentClassName = GetFullStructureName(parentClass);
+		auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
+		auto parentClassID = GetIDfromDecl(parentClass);
+		auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
+		//assert(parentClassID);
+		//assert(parentMethodID);
+		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
+		Method* parentMethod = (Method*)parentStructure->LookupMethod(parentMethodID);
+		//assert(parentMethod);
+		
+		// remove from TemplateInstantiationSpecialization methods the decletarions and arguments 
+		//if (parentMethod->isTemplateInstantiationSpecialization()) {
+		//	return;
+		//}
+
+		std::string typeName;
+		ID_T typeID;
+		Definition* def = nullptr;
+
+		if (isStructureOrStructurePointerType(d->getType())) {
+			if (d->getType()->isPointerType() || d->getType()->isReferenceType()) {
+				typeName = GetFullStructureName(d->getType()->getPointeeType()->getAsCXXRecordDecl());
+				typeID = GetIDfromDecl(d->getType()->getPointeeType()->getAsCXXRecordDecl());
+			}
+			else {
+				typeName = GetFullStructureName(d->getType()->getAsCXXRecordDecl());
+				typeID = GetIDfromDecl(d->getType()->getAsCXXRecordDecl());
+			}
+			//assert(typeID);
+			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
+			if (!typeStructure)
+				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
+			//assert(defID);
+			def = new Definition (defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
+			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+			def->SetFullType(typeName);
+		}
+		else {
+
+			typeName = d->getType().getAsString();
+			def = new Definition (defID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
+			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
+			def->SetFullType(typeName);
+		}
+			
+		if (d->isLocalVarDecl()) {
+			parentMethod->InstallDefinition(defID, *def);
+		}
+		else {
+			parentMethod->InstallArg(defID, *def);
+		}
+
+		delete def;
 	}
 }
 
