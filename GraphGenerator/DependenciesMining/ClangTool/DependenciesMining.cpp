@@ -776,19 +776,22 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		assert(d);
 
-		const auto defID = GetIDfromDecl(d);
+		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
+		// Ignore the methods declarations 
+		if (!parentMethodDecl || !(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition()))
+			return;
+
+		const auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
+
+		const auto defID = parentMethodID + "::" + GetIDfromDecl(d);
+			
 #ifdef INCREMENTAL_GENERATION
 		if (cache.Lookup(defID)) {
 			std::cout << "Loaded definition: " << defID << '\n';
 			return;
 		}
 #endif
-		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
-
-		// Ignore the methods declarations 
-		if (!parentMethodDecl || !(((CXXMethodDecl*)parentMethodDecl)->isThisDeclarationADefinition()))
-			return;
 
 		// Ignore non method declarations
 		if (!d->isLocalVarDeclOrParm() or parentMethodDecl->getDeclKind() != d->CXXMethod)
@@ -811,7 +814,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		auto parentClassName = GetFullStructureName(parentClass);
 		auto parentMethodName = GetFullMethodName((CXXMethodDecl*)parentMethodDecl);
 		auto parentClassID = GetIDfromDecl(parentClass);
-		auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
+		
 		//assert(parentClassID);
 		//assert(parentMethodID);
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentClassID);
@@ -841,14 +844,14 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 			//assert(defID);
-			def = new Definition (defID, d->getQualifiedNameAsString(), parentMethod->GetNamespace(), typeStructure);
+			def = new Definition (defID, defID, parentMethod->GetNamespace(), typeStructure);
 			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			def->SetFullType(typeName);
 		}
 		else {
 
 			typeName = d->getType().getAsString();
-			def = new Definition (defID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
+			def = new Definition (defID, defID, parentStructure->GetNamespace());
 			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			def->SetFullType(typeName);
 		}

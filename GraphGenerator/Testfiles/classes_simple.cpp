@@ -4,6 +4,18 @@
     Inheritence
 */
 namespace CS{
+  class OO {
+    void Bar() {
+      int x;
+    }
+  };
+
+  class OOOO {
+    void Foo() {
+      int x;
+    }
+  };
+
   namespace CS_1{
     class class_X;  
     class class_B;  
