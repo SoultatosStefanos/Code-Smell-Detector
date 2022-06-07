@@ -36,6 +36,7 @@ set(SUBDIRECTORIES
 	GraphToJson
 	Incremental
 	Main
+	ProgressBar
 	SourceLoader
 	Tests
 	ThirdParty
