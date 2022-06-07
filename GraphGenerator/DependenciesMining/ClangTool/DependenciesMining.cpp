@@ -1,5 +1,6 @@
 #include "DependenciesMining.h"
 #include "Utilities.h"
+#include "ProgressBar.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include <vector>
@@ -59,6 +60,13 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 		}
 	}
 
+	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+
+#ifdef PROGRESS_BAR
+	if (srcLocation.isValid())
+		wxGetApp().Update(srcLocation.getFilename());
+#endif
+
 	const auto structID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
@@ -91,7 +99,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 		assert(0);
 	}
 
-	auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 	structure.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 	if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 		return;
@@ -289,6 +296,13 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		assert(d);
 
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+
+#ifdef PROGRESS_BAR
+		if (srcLocation.isValid())
+			wxGetApp().Update(srcLocation.getFilename());
+#endif
+
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
@@ -305,7 +319,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 
 		// Ignored
-		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
 		}
@@ -359,6 +372,13 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+
+#ifdef PROGRESS_BAR
+		if (srcLocation.isValid())
+			wxGetApp().Update(srcLocation.getFilename());
+#endif
+
 		const auto methodID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
@@ -377,7 +397,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 
 		// Ignored
-		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
 		}
@@ -647,6 +666,13 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		assert(d);
 
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
+
+#ifdef PROGRESS_BAR
+		if (srcLocation.isValid())
+			wxGetApp().Update(srcLocation.getFilename());
+#endif
+
 		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
 		// Ignore the methods declarations 
@@ -674,7 +700,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 		}
 
-		auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
 		}

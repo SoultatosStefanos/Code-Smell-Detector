@@ -1,3 +1,4 @@
+#include "ArchitectureMining.h"
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4146)
 #include <iostream>
@@ -9,6 +10,8 @@
 #include "json/writer.h"
 #include "ImportST.h"
 #include "LoadGlobalCache.h"
+
+namespace arch {
 
 static void PrintMainArgInfo(void) {
 	std::cout << "MAIN ARGUMENTS:\n\n";
@@ -42,7 +45,7 @@ static void SetCodeFilesToST(Json::Value& ST, const std::vector<std::string>& sr
 	}
 }
 
-int main(int argc, char const* argv[]) {
+int MineArchitecture(int argc, char* argv[]) {
 	if (argc < 6) {
 		PrintMainArgInfo();
 		return 1;
@@ -102,4 +105,6 @@ int main(int argc, char const* argv[]) {
 	jsonSTFile.close();
 
 	std::cout << "\nCOMPILATION FINISHED\n";
+}
+
 }

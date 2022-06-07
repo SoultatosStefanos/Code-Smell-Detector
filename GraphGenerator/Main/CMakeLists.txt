@@ -1,4 +1,4 @@
-set(FILES ArchitectureMining.cpp)
+set(FILES Main.cpp)
 set(SUBDIRECTORIES )
 set(EXECUTABLE ArchitectureMining)
 

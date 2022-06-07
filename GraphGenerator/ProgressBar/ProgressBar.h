@@ -32,4 +32,6 @@ private:
 
 };
 
+DECLARE_APP(ProgressBar);
+
 #endif // PROGRESS_BAR_H
