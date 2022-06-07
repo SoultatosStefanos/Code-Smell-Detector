@@ -281,7 +281,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	assert(!cache.Lookup(fieldID)); // already checked
+		assert(!cache.Lookup(fieldID)); // already checked
 #endif
 
 		auto* parent = d->getParent();
@@ -330,10 +330,10 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto fieldID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (cache.Lookup(fieldID)) {
-		std::cout << "Loaded field: " << fieldID << '\n';
-		return;
-	}
+		if (cache.Lookup(fieldID)) {
+			std::cout << "Loaded field: " << fieldID << '\n';
+			return;
+		}
 #endif
 
 		const auto* parent = d->getParent();
@@ -403,10 +403,10 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto methodID = GetIDfromDecl(d);
 
 #ifdef INCREMENTAL_GENERATION
-	if (cache.Lookup(methodID)) { 
-		std::cout << "Loaded method: " << methodID << '\n';
-		return;
-	} 
+		if (cache.Lookup(methodID)) { 
+			std::cout << "Loaded method: " << methodID << '\n';
+			return;
+		} 
 #endif
 
 		const RecordDecl* parent = d->getParent();
