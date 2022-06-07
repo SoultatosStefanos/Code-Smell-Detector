@@ -100,7 +100,7 @@ const char* Symbol::GetClassTypeAsString() const {
 	if (classType == ClassType::Structure) {
 		return "Structure";
 	}
-	else if(classType == ClassType::Method){
+	else if (classType == ClassType::Method) {
 		return "Method";
 	}
 	else if (classType == ClassType::Definition) {
@@ -242,7 +242,7 @@ const char* Method::GetMethodTypeAsString() const {
 		return "TemplateInstantiationSpecialization";
 	}
 	else {
-		assert(0); 
+		assert(0);
 	}
 }
 
@@ -264,7 +264,7 @@ const SymbolTable& Method::GetTemplateArguments() const {
 	return templateInfo.GetArguments();
 }
 
-const std::map<std::string, Method::MemberExpr>&  Method::GetMemberExpr() const {
+const std::map<std::string, Method::MemberExpr>& Method::GetMemberExpr() const {
 	return memberExprs;
 }
 
@@ -346,15 +346,15 @@ Symbol* Method::InstallTemplateSpecializationArgument(const ID_T& id, Structure*
 
 void Method::InsertMemberExpr(MemberExpr const& memberExpr, Member const& member, const std::string& locBegin) {
 	//if (memberExpr.GetExpr() != "__$Ignore__") {
-		if (memberExprs.find(locBegin) == memberExprs.end()) {
-			memberExprs[locBegin] = memberExpr;
+	if (memberExprs.find(locBegin) == memberExprs.end()) {
+		memberExprs[locBegin] = memberExpr;
+	}
+	else {
+		if (memberExpr.GetLocEnd() > memberExprs[locBegin].GetLocEnd()) {
+			memberExprs[locBegin].SetExpr(memberExpr.GetExpr());
+			memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
 		}
-		else {
-			if (memberExpr.GetLocEnd() > memberExprs[locBegin].GetLocEnd()) {
-				memberExprs[locBegin].SetExpr(memberExpr.GetExpr());
-				memberExprs[locBegin].SetLocEnd(memberExpr.GetLocEnd());
-			}
-		}
+	}
 	//}
 	memberExprs[locBegin].InsertMember(member);
 }
@@ -373,7 +373,7 @@ void Method::UpdateMemberExpr(MemberExpr const& memberExpr, const std::string& l
 
 bool Method::IsConstructor() const {
 	if (methodType == MethodType::Constructor_UserDefined || methodType == MethodType::Constructor_Trivial)
-		return true; 
+		return true;
 	return false;
 }
 
@@ -444,11 +444,11 @@ Method::Member::MemberType Method::Member::GetMemberType() const {
 }
 
 void Method::Member::SetName(const std::string& name) {
-	this->name = name; 
+	this->name = name;
 }
 
 void Method::Member::SetLocEnd(const SourceInfo& locEnd) {
-	this->locEnd = locEnd; 
+	this->locEnd = locEnd;
 }
 
 void Method::Member::SetType(Structure* type) {
@@ -507,7 +507,7 @@ StructureType Structure::GetStructureType() const {
 	return structureType;
 }
 
-const char* Structure::GetStructureTypeAsString() const{
+const char* Structure::GetStructureTypeAsString() const {
 	if (structureType == StructureType::Class) {
 		return "Class";
 	}
@@ -560,7 +560,7 @@ const SymbolTable& Structure::GetFriends() const {
 }
 
 const SymbolTable& Structure::GetTemplateArguments() const {
-	return templateInfo.GetArguments(); 
+	return templateInfo.GetArguments();
 }
 
 
@@ -701,13 +701,13 @@ Symbol* SymbolTable::Install(const ID_T& id, const Structure& symbol) {
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
-		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {	
+		if (((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
 			(*(Structure*)(it->second)) = symbol;
 		}
 		else {							// Ignpre it, only for debugging use
 			return it->second;			//
 		}								//
-		return it->second;		
+		return it->second;
 	}
 
 	Symbol* newSymbol = new Structure(symbol);
@@ -725,7 +725,7 @@ Symbol* SymbolTable::Install2(const ID_T& id, const Structure& symbol) {
 	if (iter != byID.end()) {
 		assert(iter->second);
 		return iter->second;
-	}		
+	}
 
 	auto* newSymbol = new Structure(symbol);
 
@@ -740,7 +740,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Method& symbol) {
 
 	auto it = byID.find(id);
 	if (it != byID.end()) {
-			return it->second;
+		return it->second;
 	}
 
 	Symbol* newSymbol = new Method(symbol);
@@ -754,7 +754,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 	std::cout << "Compiled: " << id << '\n';
 
 	auto it = byID.find(id);
-	if (it != byID.end()) 
+	if (it != byID.end())
 		return it->second;
 
 	Symbol* newSymbol = new Definition(symbol);
@@ -768,7 +768,7 @@ Symbol* SymbolTable::Install(const ID_T& id, const Definition& symbol) {
 
 Symbol* SymbolTable::Install(const ID_T& id, Symbol* symbol) {
 	std::cout << "Compiled: " << id << '\n';
-	
+
 	auto it = byID.find(id);
 	if (it != byID.end()) {
 		if (symbol->GetClassType() == ClassType::Structure && ((Structure*)(it->second))->GetStructureType() == StructureType::Undefined) {
@@ -780,7 +780,7 @@ Symbol* SymbolTable::Install(const ID_T& id, Symbol* symbol) {
 	byID[id] = symbol;
 	auto& nameList = byName[symbol->GetName()];
 	nameList.push_back(symbol);
-	
+
 	return symbol;
 }
 
@@ -792,17 +792,6 @@ Symbol* SymbolTable::Lookup(const ID_T& id) {
 		return nullptr;
 }
 
-
-//Symbol* SymbolTable::Lookup(const std::string& name) {
-//	auto it = byName.find(name);
-//	if (it != byName.end()) {
-//		//assert(it->second.size() == 1);
-//		return it->second.front();			
-//	}
-//	else
-//		return nullptr;
-//}
-
 const Symbol* SymbolTable::Lookup(const ID_T& id) const {
 	auto it = byID.find(id);
 	if (it != byID.end())
@@ -810,17 +799,6 @@ const Symbol* SymbolTable::Lookup(const ID_T& id) const {
 	else
 		return nullptr;
 }
-
-
-//const Symbol* SymbolTable::Lookup(const std::string& name) const{
-//	auto it = byName.find(name);
-//	if (it != byName.end()) {
-//		//assert(it->second.size() == 1);
-//		return it->second.front();
-//	}
-//	else
-//		return nullptr;
-//}
 
 static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 	Json::Value json_src_info;
@@ -832,143 +810,23 @@ static Json::Value GetJsonSourceInfo(Symbol* symbol) {
 	return json_src_info;
 }
 
-// void SymbolTable::Print() const {
-// 	for (auto& t : byName) {
-// 		std::cout << "Name: " << t.first << std::endl;
-// 		std::cout << "--------------------------------------------\n";
-// 	}
-// }
-//
-//// Testing purpose.
-//void SymbolTable::Print2(int level) {
-//	for (auto& t : byID) {
-//		std::cout << "level " << level << ", Name: " << t.first << std::endl;
-//		//std::cout << "--------------------------------------------\n";
-//		if (t.second->GetClassType() == ClassType::Structure) {
-//			Structure* structure = (Structure*)t.second;
-//			structure->GetMethods().Print2(level + 1);
-//			structure->GetFields().Print2(level + 1);
-//			structure->GetBases().Print2(level + 1);
-//			structure->GetContains().Print2(level + 1);
-//			structure->GetFriends().Print2(level + 1);
-//		}
-//		else if (t.second->GetClassType() == ClassType::Method) {
-//			Method* method = (Method*)t.second;
-//			std::cout << "args: ---------\n";
-//			method->GetArguments().Print2(level + 1);
-//			std::cout << "end : ---------\n";
-//			method->GetDefinitions().Print2(level + 1);
-//			method->GetTemplateArguments().Print2(level + 1);
-//			const auto& member_expr = method->GetMemberExpr();
-//			for (auto& i : member_expr) {
-//				std::cout << "Member EXPR: " << i.first << std::endl;
-//				for (auto& it : i.second.GetMembers()) {
-//					std::cout << "Member: " << it.GetName() << std::endl;
-//				}
-//			}
-//
-//		}
-//	}
-//}
-//
-//Json::Value SymbolTable::GetJsonStructure(dependenciesMining::Structure* structure) {
-//	Json::Value json_structure;
-//
-//
-//	json_structure["methods"] = structure->GetMethods().GetJsonSymbolTable();
-//	json_structure["fields"] = structure->GetFields().GetJsonSymbolTable();
-//	json_structure["bases"] = structure->GetBases().GetJsonSymbolTable();
-//	json_structure["contains"] = structure->GetContains().GetJsonSymbolTable();
-//	json_structure["friends"] = structure->GetFriends().GetJsonSymbolTable();
-//	json_structure["src_info"] = GetJsonSourceInfo(structure);
-//
-//	return json_structure;
-//}
-//
-//Json::Value SymbolTable::GetJsonMethod(dependenciesMining::Method* method) {
-//	Json::Value json_method;
-//
-//	/*auto iss = method->GetMemberExpr();
-//	std::cout << iss.size() << std::endl;
-//	for (auto is : iss) {
-//		std::cout << is.first << std::endl;
-//	}*/
-//	auto* ret_type = method->GetReturnType();
-//#pragma warning ("FIX ME!!!!")
-//	if (!ret_type)
-//		json_method["ret_type"] = "void";
-//	else
-//		json_method["ret_type"] = ret_type->GetID();
-//	json_method["args"] = method->GetArguments().GetJsonSymbolTable();
-//	json_method["definitions"] = method->GetDefinitions().GetJsonSymbolTable();
-//	json_method["template_args"] = method->GetTemplateArguments().GetJsonSymbolTable();
-//	json_method["literals"] = method->GetLiterals();
-//	json_method["statements"] = method->GetStatements();
-//	json_method["branches"] = method->GetBranches();
-//	json_method["loops"] = method->GetLoops();
-//	json_method["src_info"] = GetJsonSourceInfo(method);
-//	json_method["max_scope"] = method->GetMaxScopeDepth();
-//	json_method["lines"] = method->GetLineCount();
-//	json_method["access"] = method->GetAccessTypeStr();
-//
-//#pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
-//	return json_method;
-//}
-//
-//Json::Value SymbolTable::GetJsonDefinition(dependenciesMining::Definition* definition) {
-//	Json::Value json_definition;
-//	if (definition->isStructure())
-//		json_definition["type"] = definition->GetType()->GetID();
-//	else // is fundamental
-//		json_definition["type"] = definition->GetFundamental();
-//
-//	return json_definition;
-//}
-//
-//Json::Value SymbolTable::GetJsonSymbolTable(void) {
-//	Json::Value vec(Json::arrayValue);
-//
-//	for (auto& t : byID) {
-//		Json::Value new_obj;
-//
-//		if (t.second->GetClassType() == ClassType::Structure) {
-//			new_obj = GetJsonStructure((dependenciesMining::Structure*)t.second);
-//		}
-//		else if (t.second->GetClassType() == ClassType::Definition) {
-//			new_obj = GetJsonDefinition((dependenciesMining::Definition*)t.second);
-//		}
-//		else if (t.second->GetClassType() == ClassType::Method) {
-//			new_obj = GetJsonMethod(((dependenciesMining::Method*)t.second));
-//		}
-//		else if (t.second->GetClassType() == ClassType::Undefined) {
-//			// new_obj = ...
-//		}
-//		else
-//			assert(0);
-//		new_obj["id"] = t.second->GetID();
-//		vec.append(new_obj);
-//	}
-//
-//	return vec;
-//}
-
 namespace {
 
-	inline void Put(Json::Value &val, const char* key) {
+	inline void Put(Json::Value& val, const char* key) {
 		val[key];
 	}
 
 } // namespace
 
 
-void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value &json_structure) const {
+void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Json::Value& json_structure) const {
 	assert(structure);
 
 	structure->GetMethods().AddJsonSymbolTable(json_structure["methods"]);
 	structure->GetFields().AddJsonSymbolTable(json_structure["fields"]);
 
 	Put(json_structure, "bases");
-	for (const auto& [id, base] : structure->GetBases()) 
+	for (const auto& [id, base] : structure->GetBases())
 		json_structure["bases"].append(id);
 
 	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
@@ -989,21 +847,14 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 	Put(json_structure, "nested_parent");
 	if (structure->GetNestedParent())
 		json_structure["nested_parent"] = structure->GetNestedParent()->GetID();
-	
+
 	Put(json_structure, "template_args");
 	for (const auto& [id, arg] : structure->GetTemplateArguments())
 		json_structure["template_args"].append(id);
 }
 
-void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value &json_method) const {
+void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value& json_method) const {
 	assert(method);
-	//Json::Value json_method;
-
-	/*auto iss = method->GetMemberExpr();
-	std::cout << iss.size() << std::endl;
-	for (auto is : iss) {
-		std::cout << is.first << std::endl;
-	}*/
 	auto* ret_type = method->GetReturnType();
 #pragma warning ("FIX ME!!!!")
 	if (!ret_type)
@@ -1011,7 +862,7 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value 
 	else
 		json_method["ret_type"] = ret_type->GetID();
 
-	
+
 
 	method->GetArguments().AddJsonSymbolTable(json_method["args"]);
 	method->GetDefinitions().AddJsonSymbolTable(json_method["definitions"]);
@@ -1041,7 +892,7 @@ void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, 
 	json_definition["full_type"] = definition->GetFullType();
 
 	Put(json_definition, "type");
-	if(definition->GetType())
+	if (definition->GetType())
 		json_definition["type"] = definition->GetType()->GetID();
 
 	json_definition["src_info"] = GetJsonSourceInfo(definition);
@@ -1059,13 +910,13 @@ void SymbolTable::AddJsonSymbolTable(Json::Value& st) const {
 			continue;
 
 		if (t.second->GetClassType() == ClassType::Structure) {
-			 AddJsonStructure((dependenciesMining::Structure*)t.second, new_obj);
+			AddJsonStructure((dependenciesMining::Structure*)t.second, new_obj);
 		}
 		else if (t.second->GetClassType() == ClassType::Definition) {
-			 AddJsonDefinition((dependenciesMining::Definition*)t.second, new_obj);
+			AddJsonDefinition((dependenciesMining::Definition*)t.second, new_obj);
 		}
 		else if (t.second->GetClassType() == ClassType::Method) {
-			 AddJsonMethod((dependenciesMining::Method*)t.second, new_obj);
+			AddJsonMethod((dependenciesMining::Method*)t.second, new_obj);
 		}
 		else if (t.second->GetClassType() == ClassType::Undefined) {
 			// new_obj = ...
@@ -1095,7 +946,6 @@ void SymbolTable::Accept(STVisitor* visitor) {
 		}
 	}
 }
-
 
 void SymbolTable::Accept(STVisitor* visitor) const {
 	for (auto it : byID) {

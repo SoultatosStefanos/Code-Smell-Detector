@@ -1,7 +1,7 @@
 #include "GraphGeneration.h"
 #include <cassert>
 
-using namespace dependenciesMining; 
+using namespace dependenciesMining;
 using namespace graph;
 using namespace graphGeneration;
 
@@ -9,10 +9,10 @@ using namespace graphGeneration;
 
 void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 	assert(s);
-	
+
 	if (s->IsUndefined())
 		return;
-	
+
 	if (graph.GetNode(s->GetID())) {
 		if (currNode && currNode->GetID() != s->GetID()) {			// Ignore the self dependencies 
 			assert(currDepType != Undefined_dep_t);
@@ -20,7 +20,7 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 		}
 		return;
 	}
-	
+
 	Node* oldCurrNode = currNode;
 	Edge::DependencyType oldCurrDepType = currDepType;
 	currNode = new Node();
@@ -97,12 +97,12 @@ void GraphGenerationSTVisitor::VisitStructure(Structure* s) {
 		}
 	}
 	nodeData.Set("templateArguments", templArgsObj);
-		
+
 	untyped::Object fieldsObj;
 	currDepType = ClassField_dep_t;
 	for (auto& it : s->GetFields()) {
 		auto* field = it.second;
-		if(((Definition*)field)->isStructure()){
+		if (((Definition*)field)->isStructure()) {
 			if (!((Definition*)field)->GetType()->IsUndefined()) {
 				VisitDefinition(static_cast<Definition*>(field));
 				fieldsObj.Set(it.first, innerObj);
@@ -160,7 +160,7 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 			data.Set("returnType", returnType->GetID());
 		}
 	}
-	
+
 	untyped::Object argsObj;
 	currDepType = MethodArg_dep_t;
 	for (auto& it : s->GetArguments()) {
@@ -200,7 +200,7 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 	data.Set("templateArguments", templArgsObj);
 
 	// memberexpr
-	untyped::Object memberExprsObj; 
+	untyped::Object memberExprsObj;
 	currDepType = MemberExpr_dep_t;
 	for (auto it : s->GetMemberExpr()) {
 		auto expr = it.second;
@@ -235,17 +235,10 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 				locEnd.Set("column", (double)member.GetLocEnd().GetColumn());
 				memberObj.Set("locEnd", locEnd);
 
-				/*if (member.GetMemberType() == Value_mem_t)
-					currDepType = MemberExpr_Value_dep_t;
-				else if (member.GetMemberType() == ClassField_mem_t)
-					currDepType = MemberExpr_ClassField_dep_t;
-				else 
-					currDepType = MemberExpr_MethodDefinition_dep_t;*/
-
 				VisitStructure(static_cast<Structure*>(memberType));
 				membersObj.Set(index2++, memberObj);
 			}
-			memberExprObj.Set("members", membersObj);				
+			memberExprObj.Set("members", membersObj);
 		}
 
 		memberExprsObj.Set(it.first, memberExprObj);
@@ -261,12 +254,12 @@ void GraphGenerationSTVisitor::VisitMethod(Method* s) {
 
 void GraphGenerationSTVisitor::VisitDefinition(Definition* s) {
 	assert(s);
-	
+
 	Edge::DependencyType oldCurrDepType = currDepType;
-	
+
 	Structure* typeStruct = (Structure*)s->GetType();
 	assert(typeStruct);
-	
+
 	if (typeStruct->IsUndefined())
 		assert(0);
 

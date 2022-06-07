@@ -26,11 +26,10 @@ QualType dependenciesMining::GetTemplateArgType(const TemplateArgument& arg) {
 		return arg.getAsType();
 	case TemplateArgument::Template:
 	case TemplateArgument::TemplateExpansion:
-		//assert(0);
 		return QualType();// arg.getAsTemplateOrTemplatePattern().getAsQualifiedTemplateName();
 	case TemplateArgument::Pack:
 		// den tha mpei pote edw giati to kanw handle ekswterika
-		assert(0);					
+		assert(0);
 		return QualType();
 	case TemplateArgument::Integral:
 		return arg.getIntegralType();
@@ -40,7 +39,6 @@ QualType dependenciesMining::GetTemplateArgType(const TemplateArgument& arg) {
 
 	case TemplateArgument::Declaration:
 		return arg.getParamTypeForDecl();
-		//return arg.getAsDecl()->getType();
 
 	case TemplateArgument::NullPtr:
 		return arg.getNullPtrType();
@@ -60,10 +58,10 @@ void dependenciesMining::AppendTemplateArgNameCallback(const TemplateArgument& t
 	}
 	auto argType = GetTemplateArgType(templateArg);
 	if (d || argType->isStructureOrClassType()) {
-		if(!d)
+		if (!d)
 			d = argType->getAsCXXRecordDecl();
 		auto qualifiedName = d->getQualifiedNameAsString();
-		auto name = d->getName().str(); 
+		auto name = d->getName().str();
 		if (templateArg.getKind() == TemplateArgument::Integral) {
 			llvm::SmallVector<char> str;
 			templateArg.getAsIntegral().toString(str);
@@ -73,10 +71,9 @@ void dependenciesMining::AppendTemplateArgNameCallback(const TemplateArgument& t
 			}
 		}
 		if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
-			 *args += qualifiedName + GetInnerTemplateArgs(d);							
-		}			
+			*args += qualifiedName + GetInnerTemplateArgs(d);
+		}
 		else {
-			//*args += qualifiedName;				// gia na einai idio me ta args sta methods 
 			*args += name;
 		}
 	}
@@ -105,13 +102,13 @@ std::string dependenciesMining::GetInnerTemplateArgs(const RecordDecl* d) {
 }
 
 std::string dependenciesMining::GetFullStructureName(const RecordDecl* d) {
-	std::string name; 
+	std::string name;
 	if (d->getKind() == d->ClassTemplateSpecialization || d->getKind() == d->ClassTemplatePartialSpecialization) {
 		std::string args = GetInnerTemplateArgs(d);
 		name = (d->getQualifiedNameAsString() + args + "::" + d->getNameAsString());
 	}
 	else if (d->isCXXClassMember() && ((CXXRecordDecl*)d)->getInstantiatedFromMemberClass()) {
-		name =  d->getQualifiedNameAsString() + "::" + d->getNameAsString();
+		name = d->getQualifiedNameAsString() + "::" + d->getNameAsString();
 	}
 	else {
 		name = d->getQualifiedNameAsString();
@@ -122,11 +119,11 @@ std::string dependenciesMining::GetFullStructureName(const RecordDecl* d) {
 
 
 std::string dependenciesMining::GetFullMethodName(const CXXMethodDecl* d) {
-	std::string name; 
+	std::string name;
 	std::string str = d->getType().getAsString();
 	std::size_t pos = str.find("(");
 	std::string argList = str.substr(pos);
-	if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization ){
+	if (d->getTemplatedKind() == d->TK_FunctionTemplateSpecialization || d->getTemplatedKind() == d->TK_DependentFunctionTemplateSpecialization) {
 		std::string templateArgs = "<";
 		auto args = d->getTemplateSpecializationArgs()->asArray();
 		for (auto it : args) {
@@ -135,8 +132,8 @@ std::string dependenciesMining::GetFullMethodName(const CXXMethodDecl* d) {
 		templateArgs += ">";
 		name = d->getQualifiedNameAsString() + templateArgs + argList;
 	}
-	else if (d->getTemplatedKind() == d->TK_FunctionTemplate) {	
-		auto funcTempl = d->getDescribedFunctionTemplate(); 
+	else if (d->getTemplatedKind() == d->TK_FunctionTemplate) {
+		auto funcTempl = d->getDescribedFunctionTemplate();
 		auto params = funcTempl->getTemplateParameters()->asArray();// ->getPackAsArray();
 		std::string templateArgs = "<";
 		for (auto it : params) {
@@ -150,7 +147,6 @@ std::string dependenciesMining::GetFullMethodName(const CXXMethodDecl* d) {
 	else {
 		name = d->getQualifiedNameAsString() + argList;
 	}
-	//name.erase(std::remove_if(name.begin(), name.end(), isspace), name.end());
 	return name;
 }
 
@@ -196,7 +192,7 @@ bool dependenciesMining::isIgnoredDecl(const RecordDecl* d) {
 		return true;
 	}
 
-	if(d->isCXXClassMember()) {
+	if (d->isCXXClassMember()) {
 		const auto* parent = d->getParent();
 		if (isIgnoredDecl((RecordDecl*)parent)) {
 			return true;
