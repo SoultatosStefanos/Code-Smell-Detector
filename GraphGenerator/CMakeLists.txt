@@ -15,6 +15,9 @@ else()
 )
 endif()
 
+find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
+include(${wxWidgets_USE_FILE})
+
 add_library(${PROJECT_NAME} )
 
 add_definitions("-fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
@@ -24,7 +27,7 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC INCREMENTAL_GENERATION=1)
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS})
+target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS} ${wxWidgets_LIBRARIES})
 
 set(SUBDIRECTORIES 
 	DependenciesMining
