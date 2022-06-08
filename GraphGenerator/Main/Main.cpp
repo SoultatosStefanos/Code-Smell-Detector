@@ -147,7 +147,7 @@ int main(int argc, char* argv[]) {
 
 	miningRes = MineArchitecture(*clangTool);
 
-	//wxGetApp().Finished();
+	//wxGetApp().Finished(); // TODO uncomment
   	wxTheApp->OnRun();
 #else
 	miningRes = MineArchitecture(*clangTool);
