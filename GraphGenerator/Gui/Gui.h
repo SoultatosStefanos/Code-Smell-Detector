@@ -1,16 +1,17 @@
-#ifndef PROGRESS_BAR_H
-#define PROGRESS_BAR_H
+#pragma once
 
 #include <wx/wx.h>
 #include <wx/progdlg.h>
 
-class ProgressBar : public wxApp {
+namespace gui {
+
+class Gui : public wxApp {
 public:
   using FileObserver = std::function<std::string(void)>;
 
 public:
-  bool OnInit(void);
-  int OnExit(void);
+  bool OnInit(void) override;
+  int OnExit(void) override;
 
   void Update(void);
   void Update(const std::string& file);
@@ -32,6 +33,6 @@ private:
 
 };
 
-DECLARE_APP(ProgressBar);
+}
 
-#endif // PROGRESS_BAR_H
+DECLARE_APP(gui::Gui);

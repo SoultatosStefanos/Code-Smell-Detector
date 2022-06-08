@@ -295,7 +295,7 @@ Graph& GraphGenerationSTVisitor::GetGraph() {
 }
 
 
-Graph graphGeneration::GenetareDependenciesGraph(const SymbolTable& st) {
+Graph graphGeneration::GenerateDependenciesGraph(const SymbolTable& st) {
 	GraphGenerationSTVisitor visitor;
 	st.Accept(&visitor);
 	return visitor.GetGraph();

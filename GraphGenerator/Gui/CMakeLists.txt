@@ -1,6 +1,6 @@
 set(FILES 
-	ProgressBar.cpp
-	ProgressBar.h
+	Gui.cpp
+	Gui.h
 )
 set(SUBDIRECTORIES )
 

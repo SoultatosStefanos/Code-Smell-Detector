@@ -1,4 +1,4 @@
-// Contains incremetnal integration tests
+// Contains incremental integration tests
 // Soultatos Stefanos 2022
 
 #include "gtest/gtest.h"
@@ -27,7 +27,7 @@ namespace {
 		}
 	};
 
-	void ExportST(const SymbolTable& table, const std::string_view jsonPath) {
+	inline void ExportST(const SymbolTable& table, const std::string_view jsonPath) {
 		assert(!std::filesystem::exists(jsonPath));
 
 		Json::Value jsonST;
@@ -40,9 +40,10 @@ namespace {
 
 	TEST(IncrementalTests, Importing_after_exporting_ST) {
 		constexpr auto tmp = "out.json";
-		std::vector<std::string> srcs;
-		std::vector<std::string> headers;
-		CreateClangTool(cmp_db.data(), srcs, headers, "", "");
+		auto clangTool = CreateClangTool(cmp_db.data());
+		assert(clangTool);
+		SetIgnoredRegions();
+		MineArchitecture(*clangTool);
 		ExportST(structuresTable, tmp);
 
 		SymbolTable imported;

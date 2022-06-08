@@ -1,8 +1,10 @@
-#include "ProgressBar.h"
+#include "Gui.h"
 
-IMPLEMENT_APP_NO_MAIN(ProgressBar);
+IMPLEMENT_APP_NO_MAIN(gui::Gui);
 
-bool ProgressBar::OnInit() {
+namespace gui {
+
+bool Gui::OnInit() {
   m_max_str = std::to_string(m_max);
 
   m_frame = new wxFrame(NULL, wxID_ANY, wxT("Architecture Mining"));
@@ -16,7 +18,7 @@ bool ProgressBar::OnInit() {
   return true;
 }
 
-void ProgressBar::Update(void) {
+void Gui::Update(void) {
   assert(m_frame != nullptr);
   assert(m_dialog != nullptr);
   assert(m_file_obs);
@@ -30,7 +32,7 @@ void ProgressBar::Update(void) {
   }
 }
 
-void ProgressBar::Update(const std::string& file) {
+void Gui::Update(const std::string& file) {
   assert(m_dialog != nullptr);
   assert(m_frame != nullptr);
 
@@ -38,18 +40,20 @@ void ProgressBar::Update(const std::string& file) {
     m_current_file = file;
     ++m_curr;
 
-    assert(m_curr < static_cast<decltype(m_curr)>(m_max) && "Finished sucka?");
+    assert(m_curr < static_cast<decltype(m_curr)>(m_max));
 
     m_progress_str = m_current_file + '\n' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
     m_dialog->Update(m_curr, m_progress_str);
   }
 }
 
-void ProgressBar::Finished(void) {
+void Gui::Finished(void) {
   m_dialog->Update(m_max, "Finished Mining");
   delete m_dialog;
 }
 
-int ProgressBar::OnExit() {
+int Gui::OnExit() {
   return 0;
+}
+
 }

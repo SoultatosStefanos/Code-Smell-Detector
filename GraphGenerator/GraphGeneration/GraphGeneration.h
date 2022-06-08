@@ -36,5 +36,5 @@ namespace graphGeneration {
 		Graph& GetGraph();
 	};
 
-	Graph GenetareDependenciesGraph(const SymbolTable& st);
+	Graph GenerateDependenciesGraph(const SymbolTable& st);
 }

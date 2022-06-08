@@ -21,17 +21,12 @@ namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
 	extern SymbolTable cache;
-	extern std::unordered_map<std::string, Ignored*> ignored; 
-	
+
 	// ----------------------------------------------------------------------------------
 
 	class ClassDeclsCallback : public MatchFinder::MatchCallback {
 	public:
 		virtual void run(const MatchFinder::MatchResult& result);
-		/*class FindFieldStmt : public RecursiveASTVisitor<FindFieldStmt> {
-		public:
-			bool TraverseAST(clang::ASTContext& ast);
-		};*/
 	};
 
 	class FeildDeclsCallback : public MatchFinder::MatchCallback {
@@ -69,8 +64,14 @@ namespace dependenciesMining {
 
 	// ----------------------------------------------------------------------------------
 
-	std::unique_ptr<CompilationDatabase> LoadCompilationDatabase(const char*);
-	void SetFiles(ClangTool* tool, std::vector<std::string>& srcs, std::vector<std::string>& headers);
-	int CreateClangTool(const char* cmpDBPath, std::vector<std::string>& srcs, std::vector<std::string>& headers, const char* ignoredFilePaths, const char* ignoredNamespaces);
+	std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg); 	// From a compile_commands.json, returns nullptr on error.
+	std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath);							// From a compile_commands.json, returns nullptr on error.
+	std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs);			// From a collection of file paths, returns nullptr on error.
 
-}
+	void SetIgnoredRegions(const char* filesPath = "", const char* namespacesPath = "");
+
+	int MineArchitecture(ClangTool& tool); // Requires ignored regions to hav been set.
+
+	void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<std::string>& headers); // Ignores set ignored regions.
+
+} // dependenciesMining

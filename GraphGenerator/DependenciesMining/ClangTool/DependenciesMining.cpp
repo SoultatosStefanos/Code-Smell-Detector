@@ -1,9 +1,10 @@
 #include "DependenciesMining.h"
 #include "Utilities.h"
-#include "ProgressBar.h"
+#include "Gui.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include <vector>
+#include <iostream>
 
 #define CLASS_DECL "ClassDecl"
 #define STRUCT_DECL "StructDecl"
@@ -11,25 +12,14 @@
 #define METHOD_DECL "MethodDecl"
 #define METHOD_VAR_OR_ARG "MethodVarOrArg"
 
-using namespace dependenciesMining;
+namespace dependenciesMining {
 
 // ----------------------------------------------------------------------------------------------
 
-DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
-DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
-DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
-DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
+SymbolTable structuresTable;
+SymbolTable cache;
 
-// ----------------------------------------------------------------------------------------------
-
-SymbolTable dependenciesMining::structuresTable;
-SymbolTable dependenciesMining::cache;
-std::unordered_map<std::string, Ignored*> dependenciesMining::ignored;
-
-void initializeIgnored(const std::string& ignoredFiles, const std::string& ignoredNamespaces = "") {
-	ignored["filePaths"] = new IgnoredFilePaths(ignoredFiles);
-	ignored["namespaces"] = new IgnoredNamespaces(ignoredNamespaces);
-}
+static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
 // ----------------------------------------------------------------------------------------------
 
@@ -62,7 +52,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 
 	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
-#ifdef PROGRESS_BAR
+#ifdef GUI
 	if (srcLocation.isValid())
 		wxGetApp().Update(srcLocation.getFilename());
 #endif
@@ -298,7 +288,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
-#ifdef PROGRESS_BAR
+#ifdef GUI
 		if (srcLocation.isValid())
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
@@ -374,7 +364,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
-#ifdef PROGRESS_BAR
+#ifdef GUI
 		if (srcLocation.isValid())
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
@@ -668,7 +658,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
-#ifdef PROGRESS_BAR
+#ifdef GUI
 		if (srcLocation.isValid())
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
@@ -756,106 +746,89 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 // ----------------------------------------------------------------------------------------------
 
-/*
-	returns nullptr on fail.
-*/
-std::unique_ptr<CompilationDatabase> dependenciesMining::LoadCompilationDatabase(const char* cmpDBPath) {
-	std::string errorMsg;
-	auto cmpDB = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
-	if (!cmpDB) { // Input error, exit program.
-		std::cerr << "In '" << cmpDBPath << "'\n";
-		std::cerr << errorMsg << "\n";
-		std::cerr << "Make sure Compilation Database .json is named: 'compile_commands.json'\n";
-		return nullptr;
-	}
-
-	return cmpDB;
+std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg) {
+	assert(cmpDBPath);
+	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
+	return database ? std::make_unique<ClangTool>(*database, database->getAllFiles()) : nullptr;
 }
 
-// returns true only if str ends with ending
-static inline bool hasEnding(std::string const& str, std::string const& ending) {
-	if (str.length() >= ending.length())
-		return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
-	return false;
+std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath) {
+	std::string ignoredErrorMsg;
+	return CreateClangTool(cmpDBPath, ignoredErrorMsg);
 }
 
-/*
-	Clears srcs and headers vectors.
-	Fills srcs and headers vectors with paths extracted from the ClangTool
-*/
-void dependenciesMining::SetFiles(ClangTool* Tool, std::vector<std::string>& srcs, std::vector<std::string>& headers) {
-	srcs.clear();
-	headers.clear();
+std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs) {
+	static llvm::cl::OptionCategory myToolCategory("my-tool options");
+	static llvm::cl::extrahelp commonHelp(CommonOptionsParser::HelpMessage);
+	static llvm::cl::extrahelp moreHelp("\nA help message for this specific tool can be added afterwards..\n");
 
-	std::string path;
-	auto& file_manager = Tool->getFiles();
-	SmallVector<const FileEntry* > files;
-	file_manager.GetUniqueIDMapping(files);
-	for (auto file : files) {
-		path = file->getName().str();
-		if (ignored["filePaths"]->isIgnored(path))
-			continue;
+	static auto argc = 3;
+	const char* argv[3] = {"", "", "--"};
+	static auto parser = CommonOptionsParser::create(argc, argv, myToolCategory);
 
-		if (hasEnding(path, ".h")) {
-			headers.push_back(path);
-		}
-		else if (hasEnding(path, ".cpp")) {
-			srcs.push_back(path);
-		}
-	}
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), srcs) : nullptr;
 }
 
-/*
-	Clang Tool Creation
-*/
-static llvm::cl::OptionCategory MyToolCategory("my-tool options");
-static llvm::cl::extrahelp CommonHelp(CommonOptionsParser::HelpMessage);
-static llvm::cl::extrahelp MoreHelp("\nA help message for this specific tool can be added afterwards..\n");
+void SetIgnoredRegions(const char* filesPath, const char* namespacesPath) {
+	ignored["filePaths"] =  std::make_unique<IgnoredFilePaths>(filesPath);
+	ignored["namespaces"] = std::make_unique<IgnoredNamespaces>(namespacesPath);
+}
 
-int dependenciesMining::CreateClangTool(const char* cmpDBPath, std::vector<std::string>& srcs, std::vector<std::string>& headers, const char* ignoredFilePaths, const char* ignoredNamespaces) {
-	ClangTool* Tool;
-	std::unique_ptr<CompilationDatabase> cmpDB;
+namespace {
 
-	if (cmpDBPath == nullptr) {
-		int argc = 3;
-		const char* argv[3];
-		argv[0] = "";
-		argv[1] = "";
-		argv[2] = "--";
-
-		auto OptionsParser = CommonOptionsParser::create(argc, argv, MyToolCategory);
-
-		if (!OptionsParser)
-			return -1;
-
-		Tool = new ClangTool(OptionsParser->getCompilations(), srcs);
+	// returns true only if str ends with ending
+	inline bool EndsWith(std::string const& str, std::string const& ending) {
+		if (str.length() >= ending.length())
+			return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
+		return false;
 	}
-	else {
-		cmpDB = LoadCompilationDatabase(cmpDBPath);
-		if (!cmpDB)
-			return -1;
-		Tool = new ClangTool(*cmpDB, cmpDB->getAllFiles());
-	}
+
+} // namespace
+
+
+int MineArchitecture(ClangTool& tool) {
+	assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
+	assert(ignored.find("namespaces") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
+
+	static DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
+	static DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
+	static DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
+	static DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
 
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
-
-	initializeIgnored(ignoredFilePaths, ignoredNamespaces);
 
 	ClassDeclsCallback classCallback;
 	FeildDeclsCallback fieldCallback;
 	MethodDeclsCallback methodCallback;
 	MethodVarsCallback methodVarCallback;
 	MatchFinder Finder;
+
 	Finder.addMatcher(ClassDeclMatcher, &classCallback);
 	Finder.addMatcher(FieldDeclMatcher, &fieldCallback);
 	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
 	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
 
-	int result = Tool->run(newFrontendActionFactory(&Finder).get());
-
-	SetFiles(Tool, srcs, headers);
-
-	delete Tool;
-	return result;
+	return tool.run(newFrontendActionFactory(&Finder).get());
 }
+
+void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<std::string>& headers) {
+	SmallVector<const FileEntry* > files;
+	auto& file_manager = tool.getFiles();
+	file_manager.GetUniqueIDMapping(files);
+
+	for (auto* file : files) {
+		const auto path = file->getName().str();
+		if (ignored["filePaths"]->isIgnored(path))
+			continue;
+
+		if (EndsWith(path, ".h")) {
+			headers.push_back(path);
+		}
+		else if (EndsWith(path, ".cpp")) {
+			srcs.push_back(path);
+		}
+	}
+}
+
+} // dependenciesMining
