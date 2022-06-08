@@ -53,7 +53,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-	if (srcLocation.isValid())
+	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
 		wxGetApp().Update(srcLocation.getFilename());
 #endif
 
@@ -289,7 +289,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid())
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
@@ -365,7 +365,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid())
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
@@ -659,7 +659,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid())
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
 			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
