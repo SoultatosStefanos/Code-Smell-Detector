@@ -8,6 +8,7 @@ namespace gui {
 class Gui : public wxApp {
 public:
   using FileObserver = std::function<std::string(void)>;
+  using OnFinish = std::function<void(void)>;
 
 public:
   bool OnInit(void) override;
@@ -19,6 +20,7 @@ public:
 
   void SetMax(size_t _max) { m_max = _max; }
   void SetFileObserver(const FileObserver& f) { m_file_obs = f; }
+  void SetOnFinish(const OnFinish& f) { m_on_finish = f; }
 
 private:
   size_t m_max = 0;
@@ -30,6 +32,7 @@ private:
   std::string m_progress_str = "";
 
   FileObserver m_file_obs;
+  OnFinish m_on_finish;
 
 };
 
