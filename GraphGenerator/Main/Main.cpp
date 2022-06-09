@@ -142,8 +142,17 @@ int main(int argc, char* argv[]) {
 	wxEntryStart(argc, argv);
 	  
 	wxGetApp().SetMax(clangTool->getSourcePaths().size());
+	// wxGetApp().SetOnFinish([&clangTool, &structuresTable]() {  // FIXME
+
+	// 	const auto dependenciesGraph = GenerateDependenciesGraph(structuresTable);
+
+	// 	FilePaths srcs, headers;
+	// 	GetMinedFiles(*clangTool, srcs, headers);
+
+	// 	ProduceOutput(dependenciesGraph, structuresTable, srcs, headers, outputPath);
+	// });
 	
-  	wxTheApp->CallOnInit();
+  wxTheApp->CallOnInit();
 
 	miningRes = MineArchitecture(*clangTool);
 
