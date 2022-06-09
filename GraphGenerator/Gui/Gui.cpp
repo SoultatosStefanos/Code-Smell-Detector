@@ -11,7 +11,8 @@ bool Gui::OnInit() {
   this->SetTopWindow(m_frame);
   m_frame->Show(true);
 
-  m_dialog = new wxProgressDialog(wxT("Mining..."), wxT("Keep waiting..."), m_max, m_frame, wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT | wxPD_REMAINING_TIME);
+  m_dialog = new wxProgressDialog(wxT("Mining..."), wxT("Keep waiting..."), m_max, m_frame, wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT |
+                                                                                           wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
 
   assert(m_max != 0);
 
@@ -44,7 +45,7 @@ void Gui::Update(const std::string& file) {
 
     assert(m_curr < static_cast<decltype(m_curr)>(m_max));
 
-    m_progress_str = m_current_file + '\n' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
+    m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
     if (!m_dialog->Update(m_curr, m_progress_str)) // check if the cancel button was pressed
       m_on_finish();
 
