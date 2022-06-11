@@ -11,6 +11,9 @@
 #include <cassert>
 #include <filesystem>
 
+#ifdef GUI
+#error "Disable GUI flag"
+#endif
 
 namespace {
 

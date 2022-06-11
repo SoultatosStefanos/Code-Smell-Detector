@@ -5,6 +5,8 @@ IMPLEMENT_APP_NO_MAIN(gui::Gui);
 namespace gui {
 
 bool Gui::OnInit() {
+  assert(m_on_cancel);
+
   m_max_str = std::to_string(m_max);
 
   m_frame = new wxFrame(NULL, wxID_ANY, wxT("Architecture Mining"));
@@ -22,22 +24,19 @@ bool Gui::OnInit() {
 void Gui::Update(void) {
   assert(m_frame != nullptr);
   assert(m_dialog != nullptr);
-  assert(m_file_obs);
-  assert(m_on_finish);
+  assert(m_on_cancel);
   
-  auto file = m_file_obs();
-  if (m_current_file != file) {
-    m_current_file = file;
-    ++m_curr;
-    m_progress_str = m_current_file + '\n' + std::to_string(m_curr) + '/' + m_max_str;
-    m_dialog->Update(m_curr, m_progress_str);
-  }
+  if (m_dialog->WasCancelled()) 
+    Cancel();
+  // TODO For x button
+  // TODO for ok button
+ 
 }
 
-void Gui::Update(const std::string& file) {
+void Gui::UpdateProgressBar(const std::string& file) {
   assert(m_dialog != nullptr);
   assert(m_frame != nullptr);
-  assert(m_on_finish);
+  assert(m_on_cancel);
 
   if (m_current_file != file) {
     m_current_file = file;
@@ -47,16 +46,20 @@ void Gui::Update(const std::string& file) {
 
     m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
     if (!m_dialog->Update(m_curr, m_progress_str)) // check if the cancel button was pressed
-      m_on_finish();
+      m_on_cancel();
 
   }
 }
 
 void Gui::Finished(void) {
   m_dialog->Update(m_max, "Finished Mining");
-  if (!m_dialog->WasCancelled()) // check if program finished without being cancelled
-    m_on_finish();
   delete m_dialog;
+}
+
+void Gui::Cancel(void) {
+  assert(m_on_cancel);
+
+  m_on_cancel();
 }
 
 int Gui::OnExit() {

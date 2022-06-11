@@ -5,6 +5,8 @@ using namespace dependenciesMining;
 using namespace graph;
 using namespace graphGeneration;
 
+// FIXME Dependencies cardinalities
+
 // GraphGenerationSTVisitor
 
 void GraphGenerationSTVisitor::VisitStructure(Structure* s) {

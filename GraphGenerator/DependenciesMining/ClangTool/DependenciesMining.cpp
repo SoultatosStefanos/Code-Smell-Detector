@@ -25,6 +25,9 @@ static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
 // Handle all the Classes and Structs and the Bases
 void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO Clean up, do less work before returning fromincremental
+#ifdef GUI	
+	wxGetApp().Update();
+#endif
 	const CXXRecordDecl* d;
 
 	Structure structure;
@@ -54,7 +57,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 
 #ifdef GUI
 	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
-		wxGetApp().Update(srcLocation.getFilename());
+		wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
 	const auto structID = GetIDfromDecl(d);
@@ -254,6 +257,9 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 // ----------------------------------------------------------------------------------------------
 // Hanlde all the Fields in classes/structs (non structure fields)
 void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
+#ifdef GUI	
+	wxGetApp().Update();
+#endif
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
@@ -280,9 +286,11 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 }
 
 
-
 // Hanlde all the Fields in classes/structs (structure fields)
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
+#ifdef GUI	
+	wxGetApp().Update();
+#endif
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		assert(d);
 
@@ -290,7 +298,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
-			wxGetApp().Update(srcLocation.getFilename());
+			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
 		const auto fieldID = GetIDfromDecl(d);
@@ -361,12 +369,15 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
+#ifdef GUI	
+	wxGetApp().Update();
+#endif
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
-			wxGetApp().Update(srcLocation.getFilename());
+			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
 		const auto methodID = GetIDfromDecl(d);
@@ -653,6 +664,9 @@ bool MethodDeclsCallback::FindMemberExprVisitor::VisitMemberExpr(MemberExpr* mem
 
 // Handle Method's Vars and Args
 void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
+#ifdef GUI	
+	wxGetApp().Update();
+#endif
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		assert(d);
 
@@ -660,7 +674,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
-			wxGetApp().Update(srcLocation.getFilename());
+			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
 		const auto* parentMethodDecl = d->getParentFunctionOrMethod();

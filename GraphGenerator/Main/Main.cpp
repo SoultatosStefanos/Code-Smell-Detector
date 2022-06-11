@@ -73,7 +73,7 @@ namespace {
 			ST["headers"].append(path);
 	}
 
-	void ProduceOutput(const Graph& dependencyGraph, const SymbolTable& exportedTable, const FilePaths& srcs, const FilePaths& headers, const char* outputPath) {
+	void ProduceJsonOutput(const Graph& dependencyGraph, const SymbolTable& exportedTable, const FilePaths& srcs, const FilePaths& headers, const char* outputPath) {
 		assert(outputPath);
 
 		Json::Value jsonST;
@@ -88,7 +88,19 @@ namespace {
 		jsonSTFile << jsonST;
 		std::cout << "\nGRAPH GENERATED\n";
 
+		assert(jsonSTFile.good());
 		assert(std::filesystem::exists(outputPath));
+	}
+
+	void ExportDependencies(ClangTool& tool,const SymbolTable& exportedTable, const char* outputPath) {
+		assert(outputPath);
+
+		const auto dependenciesGraph = GenerateDependenciesGraph(exportedTable);
+
+		FilePaths srcs, headers;
+		GetMinedFiles(tool, srcs, headers);
+
+		ProduceJsonOutput(dependenciesGraph, structuresTable, srcs, headers, outputPath);
 	}
 
 } // namespace
@@ -140,36 +152,32 @@ int main(int argc, char* argv[]) {
 
 #ifdef GUI
 	wxEntryStart(argc, argv);
-	  
+
 	wxGetApp().SetMax(clangTool->getSourcePaths().size());
-	// wxGetApp().SetOnFinish([&clangTool, &structuresTable]() {  // FIXME
+	wxGetApp().SetOnCancel([&clangTool, outputPath]() {
+		ExportDependencies(*clangTool, structuresTable, outputPath);
 
-	// 	const auto dependenciesGraph = GenerateDependenciesGraph(structuresTable);
-
-	// 	FilePaths srcs, headers;
-	// 	GetMinedFiles(*clangTool, srcs, headers);
-
-	// 	ProduceOutput(dependenciesGraph, structuresTable, srcs, headers, outputPath);
-	// });
+		std::exit(EXIT_SUCCESS);
+	});
 	
-  wxTheApp->CallOnInit();
+ 	wxTheApp->CallOnInit();
 
 	miningRes = MineArchitecture(*clangTool);
 
-	//wxGetApp().Finished(); // TODO uncomment
-  	wxTheApp->OnRun();
-#else
-	miningRes = MineArchitecture(*clangTool);
-#endif
+	wxGetApp().Finished();
+  	//wxTheApp->OnRun(); 
 
 	PrintMiningResult(miningRes);
 
-	const auto dependenciesGraph = GenerateDependenciesGraph(structuresTable);
+	ExportDependencies(*clangTool, structuresTable, outputPath);
 
-	FilePaths srcs, headers;
-	GetMinedFiles(*clangTool, srcs, headers);
+#else
+	miningRes = MineArchitecture(*clangTool);
+	
+	PrintMiningResult(miningRes);
 
-	ProduceOutput(dependenciesGraph, structuresTable, srcs, headers, outputPath);
+	ExportDependencies(*clangTool, structuresTable, outputPath);
+#endif
 
 	return EXIT_SUCCESS;
 }
