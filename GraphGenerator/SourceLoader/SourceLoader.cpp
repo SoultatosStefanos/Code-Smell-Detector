@@ -2,6 +2,8 @@
 
 using namespace sourceLoader;
 
+// FIXME
+
 bool SourceLoader::IsSourceFile(const fs::path& p) {
 	if (p.extension() == ".cpp" || p.extension() == ".h" || p.extension() == ".hh" || 
 		p.extension() == ".CPP" || p.extension() == ".H" || p.extension() == ".HH")

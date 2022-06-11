@@ -21,6 +21,25 @@ SymbolTable cache;
 
 static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
+namespace {
+
+	// returns true only if str ends with ending
+	inline bool EndsWith(std::string const& str, std::string const& ending) {
+		if (str.length() >= ending.length())
+			return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
+		return false;
+	}
+
+	inline bool IsHeaderFile(const std::string& file) {
+		return EndsWith(file, ".h") or EndsWith(file, ".hpp"); // TODO More
+	}
+
+	inline bool IsSrcFile(const std::string& file) {
+		return EndsWith(file, ".cpp") or EndsWith(file, ".cc"); // TODO More
+	}
+
+} // namespace
+
 // ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
@@ -56,7 +75,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
+	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
 		wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
@@ -297,7 +316,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
 			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
@@ -376,7 +395,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
 			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
@@ -673,7 +692,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 #ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()))
+		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
 			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
 #endif
 
@@ -762,7 +781,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg) {
 	assert(cmpDBPath);
-	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
+	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg); // TODO Filter compiled files out
 	return database ? std::make_unique<ClangTool>(*database, database->getAllFiles()) : nullptr;
 }
 
@@ -787,18 +806,6 @@ void SetIgnoredRegions(const char* filesPath, const char* namespacesPath) {
 	ignored["filePaths"] =  std::make_unique<IgnoredFilePaths>(filesPath);
 	ignored["namespaces"] = std::make_unique<IgnoredNamespaces>(namespacesPath);
 }
-
-namespace {
-
-	// returns true only if str ends with ending
-	inline bool EndsWith(std::string const& str, std::string const& ending) {
-		if (str.length() >= ending.length())
-			return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
-		return false;
-	}
-
-} // namespace
-
 
 int MineArchitecture(ClangTool& tool) {
 	assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
@@ -836,10 +843,10 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 		if (ignored["filePaths"]->isIgnored(path))
 			continue;
 
-		if (EndsWith(path, ".h")) {
+		if (IsHeaderFile(path)) { // TODO More extensions
 			headers.push_back(path);
 		}
-		else if (EndsWith(path, ".cpp")) {
+		else if (IsSrcFile(path)) {
 			srcs.push_back(path);
 		}
 	}

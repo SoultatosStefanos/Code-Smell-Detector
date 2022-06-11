@@ -45,9 +45,7 @@ void Gui::UpdateProgressBar(const std::string& file) {
     assert(m_curr < static_cast<decltype(m_curr)>(m_max));
 
     m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
-    if (!m_dialog->Update(m_curr, m_progress_str)) // check if the cancel button was pressed
-      m_on_cancel();
-
+    m_dialog->Update(m_curr, m_progress_str);
   }
 }
 
