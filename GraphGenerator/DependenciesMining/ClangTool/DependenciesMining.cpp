@@ -18,6 +18,7 @@ namespace dependenciesMining {
 
 SymbolTable structuresTable;
 SymbolTable cache;
+Sources parsedFiles;
 
 static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
@@ -779,10 +780,46 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 // ----------------------------------------------------------------------------------------------
 
+namespace {
+
+	inline bool IsParsed(const std::string& file) {
+		return std::find(std::begin(parsedFiles), std::end(parsedFiles), file) != std::end(parsedFiles); 
+	}
+
+	inline bool IsParsedLast(const std::string& file) {
+		assert(!parsedFiles.empty());
+		return parsedFiles.back() == file; 
+	}
+
+	inline bool IsIgnored(const std::string& file) {
+		assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
+		return ignored["filePaths"]->isIgnored(file); 
+	}
+
+	Sources FilterParsedFiles(const Sources& databaseSrcs) {
+		assert(databaseSrcs.size() >= parsedFiles.size());
+
+		if (parsedFiles.empty()) 
+			return databaseSrcs;
+		
+		Sources res;
+		std::copy_if(std::begin(databaseSrcs), std::end(databaseSrcs), std::back_inserter(res), [](const auto& file) {
+			return !IsIgnored(file) and (!IsParsed(file) or IsParsedLast(file));
+		});
+		return res;
+	}
+
+} // namespace
+
 std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg) {
 	assert(cmpDBPath);
-	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg); // TODO Filter compiled files out
+	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
+	
+#ifdef INCREMENTAL_GENERATION
+	return database ? std::make_unique<ClangTool>(*database, FilterParsedFiles(database->getAllFiles())) : nullptr;
+#else
 	return database ? std::make_unique<ClangTool>(*database, database->getAllFiles()) : nullptr;
+#endif
 }
 
 std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath) {
@@ -799,7 +836,11 @@ std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs)
 	const char* argv[3] = {"", "", "--"};
 	static auto parser = CommonOptionsParser::create(argc, argv, myToolCategory);
 
+#ifdef INCREMENTAL_GENERATION
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(),  FilterParsedFiles(srcs)) : nullptr;
+#else
 	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), srcs) : nullptr;
+#endif
 }
 
 void SetIgnoredRegions(const char* filesPath, const char* namespacesPath) {

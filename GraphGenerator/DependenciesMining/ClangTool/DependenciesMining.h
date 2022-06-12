@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include "SymbolTable.h"
+#include "Incremental.h"
 #include "../Ignored/Ignored.h"
 #include "clang/Frontend/FrontendActions.h"
 #include "clang/Tooling/CommonOptionsParser.h"
@@ -16,10 +17,12 @@ using namespace clang;
 using namespace clang::ast_matchers;
 using namespace llvm;
 using namespace clang::tooling;
+using namespace incremental;
 
 namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
+	extern Sources parsedFiles;
 	extern SymbolTable cache;
 
 	// ----------------------------------------------------------------------------------

@@ -12,8 +12,10 @@
 
 namespace incremental {
 
+	using Sources = std::vector<std::string>;
+
 	void ImportST(const std::string_view jsonPath, dependenciesMining::SymbolTable& table);
-	void ImportSources(const std::string_view jsonPath, std::vector<std::string>& srcs);
+	void ImportSources(const std::string_view jsonPath, Sources& srcs);
 
 	void LoadGlobalCache(const dependenciesMining::SymbolTable& from, dependenciesMining::SymbolTable& to); // TODO Remove
 

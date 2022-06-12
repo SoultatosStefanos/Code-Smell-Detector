@@ -279,7 +279,7 @@ namespace incremental {
 		assert(from.is_open());
 	}
 
-	void ImportSources(const std::string_view jsonPath, std::vector<std::string>& srcs) {
+	void ImportSources(const std::string_view jsonPath, Sources& srcs) {
 		assert(srcs.empty());
 
 		JsonArchive from{jsonPath.data()};

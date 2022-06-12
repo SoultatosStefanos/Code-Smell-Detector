@@ -122,6 +122,15 @@ int main(int argc, char* argv[]) {
 	std::unique_ptr<ClangTool> clangTool;
 	std::string errorMsg;
 
+#ifdef INCREMENTAL_GENERATION
+	if (std::filesystem::exists(outputPath)) {
+		ImportST(outputPath, structuresTable);
+		ImportSources(outputPath, parsedFiles);
+		LoadGlobalCache(structuresTable, cache);
+	}
+#endif
+	SetIgnoredRegions(ignoredFilesPath, ignoredNamespacesPath);
+
 	if (compilationOption == srcOption) {
 		clangTool = CreateClangTool(SourceLoader{ inputPath }.GetSources());
 
@@ -137,19 +146,6 @@ int main(int argc, char* argv[]) {
 		PrintClangToolInfo(errorMsg);
 		return EXIT_FAILURE;
 	}
-
-#ifdef INCREMENTAL_GENERATION
-	FilePaths sources;
-
-	if (std::filesystem::exists(outputPath)) {
-		ImportST(outputPath, structuresTable);
-		ImportSources(outputPath, sources);
-		
-		LoadGlobalCache(structuresTable, cache);
-	}
-#endif
-
-	SetIgnoredRegions(ignoredFilesPath, ignoredNamespacesPath);
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int miningRes;
