@@ -43,7 +43,7 @@ namespace {
 // ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
-void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO Clean up, do less work before returning fromincremental
+void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 #ifdef GUI	
 	wxGetApp().Update();
 #endif
@@ -81,7 +81,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) { // TODO C
 
 	const auto structID = GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION
+#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
 	if (cache.Lookup(structID)) {
 		std::cout << "Loaded struct: " << structID << '\n';
 		return;
@@ -282,7 +282,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION
+#ifdef INCREMENTAL_GENERATION 
 		assert(!cache.Lookup(fieldID)); // already checked
 #endif
 
@@ -322,7 +322,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto fieldID = GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION
+#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
 		if (cache.Lookup(fieldID)) {
 			std::cout << "Loaded field: " << fieldID << '\n';
 			return;
@@ -401,7 +401,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto methodID = GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION
+#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
 		if (cache.Lookup(methodID)) {
 			std::cout << "Loaded method: " << methodID << '\n';
 			return;
@@ -706,7 +706,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto defID = parentMethodID + "::" + GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION
+#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
 		if (cache.Lookup(defID)) {
 			std::cout << "Loaded definition: " << defID << '\n';
 			return;
