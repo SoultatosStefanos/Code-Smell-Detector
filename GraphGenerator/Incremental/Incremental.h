@@ -17,6 +17,4 @@ namespace incremental {
 	void ImportST(const std::string_view jsonPath, dependenciesMining::SymbolTable& table);
 	void ImportSources(const std::string_view jsonPath, Sources& srcs);
 
-	void LoadGlobalCache(const dependenciesMining::SymbolTable& from, dependenciesMining::SymbolTable& to); // TODO Remove
-
-}
+} // incremental

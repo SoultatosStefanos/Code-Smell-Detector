@@ -126,7 +126,6 @@ int main(int argc, char* argv[]) {
 	if (std::filesystem::exists(outputPath)) {
 		ImportST(outputPath, structuresTable);
 		ImportSources(outputPath, parsedFiles);
-		LoadGlobalCache(structuresTable, cache);
 	}
 #endif
 	SetIgnoredRegions(ignoredFilesPath, ignoredNamespacesPath);

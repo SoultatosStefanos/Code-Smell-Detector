@@ -17,7 +17,6 @@ namespace dependenciesMining {
 // ----------------------------------------------------------------------------------------------
 
 SymbolTable structuresTable;
-SymbolTable cache;
 Sources parsedFiles;
 
 static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
@@ -81,13 +80,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 #endif
 
 	const auto structID = GetIDfromDecl(d);
-
-#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
-	if (cache.Lookup(structID)) {
-		std::cout << "Loaded struct: " << structID << '\n';
-		return;
-	}
-#endif
 
 	if (isIgnoredDecl(d))
 		return;
@@ -283,10 +275,6 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
-#ifdef INCREMENTAL_GENERATION 
-		assert(!cache.Lookup(fieldID)); // already checked
-#endif
-
 		auto* parent = d->getParent();
 
 		// Ignored
@@ -322,13 +310,6 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 #endif
 
 		const auto fieldID = GetIDfromDecl(d);
-
-#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
-		if (cache.Lookup(fieldID)) {
-			std::cout << "Loaded field: " << fieldID << '\n';
-			return;
-		}
-#endif
 
 		const auto* parent = d->getParent();
 		assert(parent);
@@ -401,13 +382,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 #endif
 
 		const auto methodID = GetIDfromDecl(d);
-
-#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
-		if (cache.Lookup(methodID)) {
-			std::cout << "Loaded method: " << methodID << '\n';
-			return;
-		}
-#endif
 
 		const RecordDecl* parent = d->getParent();
 		std::string parentName = GetFullStructureName(parent);
@@ -706,13 +680,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		const auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
 
 		const auto defID = parentMethodID + "::" + GetIDfromDecl(d);
-
-#ifdef INCREMENTAL_GENERATION // Slight optimization in case of half-compiled files.
-		if (cache.Lookup(defID)) {
-			std::cout << "Loaded definition: " << defID << '\n';
-			return;
-		}
-#endif
 
 		// Ignore non method declarations
 		if (!d->isLocalVarDeclOrParm() or parentMethodDecl->getDeclKind() != d->CXXMethod)

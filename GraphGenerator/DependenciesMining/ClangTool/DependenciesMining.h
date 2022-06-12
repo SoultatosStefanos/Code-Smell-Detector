@@ -23,7 +23,6 @@ namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
 	extern Sources parsedFiles;
-	extern SymbolTable cache;
 
 	// ----------------------------------------------------------------------------------
 
