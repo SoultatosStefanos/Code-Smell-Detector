@@ -1,6 +1,10 @@
 // Contains incremental integration tests
 // Soultatos Stefanos 2022
 
+#ifdef GUI
+#undef GUI
+#endif
+
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "DependenciesMining.h"
@@ -10,10 +14,6 @@
 
 #include <cassert>
 #include <filesystem>
-
-#ifdef GUI
-#error "Disable GUI flag"
-#endif
 
 namespace {
 
