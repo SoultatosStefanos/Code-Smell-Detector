@@ -6,7 +6,7 @@
 #include "DependenciesMining.h"
 #include "SymbolTable.h"
 #include "Utility.h"
-#include "ImportST.h"
+#include "Incremental.h"
 
 #include <cassert>
 #include <filesystem>
@@ -50,7 +50,7 @@ namespace {
 		ExportST(structuresTable, tmp);
 
 		SymbolTable imported;
-		ImportStashedST(tmp, imported);
+		ImportST(tmp, imported);
 
 		EXPECT_TRUE(AreEqual(imported, structuresTable));
 

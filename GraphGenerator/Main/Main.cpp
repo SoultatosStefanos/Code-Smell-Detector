@@ -1,8 +1,7 @@
 #include "DependenciesMining.h"
 #include "Gui.h"
 #include "SourceLoader.h"
-#include "ImportST.h"
-#include "LoadGlobalCache.h"
+#include "Incremental.h"
 #include "Graph.h"
 #include "GraphToJson.h"
 #include "GraphGeneration.h"
@@ -140,9 +139,14 @@ int main(int argc, char* argv[]) {
 	}
 
 #ifdef INCREMENTAL_GENERATION
-	ImportStashedST(outputPath, structuresTable);
+	FilePaths sources;
 
-	LoadGlobalCache(structuresTable, cache);
+	if (std::filesystem::exists(outputPath)) {
+		ImportST(outputPath, structuresTable);
+		ImportSources(outputPath, sources);
+		
+		LoadGlobalCache(structuresTable, cache);
+	}
 #endif
 
 	SetIgnoredRegions(ignoredFilesPath, ignoredNamespacesPath);

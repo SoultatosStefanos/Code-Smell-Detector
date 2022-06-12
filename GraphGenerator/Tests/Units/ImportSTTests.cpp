@@ -4,7 +4,7 @@
 #include "gtest/gtest.h"
 #include "gmock/gmock.h"
 #include "Utility.h"
-#include "ImportST.h"
+#include "Incremental.h"
 #include <string_view>
 #include <cassert>
 #include <libgen.h>
@@ -17,22 +17,12 @@ namespace {
 	using namespace dependenciesMining;
 	using namespace tests::utility;
 
-	TEST(ImportStashedST, Imports_nothing_from_non_existent_path) {
-		constexpr auto path = "out.json";
-		assert(!std::filesystem::exists(path));
-		SymbolTable table;
-
-		ImportStashedST(path, table);
-
-		ASSERT_TRUE(table.IsEmpty());
-	}
-
 	TEST(ImportStashedST, Imports_empty_symbol_table_correctly) {
 		const auto path = RESOLVE_PATH("sample_empty.json");
 		assert(std::filesystem::exists(path));
 		SymbolTable table;
 
-		ImportStashedST(path, table);
+		ImportST(path, table);
 
 		ASSERT_TRUE(table.IsEmpty());
 	}
@@ -102,7 +92,7 @@ namespace {
 		SymbolTable actual, expected;
 		Prepare(expected);
 
-		ImportStashedST(path, actual);
+		ImportST(path, actual);
 
 		ASSERT_TRUE(AreEqual(expected, actual));
 	}

@@ -1,21 +1,18 @@
-// Contains functions to import a Symbol Table from a json file.
+// Incremental Generation module.
 // Soultatos Stefanos 2022
 
-#include "ImportST.h"
+#include "Incremental.h"
 #include "Converters.h"
-#include <cassert>
-#include <iostream>
-#include <jsoncpp/json/json.h>
 #include <filesystem>
-#include <algorithm>
-#include <sstream>
 
 namespace incremental {
 
+	using namespace dependenciesMining;
 	using namespace details;
 
 	namespace {
 
+		using JsonArchive = std::ifstream;
 		using JsonVal = Json::Value;
 		using JsonString = Json::String;
 		using SymbolID = JsonString;
@@ -274,21 +271,68 @@ namespace incremental {
 
 	} // namespace
 
-	void ImportST(JsonArchive& from, SymbolTable& table) {
-		assert(from.good());
-		assert(from.is_open());
-
+	void ImportST(const std::string_view jsonPath, SymbolTable& table) {
+		JsonArchive from{jsonPath.data()};
 		ImportStructures(GetArchiveRoot(from), table);
 
 		assert(from.good());
 		assert(from.is_open());
 	}
 
-	void ImportStashedST(const std::string_view fpath, dependenciesMining::SymbolTable& table) {
-		if (std::filesystem::exists(fpath)) {
-			JsonArchive file{fpath.data()};
-			ImportST(file, table);
-		}
+	void ImportSources(const std::string_view jsonPath, std::vector<std::string>& srcs) {
+		assert(srcs.empty());
+
+		JsonArchive from{jsonPath.data()};
+		const auto srcVal =  Get(GetArchiveRoot(from), "sources");
+		assert(srcVal.isArray());
+
+		srcs.reserve(std::distance(std::begin(srcVal), std::end(srcVal)));
+		std::transform(std::begin(srcVal), std::end(srcVal), std::back_inserter(srcs), [](const auto& val) {
+			assert(val.isString());
+			return val.asString();
+		});
+
+		assert(from.good());
+		assert(from.is_open());
 	}
 
-} // incremental
+	namespace {
+
+		void LoadDefinitions(const SymbolTable& from, SymbolTable& to) {
+			for (const auto& [id, symbol] : from) 
+				to.Install(id, symbol);
+		}
+
+		void LoadMethods(const SymbolTable& from, SymbolTable& to) {
+			for (const auto& [id, method] : from) {
+				assert(method->GetClassType() == ClassType::Method);
+
+				auto* m = (Method*) to.Install(id, method);
+				assert(m);
+
+				LoadDefinitions(m->GetArguments(), to);
+				LoadDefinitions(m->GetDefinitions(), to);
+			} 
+		}
+
+		void LoadStructures(const SymbolTable& from, SymbolTable& to) {
+			for (const auto& [id, structure] : from) {
+				assert(structure->GetClassType() == ClassType::Structure);
+
+				auto* s = (Structure*) to.Install(id, structure);
+				assert(s);
+
+				LoadMethods(s->GetMethods(), to);
+				LoadDefinitions(s->GetFields(), to);
+				LoadStructures(s->GetContains(), to);
+			} 
+		}
+
+
+	} // namespace
+
+	void LoadGlobalCache(const SymbolTable& from, SymbolTable& to) {
+		LoadStructures(from, to);
+	}
+
+}
