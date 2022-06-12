@@ -814,7 +814,7 @@ namespace {
 std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg) {
 	assert(cmpDBPath);
 	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
-	
+
 #ifdef INCREMENTAL_GENERATION
 	return database ? std::make_unique<ClangTool>(*database, FilterParsedFiles(database->getAllFiles())) : nullptr;
 #else
@@ -875,6 +875,13 @@ int MineArchitecture(ClangTool& tool) {
 }
 
 void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<std::string>& headers) {
+	assert(srcs.empty());
+	assert(headers.empty());
+
+#ifdef INCREMENTAL_GENERATION
+	std::copy(std::begin(parsedFiles), std::end(parsedFiles) - 1, std::back_inserter(srcs)); // copy parsed files up to last
+#endif
+
 	SmallVector<const FileEntry* > files;
 	auto& file_manager = tool.getFiles();
 	file_manager.GetUniqueIDMapping(files);
@@ -888,6 +895,9 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 			headers.push_back(path);
 		}
 		else if (IsSrcFile(path)) {
+#ifdef INCREMENTAL_GENERATION
+			assert(std::none_of(std::begin(parsedFiles), std::end(parsedFiles) - 1, [&path](const auto& file) { return file == path; }));
+#endif
 			srcs.push_back(path);
 		}
 	}
