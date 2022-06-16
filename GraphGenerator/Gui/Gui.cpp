@@ -33,7 +33,7 @@ void Gui::Update(void) {
  
 }
 
-void Gui::UpdateProgressBar(const std::string& file) {
+void Gui::Update(const std::string& file) {
   assert(m_dialog != nullptr);
   assert(m_frame != nullptr);
   assert(m_on_cancel);
@@ -42,10 +42,7 @@ void Gui::UpdateProgressBar(const std::string& file) {
     m_current_file = file;
     ++m_curr;
 
-    assert(m_curr < static_cast<decltype(m_curr)>(m_max));
-
-    m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
-    m_dialog->Update(m_curr, m_progress_str);
+    UpdateProgressBar();
   }
 }
 
@@ -54,11 +51,25 @@ void Gui::Finished(void) {
   delete m_dialog;
 }
 
+void Gui::UpdateProgressBar() {
+  assert(m_curr < static_cast<decltype(m_curr)>(m_max));
+
+  m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
+  m_dialog->Update(m_curr, m_progress_str);
+}
+
+void Gui::SkipFiles(size_t num, const std::string& currFile) {
+  m_curr += num;
+  m_current_file = currFile;
+  UpdateProgressBar();
+}
+
 void Gui::Cancel(void) {
   assert(m_on_cancel);
 
   m_on_cancel();
 }
+
 
 int Gui::OnExit() {
   return 0;

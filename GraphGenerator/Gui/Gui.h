@@ -14,13 +14,16 @@ public:
   int OnExit(void) override;
 
   void Update(void);
-  void UpdateProgressBar(const std::string& file);
+  void Update(const std::string& file);
   void Finished(void);
 
   void SetMax(size_t _max) { m_max = _max; }
   void SetOnCancel(const OnCancel& f) { m_on_cancel = f; }
 
+  void SkipFiles(size_t num, const std::string& currFile);
+
 private:
+  void UpdateProgressBar();
   void Cancel();
 
   size_t m_max = 0;

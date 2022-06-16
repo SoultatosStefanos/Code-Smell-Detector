@@ -8,6 +8,7 @@
 #include "json/writer.h"
 #include <iostream>
 #include <cstdlib>
+#include <thread>
 
 using namespace dependenciesMining;
 using namespace sourceLoader;
@@ -149,6 +150,8 @@ int main(int argc, char* argv[]) {
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int miningRes;
 
+
+
 #ifdef GUI
 	wxEntryStart(argc, argv);
 
@@ -161,7 +164,15 @@ int main(int argc, char* argv[]) {
 	
  	wxTheApp->CallOnInit();
 
-	miningRes = MineArchitecture(*clangTool);
+#ifdef INCREMENTAL_GENERATION
+	if (parsedFiles.size() > 1)
+		wxGetApp().SkipFiles(parsedFiles.size() - 1, parsedFiles.back());
+#endif
+	// std::thread t1{[&miningRes, &clangTool](){ miningRes = MineArchitecture(*clangTool); }};
+    // std::thread t2{[](){ while (true) { wxGetApp().Update(); } }};
+
+    // t1.join();
+    // t2.join();
 
 	wxGetApp().Finished();
   	//wxTheApp->OnRun(); 
