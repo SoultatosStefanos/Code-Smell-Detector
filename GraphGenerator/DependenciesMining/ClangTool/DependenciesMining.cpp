@@ -14,6 +14,8 @@
 
 namespace dependenciesMining {
 
+// TODO Tidy filtering and stuff
+
 // ----------------------------------------------------------------------------------------------
 
 SymbolTable structuresTable;
@@ -76,7 +78,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-		wxGetApp().UpdateProgressBar(srcLocation.getFilename());
+		wxGetApp().Update(srcLocation.getFilename());
 #endif
 
 	const auto structID = GetIDfromDecl(d);
@@ -306,7 +308,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
+			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
 		const auto fieldID = GetIDfromDecl(d);
@@ -378,7 +380,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
+			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
 		const auto methodID = GetIDfromDecl(d);
@@ -668,7 +670,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 #ifdef GUI
 		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			wxGetApp().UpdateProgressBar(srcLocation.getFilename());
+			wxGetApp().Update(srcLocation.getFilename());
 #endif
 
 		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
@@ -679,7 +681,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto parentMethodID = GetIDfromDecl((CXXMethodDecl*)parentMethodDecl);
 
-		const auto defID = parentMethodID + "::" + GetIDfromDecl(d);
+		const auto defID = GetIDfromDecl(d);
 
 		// Ignore non method declarations
 		if (!d->isLocalVarDeclOrParm() or parentMethodDecl->getDeclKind() != d->CXXMethod)
