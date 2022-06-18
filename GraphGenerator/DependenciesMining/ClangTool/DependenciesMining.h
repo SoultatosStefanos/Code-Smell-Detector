@@ -23,6 +23,7 @@ namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
 	extern Sources parsedFiles;
+	extern std::string currFile;
 
 	// ----------------------------------------------------------------------------------
 

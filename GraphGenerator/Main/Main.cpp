@@ -161,6 +161,7 @@ int main(int argc, char* argv[]) {
 
 		std::exit(EXIT_SUCCESS);
 	});
+	wxGetApp().SetFileObserver([]() -> const auto& { return currFile; });
 	
  	wxTheApp->CallOnInit();
 
@@ -168,11 +169,7 @@ int main(int argc, char* argv[]) {
 	if (parsedFiles.size() > 1)
 		wxGetApp().SkipFiles(parsedFiles.size() - 1, parsedFiles.back());
 #endif
-	// std::thread t1{[&miningRes, &clangTool](){ miningRes = MineArchitecture(*clangTool); }};
-    // std::thread t2{[](){ while (true) { wxGetApp().Update(); } }};
-
-    // t1.join();
-    // t2.join();
+	miningRes = MineArchitecture(*clangTool); 
 
 	wxGetApp().Finished();
   	//wxTheApp->OnRun(); 

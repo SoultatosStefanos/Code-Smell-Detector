@@ -21,38 +21,32 @@ bool Gui::OnInit() {
   return true;
 }
 
-void Gui::Update(void) {
+void Gui::Update() {
   assert(m_frame != nullptr);
   assert(m_dialog != nullptr);
   assert(m_on_cancel);
-  
+  assert(m_f_observer);
+
   if (m_dialog->WasCancelled()) 
     Cancel();
+
+  if (m_current_file != m_f_observer()) {
+    m_current_file = m_f_observer();
+    ++m_curr;
+  }
+
+  UpdateProgressBar();
   // TODO For x button
   // TODO for ok button
- 
 }
 
-void Gui::Update(const std::string& file) {
-  assert(m_dialog != nullptr);
-  assert(m_frame != nullptr);
-  assert(m_on_cancel);
-
-  if (m_current_file != file) {
-    m_current_file = file;
-    ++m_curr;
-
-    UpdateProgressBar();
-  }
-}
-
-void Gui::Finished(void) {
+void Gui::Finished() {
   m_dialog->Update(m_max, "Finished Mining");
   delete m_dialog;
 }
 
 void Gui::UpdateProgressBar() {
-  assert(m_curr < static_cast<decltype(m_curr)>(m_max));
+  assert(m_curr <= m_max);
 
   m_progress_str = m_current_file + '\t' + std::to_string(m_curr) + '/' + m_max_str + '\t' + std::to_string(m_curr * 100 / m_max) + '%';
   m_dialog->Update(m_curr, m_progress_str);
@@ -64,7 +58,7 @@ void Gui::SkipFiles(size_t num, const std::string& currFile) {
   UpdateProgressBar();
 }
 
-void Gui::Cancel(void) {
+void Gui::Cancel() {
   assert(m_on_cancel);
 
   m_on_cancel();
