@@ -11,11 +11,10 @@ bool Gui::OnInit() {
 
   m_frame = new wxFrame(NULL, wxID_ANY, wxT("Architecture Mining"));
   this->SetTopWindow(m_frame);
-  m_frame->Show(true);
+  m_frame->Show(false);
 
   m_dialog = new wxProgressDialog(wxT("Mining..."), wxT("Keep waiting..."), m_max, m_frame, wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT |
                                                                                            wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME);
-
   assert(m_max != 0);
 
   return true;
