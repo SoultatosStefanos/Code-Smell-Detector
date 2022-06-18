@@ -2,6 +2,7 @@
 #pragma warning(disable : 4996)
 #pragma warning(disable : 4146)
 
+#include <functional>
 #include <iostream>
 #include "SymbolTable.h"
 #include "Incremental.h"
@@ -23,7 +24,7 @@ namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
 	extern Sources parsedFiles;
-	extern std::string currFile;
+	extern std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
 	// ----------------------------------------------------------------------------------
 
@@ -76,5 +77,17 @@ namespace dependenciesMining {
 	int MineArchitecture(ClangTool& tool); // Requires ignored regions to hav been set.
 
 	void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<std::string>& headers); // Ignores set ignored regions.
+
+	// ----------------------------------------------------------------------------------
+
+	using ClassDeclObserver = std::function<void(const MatchFinder::MatchResult&, const CXXRecordDecl&)>;
+	using FieldDeclObserver = std::function<void(const MatchFinder::MatchResult&, const FieldDecl&)>;
+	using MethodDeclObserver = std::function<void(const MatchFinder::MatchResult&, const CXXMethodDecl&)>;
+	using MethodVarDeclObserver = std::function<void(const MatchFinder::MatchResult&, const VarDecl&)>;
+
+	void InstallClassDeclObserver(ClassDeclObserver f);
+	void InstallFieldDeclObserver(FieldDeclObserver f);
+	void InstallMethodDeclObserver(MethodDeclObserver f);
+	void InstallMethodVarDeclObserver(MethodVarDeclObserver f);
 
 } // dependenciesMining

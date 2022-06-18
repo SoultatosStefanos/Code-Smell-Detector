@@ -7,19 +7,18 @@ namespace gui {
 
 class Gui : public wxApp {
 public:
-  using OnCancel = std::function<void(void)>;
-  using FileObserver = std::function<const std::string&(void)>;
+  using OnCancel = std::function<void()>;
 
 public:
-  bool OnInit(void) override;
-  int OnExit(void) override;
+  bool OnInit() override;
+  int OnExit() override;
 
-  void Update(void);
-  void Finished(void);
+  void Update();
+  void Update(const char* file);
+  void Finish();
 
   void SetMax(size_t _max) { m_max = _max; }
   void SetOnCancel(const OnCancel& f) { m_on_cancel = f; }
-  void SetFileObserver(const FileObserver& f) { m_f_observer = f; }
 
   void SkipFiles(size_t num, const std::string& currFile);
 
@@ -36,8 +35,6 @@ private:
   std::string m_progress_str = "";
 
   OnCancel m_on_cancel;
-  FileObserver m_f_observer;
-
 };
 
 }

@@ -25,22 +25,30 @@ void Gui::Update() {
   assert(m_frame != nullptr);
   assert(m_dialog != nullptr);
   assert(m_on_cancel);
-  assert(m_f_observer);
 
   if (m_dialog->WasCancelled()) 
     Cancel();
 
-  if (m_current_file != m_f_observer()) {
-    m_current_file = m_f_observer();
+  UpdateProgressBar();
+}
+
+void Gui::Update(const char* file) {
+  assert(m_frame != nullptr);
+  assert(m_dialog != nullptr);
+  assert(m_on_cancel);
+
+  if (m_dialog->WasCancelled()) 
+    Cancel();
+
+  if (m_current_file != file) {
+    m_current_file = file;
     ++m_curr;
   }
 
   UpdateProgressBar();
-  // TODO For x button
-  // TODO for ok button
 }
 
-void Gui::Finished() {
+void Gui::Finish() {
   m_dialog->Update(m_max, "Finished Mining");
   delete m_dialog;
 }

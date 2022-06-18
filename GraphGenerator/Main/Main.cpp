@@ -1,10 +1,12 @@
 #include "DependenciesMining.h"
 #include "Gui.h"
+#include "GuiController.h"
 #include "SourceLoader.h"
 #include "Incremental.h"
 #include "Graph.h"
 #include "GraphToJson.h"
 #include "GraphGeneration.h"
+#include "FileSystem.h"
 #include "json/writer.h"
 #include <iostream>
 #include <cstdlib>
@@ -13,9 +15,11 @@
 using namespace dependenciesMining;
 using namespace sourceLoader;
 using namespace incremental;
+using namespace filesystem;
 using namespace graph;
 using namespace graphGeneration;
 using namespace graphToJson;
+using namespace gui;
 
 using FilePaths = std::vector<std::string>;
 
@@ -129,6 +133,7 @@ int main(int argc, char* argv[]) {
 		ImportSources(outputPath, parsedFiles);
 	}
 #endif
+
 	SetIgnoredRegions(ignoredFilesPath, ignoredNamespacesPath);
 
 	if (compilationOption == srcOption) {
@@ -150,8 +155,6 @@ int main(int argc, char* argv[]) {
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
 	int miningRes;
 
-
-
 #ifdef GUI
 	wxEntryStart(argc, argv);
 
@@ -161,17 +164,25 @@ int main(int argc, char* argv[]) {
 
 		std::exit(EXIT_SUCCESS);
 	});
-	wxGetApp().SetFileObserver([]() -> const auto& { return currFile; });
 	
  	wxTheApp->CallOnInit();
+
+	GuiController::GetSingleton().SetHeaderPred([](const auto* f) { return IsHeaderFile(f); });
+	GuiController::GetSingleton().SetIgnoredPred([](const auto* f) { return ignored["filePaths"]->isIgnored(f); } );
+
+	InstallClassDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
+	InstallFieldDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
+	InstallMethodDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
+	InstallMethodVarDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
 
 #ifdef INCREMENTAL_GENERATION
 	if (parsedFiles.size() > 1)
 		wxGetApp().SkipFiles(parsedFiles.size() - 1, parsedFiles.back());
 #endif
+
 	miningRes = MineArchitecture(*clangTool); 
 
-	wxGetApp().Finished();
+	wxGetApp().Finish();
   	//wxTheApp->OnRun(); 
 
 	PrintMiningResult(miningRes);

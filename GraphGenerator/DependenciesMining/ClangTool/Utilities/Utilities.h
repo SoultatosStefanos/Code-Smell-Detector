@@ -5,6 +5,7 @@
 #include "clang/ASTMatchers/ASTMatchers.h"
 #include "clang/ASTMatchers/ASTMatchFinder.h"
 #include <iostream>
+#include <string>
 
 #define ID_T std::string
 
@@ -61,5 +62,5 @@ namespace dependenciesMining {
 		auto loc = d->getLocation().printToString(sm);
 		std::cout << "\t" << loc << "\n\n";
 	}
-
+	
 }

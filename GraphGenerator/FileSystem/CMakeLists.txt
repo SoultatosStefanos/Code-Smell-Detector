@@ -1,8 +1,6 @@
 set(FILES
-	Gui.cpp
-	Gui.h
-	GuiController.cpp
-	GuiController.h
+	FileSystem.cpp
+	FileSystem.h
 )
 set(SUBDIRECTORIES)
 

@@ -32,6 +32,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS} ${wx
 
 set(SUBDIRECTORIES
 	DependenciesMining
+	FileSystem
 	Graph
 	GraphGeneration
 	GraphToJson

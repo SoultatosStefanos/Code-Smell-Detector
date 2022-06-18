@@ -1,6 +1,6 @@
 #include "DependenciesMining.h"
 #include "Utilities.h"
-#include "Gui.h"
+#include "FileSystem.h"
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include <vector>
@@ -14,32 +14,36 @@
 
 namespace dependenciesMining {
 
+using namespace filesystem;
+
 // ----------------------------------------------------------------------------------------------
 
 SymbolTable structuresTable;
 Sources parsedFiles;
-std::string currFile;
+std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
-static std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
+// ----------------------------------------------------------------------------------------------
 
 namespace {
 
-	// returns true only if str ends with ending
-	inline bool EndsWith(std::string const& str, std::string const& ending) {
-		if (str.length() >= ending.length())
-			return (0 == str.compare(str.length() - ending.length(), ending.length(), ending));
-		return false;
-	}
+	using ClassDeclObservers = std::vector<ClassDeclObserver>;
+	using FieldDeclObservers = std::vector<FieldDeclObserver>;
+	using MethodDeclObservers = std::vector<MethodDeclObserver>;
+	using MethodVarDeclObservers = std::vector<MethodVarDeclObserver>;
 
-	inline bool IsHeaderFile(const std::string& file) {
-		return EndsWith(file, ".h") or EndsWith(file, ".hpp"); // TODO More
-	}
+	ClassDeclObservers classCallbacks;
+	FieldDeclObservers fieldCallbacks;
+	MethodDeclObservers methodCallbacks;
+	MethodVarDeclObservers methodVarCallbacks;
 
-	inline bool IsSrcFile(const std::string& file) {
-		return EndsWith(file, ".cpp") or EndsWith(file, ".cc"); // TODO More
+	template <typename Decl, typename Observers>
+	inline void NotifyObservers(const MatchFinder::MatchResult& res, const Decl& decl, const Observers& observers) {
+		for (const auto& f : observers)
+			f(res, decl);
 	}
 
 } // namespace
+
 
 // ----------------------------------------------------------------------------------------------
 
@@ -70,14 +74,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		}
 	}
 
-	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-
-#ifdef GUI
-	if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-		currFile = srcLocation.getFilename();
-
-	wxGetApp().Update(); // TODO Remove
-#endif
+	assert(d);
+	NotifyObservers(result, *d, classCallbacks);
 
 	const auto structID = GetIDfromDecl(d);
 
@@ -104,6 +102,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		assert(0);
 	}
 
+	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 	structure.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 	if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 		return;
@@ -296,14 +295,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		assert(d);
 
-		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-
-#ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			currFile = srcLocation.getFilename();
-
-		wxGetApp().Update(); // TODO Remove
-#endif
+		NotifyObservers(result, *d, fieldCallbacks);
 
 		const auto fieldID = GetIDfromDecl(d);
 
@@ -313,6 +305,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		if (!parent->isClass() and !parent->isStruct())
 			return;
 
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		// Ignored
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
@@ -367,14 +360,9 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // Handle all the Methods
 void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
-		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-
-#ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			currFile = srcLocation.getFilename();
-
-		wxGetApp().Update(); // TODO Remove
-#endif
+		assert(d);
+		
+		NotifyObservers(result, *d, methodCallbacks);
 
 		const auto methodID = GetIDfromDecl(d);
 
@@ -386,6 +374,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			return;
 		}
 
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		// Ignored
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
@@ -656,14 +645,7 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		assert(d);
 
-		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
-
-#ifdef GUI
-		if (srcLocation.isValid() and !ignored["filePaths"]->isIgnored(srcLocation.getFilename()) and !IsHeaderFile(srcLocation.getFilename()))
-			currFile = srcLocation.getFilename();
-
-		wxGetApp().Update(); // TODO Remove
-#endif
+		NotifyObservers(result, *d, methodVarCallbacks);
 
 		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
@@ -684,6 +666,8 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 		if (isIgnoredDecl(parentClass)) {
 			return;
 		}
+
+		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
 		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
 			return;
@@ -855,7 +839,7 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 		if (IsHeaderFile(path)) { // TODO More extensions
 			headers.push_back(path);
 		}
-		else if (IsSrcFile(path)) {
+		else if (IsSourceFile(path)) {
 #ifdef INCREMENTAL_GENERATION
 			assert(std::none_of(std::begin(parsedFiles), std::end(parsedFiles) - 1, [&path](const auto& file) { return file == path; }));
 #endif
@@ -863,5 +847,22 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 		}
 	}
 }
+
+void InstallClassDeclObserver(ClassDeclObserver f) {
+	classCallbacks.push_back(std::move(f));
+}
+
+void InstallFieldDeclObserver(FieldDeclObserver f) {
+	fieldCallbacks.push_back(std::move(f));
+}
+
+void InstallMethodDeclObserver(MethodDeclObserver f) {
+	methodCallbacks.push_back(std::move(f));
+}
+
+void InstallMethodVarDeclObserver(MethodVarDeclObserver f) {
+	methodVarCallbacks.push_back(std::move(f));
+}
+
 
 } // dependenciesMining
