@@ -1,6 +1,3 @@
-// Filesystem utilities.
-// Soultatos Stefanos 2022
-
 #include <string>
 
 namespace filesystem {

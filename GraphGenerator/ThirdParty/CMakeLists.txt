@@ -1,8 +1,0 @@
-set(EXTERNAL_TRGTS gtest )
-set(EXTERNAL_SUBDIRECTORIES googletest )
-
-foreach(TRGT DIRECTORY IN ZIP_LISTS EXTERNAL_TRGTS EXTERNAL_SUBDIRECTORIES)
-    if(NOT TARGET ${TRGT})
-		add_subdirectory(${DIRECTORY})
-	endif()
-endforeach()
