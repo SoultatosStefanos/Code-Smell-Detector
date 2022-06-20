@@ -24,6 +24,7 @@ namespace dependenciesMining {
 
 	extern SymbolTable structuresTable;
 	extern Sources parsedFiles;
+	extern SourceIDs cachedFileIDs;
 	extern std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
 	// ----------------------------------------------------------------------------------

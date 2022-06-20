@@ -24,7 +24,7 @@ add_definitions("-fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__S
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC INCREMENTAL_GENERATION=1)
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC GUI=1)
+# target_compile_definitions(${PROJECT_NAME} PUBLIC GUI=1)
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
 

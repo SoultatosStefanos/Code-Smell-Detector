@@ -20,6 +20,7 @@ using namespace filesystem;
 
 SymbolTable structuresTable;
 Sources parsedFiles;
+SourceIDs cachedFileIDs;
 std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
 
 // ----------------------------------------------------------------------------------------------
@@ -727,30 +728,14 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 namespace {
 
-	inline bool IsParsed(const std::string& file) {
-		return std::find(std::begin(parsedFiles), std::end(parsedFiles), file) != std::end(parsedFiles); 
-	}
-
-	inline bool IsParsedLast(const std::string& file) {
-		assert(!parsedFiles.empty());
-		return parsedFiles.back() == file; 
-	}
-
-	inline bool IsIgnored(const std::string& file) {
+	Sources DropIgnoredFiles(const Sources& srcs) {
 		assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
-		return ignored["filePaths"]->isIgnored(file); 
-	}
 
-	Sources FilterParsedFiles(const Sources& databaseSrcs) {
-		assert(databaseSrcs.size() >= parsedFiles.size());
-
-		if (parsedFiles.empty()) 
-			return databaseSrcs;
-		
 		Sources res;
-		std::copy_if(std::begin(databaseSrcs), std::end(databaseSrcs), std::back_inserter(res), [](const auto& file) {
-			return !IsIgnored(file) and (!IsParsed(file) or IsParsedLast(file));
+		std::copy_if(std::begin(srcs), std::end(srcs), std::back_inserter(res), [](const auto& file) {
+			return !ignored["filePaths"]->isIgnored(file);
 		});
+
 		return res;
 	}
 
@@ -760,10 +745,21 @@ std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& e
 	assert(cmpDBPath);
 	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
 
+	FileManager mnger{FileSystemOptions{}};
+	for (const auto& file : database->getAllFiles()) {
+		auto fileRef = mnger.getFileRef(file);
+		assert(fileRef);
+		std::cout << "Given: " << file << ", with id: " << fileRef->getUID() << '\n';
+	}
+	for (auto id : cachedFileIDs) {
+		std::cout << "Cached: " << id << '\n';
+	}
+
+
 #ifdef INCREMENTAL_GENERATION
-	return database ? std::make_unique<ClangTool>(*database, FilterParsedFiles(database->getAllFiles())) : nullptr;
+	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(DropParsedFiles(database->getAllFiles(), cachedFileIDs))) : nullptr;
 #else
-	return database ? std::make_unique<ClangTool>(*database, database->getAllFiles()) : nullptr;
+	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(database->getAllFiles())) : nullptr;
 #endif
 }
 
@@ -782,9 +778,9 @@ std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs)
 	static auto parser = CommonOptionsParser::create(argc, argv, myToolCategory);
 
 #ifdef INCREMENTAL_GENERATION
-	return parser ? std::make_unique<ClangTool>(parser->getCompilations(),  FilterParsedFiles(srcs)) : nullptr;
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(DropParsedFiles(srcs, cachedFileIDs))) : nullptr;
 #else
-	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), srcs) : nullptr;
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(srcs)) : nullptr;
 #endif
 }
 
@@ -824,7 +820,7 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 	assert(headers.empty());
 
 #ifdef INCREMENTAL_GENERATION
-	std::copy(std::begin(parsedFiles), std::end(parsedFiles) - 1, std::back_inserter(srcs)); // copy parsed files up to last
+	std::copy(std::begin(parsedFiles), std::end(parsedFiles) - 1, std::back_inserter(srcs)); // In order to include previously mined files.
 #endif
 
 	SmallVector<const FileEntry* > files;
@@ -832,16 +828,17 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 	file_manager.GetUniqueIDMapping(files);
 
 	for (auto* file : files) {
-		const auto path = file->getName().str();
+		const auto path =  file->getName().str();
+
 		if (ignored["filePaths"]->isIgnored(path))
 			continue;
 
-		if (IsHeaderFile(path)) { // TODO More extensions
+		if (IsHeaderFile(path)) {
 			headers.push_back(path);
 		}
 		else if (IsSourceFile(path)) {
 #ifdef INCREMENTAL_GENERATION
-			assert(std::none_of(std::begin(parsedFiles), std::end(parsedFiles) - 1, [&path](const auto& file) { return file == path; }));
+			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) && "Recompiled stuff?") : true);
 #endif
 			srcs.push_back(path);
 		}

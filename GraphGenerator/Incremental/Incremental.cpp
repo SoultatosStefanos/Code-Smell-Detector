@@ -3,6 +3,7 @@
 
 #include "Incremental.h"
 #include "Converters.h"
+
 #include <filesystem>
 
 namespace incremental {
@@ -294,6 +295,80 @@ namespace incremental {
 
 		assert(from.good());
 		assert(from.is_open());
+	}
+
+	void ImportSourceIDs(const std::string_view jsonPath, SourceIDs& srcs) {
+		assert(srcs.empty());
+
+		JsonArchive from{jsonPath.data()};
+		const auto srcVal =  Get(GetArchiveRoot(from), "source_ids");
+		assert(srcVal.isArray());
+
+		srcs.reserve(std::distance(std::begin(srcVal), std::end(srcVal)));
+		std::transform(std::begin(srcVal), std::end(srcVal), std::back_inserter(srcs), [](const auto& val) {
+			assert(val.isUInt());
+			return val.asUInt();
+		});
+
+		assert(from.good());
+		assert(from.is_open());
+	}
+
+	namespace {
+
+		using namespace clang;
+		using namespace llvm;
+
+		inline bool IsParsed(const std::string& file, const SourceIDs& cached_ids, FileManager& manager) {
+			auto fileRef = manager.getFileRef(file);
+			return 	std::find_if(std::begin(cached_ids), std::end(cached_ids), [&fileRef](auto id) {
+						assert(fileRef && "invalid source file");
+						return fileRef->getUID() == id;
+					}) 
+					!= std::end(cached_ids); 
+		}
+
+		inline bool IsParsedLast(const std::string& file, const SourceIDs& cached_ids, FileManager& manager) {
+			assert(!cached_ids.empty());
+			
+			auto fileRef = manager.getFileRef(file);
+			assert(fileRef && "invalid source file");
+			return cached_ids.back() == fileRef->getUID(); 
+		}
+
+	} // namespace
+
+	Sources DropParsedFiles(const Sources& sources, const SourceIDs& cached_ids) {
+		assert(sources.size() >= cached_ids.size());
+
+		if (cached_ids.empty()) 
+			return sources;
+
+		Sources res;
+		FileManager manager{FileSystemOptions{}};
+		std::copy_if(std::begin(sources), std::end(sources), std::back_inserter(res), [&cached_ids, &manager](const auto& file) {
+			return !IsParsed(file, cached_ids, manager) or IsParsedLast(file, cached_ids, manager);
+		});
+
+		return res;
+	}
+
+	void SerializeSourceIDs(Json::Value& value, const Sources& srcs, clang::FileManager& manager) {
+		SmallVector<const FileEntry* > files;
+		manager.GetUniqueIDMapping(files);
+		for (auto* file : files) {
+			const auto path =  file->getName().str();
+			auto fileRef = manager.getFileRef(path);
+			assert(fileRef && "invalid source file");
+			std::cout << "From FileManager: " << path << ", with id: " << fileRef->getUID() << '\n';
+		}
+
+		for (const auto& file : srcs) {
+			auto fileRef = manager.getFileRef(file);
+			assert(fileRef && "invalid source file");
+			std::cout << "Caching: " << file << ", with id: " << fileRef->getUID() << '\n';
+			value["source_ids"].append(fileRef->getUID());
+		}
 	}
 
 } // incremental
