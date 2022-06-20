@@ -47,7 +47,7 @@ namespace incremental {
 
 		inline void DeserializeDefinition(const SymbolID& id, const JsonVal& val, Definition* d) {
 			d->SetID(id);
-			d->SetName(id);
+			d->SetName(Get(val, "name").asString());
 			d->SetFullType(Get(val, "full_type").asString());
 			d->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));
 		}
@@ -59,7 +59,7 @@ namespace incremental {
 
 		inline void DeserializeMethod(const SymbolID& id, const JsonVal& val, Method* m) {
 			m->SetID(id);
-			m->SetName(id);
+			m->SetName(Get(val, "name").asString());
 			m->SetBranches(Get(val, "branches").asInt());
 			m->SetLineCount(Get(val, "lines").asInt());
 			m->SetLiterals(Get(val, "literals").asInt());
@@ -74,7 +74,7 @@ namespace incremental {
 
 		inline void DeserializeStructure(const SymbolID& id, const JsonVal& val, Structure* s) {
 			s->SetID(id);
-			s->SetName(id);
+			s->SetName(Get(val, "name").asString());
 			s->SetNamespace(Get(val, "namespace").asString());
 			s->SetStructureType(ToStructureType(Get(val, "structure_type").asString()));
 			s->SetSourceInfo(DeserializeSrcInfo(Get(val, "src_info")));

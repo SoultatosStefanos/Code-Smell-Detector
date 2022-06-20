@@ -109,7 +109,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	//assert(structID); 
-	structure.SetName(GetFullStructureName(d));
+	structure.SetName(d->getNameAsString());
 	structure.SetID(structID);
 
 	// Namespace
@@ -281,7 +281,7 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 		ID_T parentID = GetIDfromDecl(parent);
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
-		Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace());
+		Definition field(fieldID, d->getNameAsString(), parentStructure->GetNamespace());
 		field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 		field.SetFullType(typeName);
 		auto* _field = parentStructure->InstallField(fieldID, field);
@@ -345,8 +345,7 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
 
-
-			Definition field(fieldID, d->getQualifiedNameAsString(), parentStructure->GetNamespace(), typeStructure);
+			Definition field(fieldID, d->getNameAsString(), parentStructure->GetNamespace(), typeStructure);
 			field.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			field.SetFullType(d->getType().getAsString());
 			auto* _field = parentStructure->InstallField(fieldID, field);
@@ -389,7 +388,7 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		Structure* parentStructure = (Structure*)structuresTable.Lookup(parentID);
 		assert(parentStructure);
-		Method method(methodID, GetFullMethodName(d), parentStructure->GetNamespace());
+		Method method(methodID,  d->getNameAsString(), parentStructure->GetNamespace());
 		method.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 
 		// Method's Type
@@ -699,14 +698,14 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 			Structure* typeStructure = (Structure*)structuresTable.Lookup(typeID);
 			if (!typeStructure)
 				typeStructure = (Structure*)structuresTable.Install(typeID, typeName);
-			def = new Definition(defID, defID, parentMethod->GetNamespace(), typeStructure);
+			def = new Definition(defID,  d->getNameAsString(), parentMethod->GetNamespace(), typeStructure);
 			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			def->SetFullType(typeName);
 		}
 		else {
 
 			typeName = d->getType().getAsString();
-			def = new Definition(defID, defID, parentStructure->GetNamespace());
+			def = new Definition(defID, d->getNameAsString(), parentStructure->GetNamespace());
 			def->SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
 			def->SetFullType(typeName);
 		}

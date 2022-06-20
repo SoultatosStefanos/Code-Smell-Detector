@@ -851,6 +851,8 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 	Put(json_structure, "template_args");
 	for (const auto& [id, arg] : structure->GetTemplateArguments())
 		json_structure["template_args"].append(id);
+
+	json_structure["name"] = structure->GetName();
 }
 
 void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value& json_method) const {
@@ -883,6 +885,8 @@ void SymbolTable::AddJsonMethod(dependenciesMining::Method* method, Json::Value&
 
 	json_method["method_type"] = method->GetMethodTypeAsString();
 
+	json_method["name"] = method->GetName();
+
 #pragma warning(">>>>>>>>>>>>>> GetMemberExpr() <<<<<<<<<<<<<<<<<")
 }
 
@@ -898,6 +902,8 @@ void SymbolTable::AddJsonDefinition(dependenciesMining::Definition* definition, 
 	json_definition["src_info"] = GetJsonSourceInfo(definition);
 	if (definition->GetAccessType() != AccessType::unknown)
 		json_definition["access"] = definition->GetAccessTypeStr();
+	
+	json_definition["name"] = definition->GetName();
 
 }
 
