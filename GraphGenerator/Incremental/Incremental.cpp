@@ -320,20 +320,12 @@ namespace incremental {
 		using namespace llvm;
 
 		inline bool IsParsed(const std::string& file, const SourceIDs& cached_ids, FileManager& manager) {
-			auto fileRef = manager.getFileRef(file);
-			return 	std::find_if(std::begin(cached_ids), std::end(cached_ids), [&fileRef](auto id) {
-						assert(fileRef && "invalid source file");
-						return fileRef->getUID() == id;
-					}) 
-					!= std::end(cached_ids); 
-		}
-
-		inline bool IsParsedLast(const std::string& file, const SourceIDs& cached_ids, FileManager& manager) {
 			assert(!cached_ids.empty());
-			
+
 			auto fileRef = manager.getFileRef(file);
 			assert(fileRef && "invalid source file");
-			return cached_ids.back() == fileRef->getUID(); 
+
+			return fileRef->getUID() < cached_ids.back();
 		}
 
 	} // namespace
@@ -347,28 +339,24 @@ namespace incremental {
 		Sources res;
 		FileManager manager{FileSystemOptions{}};
 		std::copy_if(std::begin(sources), std::end(sources), std::back_inserter(res), [&cached_ids, &manager](const auto& file) {
-			return !IsParsed(file, cached_ids, manager) or IsParsedLast(file, cached_ids, manager);
+			return !IsParsed(file, cached_ids, manager);
 		});
 
 		return res;
 	}
 
-	void SerializeSourceIDs(Json::Value& value, const Sources& srcs, clang::FileManager& manager) {
-		SmallVector<const FileEntry* > files;
+	void SerializeSourceIDs(Json::Value& value, FileManager& manager, const IgnoreRegistry& ignored) {
+		SmallVector<const FileEntry*> files;
 		manager.GetUniqueIDMapping(files);
-		for (auto* file : files) {
-			const auto path =  file->getName().str();
-			auto fileRef = manager.getFileRef(path);
-			assert(fileRef && "invalid source file");
-			std::cout << "From FileManager: " << path << ", with id: " << fileRef->getUID() << '\n';
-		}
 
-		for (const auto& file : srcs) {
-			auto fileRef = manager.getFileRef(file);
-			assert(fileRef && "invalid source file");
-			std::cout << "Caching: " << file << ", with id: " << fileRef->getUID() << '\n';
-			value["source_ids"].append(fileRef->getUID());
-		}
+		std::for_each(std::begin(files), std::end(files), [id = 0, &manager, &ignored, &value](auto* file) mutable {
+			assert(file);
+
+			const auto path =  file->getName().str();
+
+			if (!IsFilePathIgnored(ignored, path)) 
+				value["source_ids"].append(id++);
+		});
 	}
 
 } // incremental

@@ -4,6 +4,7 @@
 #pragma once
 
 #include "SymbolTable.h"
+#include "Ignored.h"
 
 #include <clang/Tooling/Tooling.h>
 #include <fstream>
@@ -24,6 +25,7 @@ namespace incremental {
 	// Assumes that all cached files, except the last one, were entirely parsed.
 	Sources DropParsedFiles(const Sources& sources, const SourceIDs& cached_ids);
 
-	void SerializeSourceIDs(Json::Value& value, const Sources& srcs, clang::FileManager& manager);
+	// Expects FileManager from used ClangTool.
+	void SerializeSourceIDs(Json::Value& value, clang::FileManager& manager, const dependenciesMining::IgnoreRegistry& ignored);
 
 } // incremental

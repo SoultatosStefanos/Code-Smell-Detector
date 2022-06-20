@@ -21,7 +21,7 @@ using namespace filesystem;
 SymbolTable structuresTable;
 Sources parsedFiles;
 SourceIDs cachedFileIDs;
-std::unordered_map<std::string, std::unique_ptr<Ignored>> ignored;
+IgnoreRegistry ignored;
 
 // ----------------------------------------------------------------------------------------------
 
@@ -745,17 +745,6 @@ std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& e
 	assert(cmpDBPath);
 	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
 
-	FileManager mnger{FileSystemOptions{}};
-	for (const auto& file : database->getAllFiles()) {
-		auto fileRef = mnger.getFileRef(file);
-		assert(fileRef);
-		std::cout << "Given: " << file << ", with id: " << fileRef->getUID() << '\n';
-	}
-	for (auto id : cachedFileIDs) {
-		std::cout << "Cached: " << id << '\n';
-	}
-
-
 #ifdef INCREMENTAL_GENERATION
 	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(DropParsedFiles(database->getAllFiles(), cachedFileIDs))) : nullptr;
 #else
@@ -837,9 +826,9 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 			headers.push_back(path);
 		}
 		else if (IsSourceFile(path)) {
-#ifdef INCREMENTAL_GENERATION
-			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) && "Recompiled stuff?") : true);
-#endif
+// #ifdef INCREMENTAL_GENERATION
+// 			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) && "Recompiled stuff?") : true);
+// #endif
 			srcs.push_back(path);
 		}
 	}

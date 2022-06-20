@@ -89,7 +89,7 @@ namespace {
 		SerializeDependencies(jsonGraph, jsonST);
 		SerializeFilePaths(jsonST, srcs, headers);
 #ifdef INCREMENTAL_GENERATION
-		SerializeSourceIDs(jsonST, srcs, tool.getFiles());
+		SerializeSourceIDs(jsonST, tool.getFiles(), ignored);
 #endif
 
 		std::ofstream jsonSTFile{outputPath};

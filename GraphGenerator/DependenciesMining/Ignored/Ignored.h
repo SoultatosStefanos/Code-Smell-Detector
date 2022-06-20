@@ -1,10 +1,13 @@
 #pragma once
+
 #include <list>
 #include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <stack>
+#include <unordered_map>
+#include <memory>
 
 namespace dependenciesMining {
 	
@@ -38,5 +41,15 @@ namespace dependenciesMining {
 		IgnoredFilePaths(const std::string& inputFile = "");
 		virtual bool isIgnored(const std::string& file);
 	};
+
+	using IgnoreRegistry = std::unordered_map<std::string, std::unique_ptr<Ignored>>;
+
+	inline bool IsFilePathIgnored(const IgnoreRegistry& ignored, const std::string& file) {
+		return ignored.at("filePaths")->isIgnored(file);
+	}
+
+	inline bool IsNamespaceIgnored(const IgnoreRegistry& ignored, const std::string& nameSpace) {
+		return ignored.at("namespaces")->isIgnored(nameSpace);
+	}
 
 }
