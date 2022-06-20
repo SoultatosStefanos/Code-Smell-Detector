@@ -20,7 +20,6 @@ using namespace filesystem;
 
 SymbolTable structuresTable;
 Sources parsedFiles;
-SourceIDs cachedFileIDs;
 IgnoreRegistry ignored;
 
 // ----------------------------------------------------------------------------------------------
@@ -746,7 +745,7 @@ std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& e
 	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
 
 #ifdef INCREMENTAL_GENERATION
-	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(DropParsedFiles(database->getAllFiles(), cachedFileIDs))) : nullptr;
+	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(DropParsedFiles(database->getAllFiles(), parsedFiles))) : nullptr;
 #else
 	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(database->getAllFiles())) : nullptr;
 #endif
@@ -767,7 +766,7 @@ std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs)
 	static auto parser = CommonOptionsParser::create(argc, argv, myToolCategory);
 
 #ifdef INCREMENTAL_GENERATION
-	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(DropParsedFiles(srcs, cachedFileIDs))) : nullptr;
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(DropParsedFiles(srcs, parsedFiles))) : nullptr;
 #else
 	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(srcs)) : nullptr;
 #endif
@@ -826,9 +825,9 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 			headers.push_back(path);
 		}
 		else if (IsSourceFile(path)) {
-// #ifdef INCREMENTAL_GENERATION
-// 			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) && "Recompiled stuff?") : true);
-// #endif
+#ifdef INCREMENTAL_GENERATION
+			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) - 1 && "Recompiled stuff?") : true);
+#endif
 			srcs.push_back(path);
 		}
 	}

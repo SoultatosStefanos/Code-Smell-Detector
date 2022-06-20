@@ -4,6 +4,7 @@
 #include "Incremental.h"
 #include "Converters.h"
 
+#include <algorithm>
 #include <filesystem>
 
 namespace incremental {
@@ -297,66 +298,16 @@ namespace incremental {
 		assert(from.is_open());
 	}
 
-	void ImportSourceIDs(const std::string_view jsonPath, SourceIDs& srcs) {
-		assert(srcs.empty());
+	Sources DropParsedFiles(const Sources& sources, const Sources& cached) {
+		assert(sources.size() >= cached.size());
+		assert((std::begin(sources) + (sources.size() - 1)) <= std::end(sources));
 
-		JsonArchive from{jsonPath.data()};
-		const auto srcVal =  Get(GetArchiveRoot(from), "source_ids");
-		assert(srcVal.isArray());
-
-		srcs.reserve(std::distance(std::begin(srcVal), std::end(srcVal)));
-		std::transform(std::begin(srcVal), std::end(srcVal), std::back_inserter(srcs), [](const auto& val) {
-			assert(val.isUInt());
-			return val.asUInt();
-		});
-
-		assert(from.good());
-		assert(from.is_open());
-	}
-
-	namespace {
-
-		using namespace clang;
-		using namespace llvm;
-
-		inline bool IsParsed(const std::string& file, const SourceIDs& cached_ids, FileManager& manager) {
-			assert(!cached_ids.empty());
-
-			auto fileRef = manager.getFileRef(file);
-			assert(fileRef && "invalid source file");
-
-			return fileRef->getUID() < cached_ids.back();
-		}
-
-	} // namespace
-
-	Sources DropParsedFiles(const Sources& sources, const SourceIDs& cached_ids) {
-		assert(sources.size() >= cached_ids.size());
-
-		if (cached_ids.empty()) 
+		if (cached.empty()) 
 			return sources;
 
-		Sources res;
-		FileManager manager{FileSystemOptions{}};
-		std::copy_if(std::begin(sources), std::end(sources), std::back_inserter(res), [&cached_ids, &manager](const auto& file) {
-			return !IsParsed(file, cached_ids, manager);
-		});
+		Sources res{std::begin(sources) + (sources.size() - 1), std::end(sources)};
 
 		return res;
-	}
-
-	void SerializeSourceIDs(Json::Value& value, FileManager& manager, const IgnoreRegistry& ignored) {
-		SmallVector<const FileEntry*> files;
-		manager.GetUniqueIDMapping(files);
-
-		std::for_each(std::begin(files), std::end(files), [id = 0, &manager, &ignored, &value](auto* file) mutable {
-			assert(file);
-
-			const auto path =  file->getName().str();
-
-			if (!IsFilePathIgnored(ignored, path)) 
-				value["source_ids"].append(id++);
-		});
 	}
 
 } // incremental

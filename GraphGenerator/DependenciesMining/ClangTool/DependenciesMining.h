@@ -22,9 +22,10 @@ using namespace incremental;
 
 namespace dependenciesMining {
 
+	using IgnoreRegistry = std::unordered_map<std::string, std::unique_ptr<Ignored>>;
+
 	extern SymbolTable structuresTable;
 	extern Sources parsedFiles;
-	extern SourceIDs cachedFileIDs;
 	extern IgnoreRegistry ignored;
 
 	// ----------------------------------------------------------------------------------

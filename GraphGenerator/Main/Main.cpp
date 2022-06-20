@@ -78,7 +78,7 @@ namespace {
 			ST["headers"].append(path);
 	}
 
-	void ProduceJsonOutput(ClangTool& tool, const Graph& dependencyGraph, const SymbolTable& exportedTable, const FilePaths& srcs, const FilePaths& headers, const char* outputPath) {
+	void ProduceJsonOutput(const Graph& dependencyGraph, const SymbolTable& exportedTable, const FilePaths& srcs, const FilePaths& headers, const char* outputPath) {
 		assert(outputPath);
 
 		Json::Value jsonST;
@@ -88,9 +88,6 @@ namespace {
 
 		SerializeDependencies(jsonGraph, jsonST);
 		SerializeFilePaths(jsonST, srcs, headers);
-#ifdef INCREMENTAL_GENERATION
-		SerializeSourceIDs(jsonST, tool.getFiles(), ignored);
-#endif
 
 		std::ofstream jsonSTFile{outputPath};
 		jsonSTFile << jsonST;
@@ -108,7 +105,7 @@ namespace {
 		FilePaths srcs, headers;
 		GetMinedFiles(tool, srcs, headers);
 
-		ProduceJsonOutput(tool, dependenciesGraph, structuresTable, srcs, headers, outputPath);
+		ProduceJsonOutput(dependenciesGraph, structuresTable, srcs, headers, outputPath);
 	}
 
 } // namespace
@@ -135,7 +132,6 @@ int main(int argc, char* argv[]) {
 	if (std::filesystem::exists(outputPath)) {
 		ImportST(outputPath, structuresTable);
 		ImportSources(outputPath, parsedFiles);
-		ImportSourceIDs(outputPath, cachedFileIDs);
 	}
 #endif
 
