@@ -9,10 +9,7 @@ project(GraphGenerator CXX)
 if(MSVC)
 	add_compile_options(/W4 /WX)
 else()
-	add_compile_options(
-		-Wall -Wextra -pedantic
-		-I/usr/lib/gcc/x86_64-linux-gnu/11/include
-	)
+	add_compile_options(-Wall -Wextra -pedantic)
 endif()
 
 find_package(wxWidgets REQUIRED gl core base OPTIONAL_COMPONENTS net)
