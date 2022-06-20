@@ -160,9 +160,9 @@ int main(int argc, char* argv[]) {
 	wxEntryStart(argc, argv);
 
 #ifdef INCREMENTAL_GENERATION
-		const auto max = clangTool->getSourcePaths().size() + (parsedFiles.empty() ? 0 : parsedFiles.size() - 1);
+	const auto max = clangTool->getSourcePaths().size() + (parsedFiles.empty() ? 0 : parsedFiles.size() - 1);
 #else
-		const auto max = clangTool->getSourcePaths().size();
+	const auto max = clangTool->getSourcePaths().size();
 #endif
 
 	wxGetApp().SetMax(max);
