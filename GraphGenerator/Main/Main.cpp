@@ -159,7 +159,13 @@ int main(int argc, char* argv[]) {
 #ifdef GUI
 	wxEntryStart(argc, argv);
 
-	wxGetApp().SetMax(clangTool->getSourcePaths().size());
+#ifdef INCREMENTAL_GENERATION
+		const auto max = clangTool->getSourcePaths().size() + (parsedFiles.empty() ? 0 : parsedFiles.size() - 1);
+#else
+		const auto max = clangTool->getSourcePaths().size();
+#endif
+
+	wxGetApp().SetMax(max);
 	wxGetApp().SetOnCancel([&clangTool, outputPath]() {
 		ExportDependencies(*clangTool, structuresTable, outputPath);
 
