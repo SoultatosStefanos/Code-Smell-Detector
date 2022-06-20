@@ -302,7 +302,7 @@ namespace incremental {
 		assert(sources.size() >= cached.size());
 		assert((std::begin(sources) + (sources.size() - 1)) <= std::end(sources));
 
-		return cached.empty() ? sources : Sources{std::begin(sources) + (sources.size() - 1), std::end(sources)};
+		return cached.empty() ? sources : Sources{std::begin(sources) + (cached.size() - 1), std::end(sources)};
 	}
 
 } // incremental

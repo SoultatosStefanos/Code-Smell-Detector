@@ -190,7 +190,6 @@ int main(int argc, char* argv[]) {
 	miningRes = MineArchitecture(*clangTool); 
 
 	wxGetApp().Finish();
-  	//wxTheApp->OnRun(); 
 
 	PrintMiningResult(miningRes);
 

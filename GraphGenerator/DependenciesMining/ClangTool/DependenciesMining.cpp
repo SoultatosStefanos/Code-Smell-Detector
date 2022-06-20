@@ -825,9 +825,6 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 			headers.push_back(path);
 		}
 		else if (IsSourceFile(path)) {
-#ifdef INCREMENTAL_GENERATION
-			assert(!parsedFiles.empty() ? (std::find(std::begin(parsedFiles), std::end(parsedFiles) - 1, path) == std::end(parsedFiles) - 1 && "Recompiled stuff?") : true);
-#endif
 			srcs.push_back(path);
 		}
 	}
