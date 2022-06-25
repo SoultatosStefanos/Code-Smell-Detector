@@ -121,9 +121,9 @@ namespace incremental {
 
 		Structure* ImportStructure(const SymbolID& id, const JsonVal& val, SymbolTable& table); // fwd declare for early usage
 
-		inline void ImportStructureNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
-			ForEach(Get(val, "contains"), [&table, s](const auto& id, const auto& val) {
-				s->InstallNestedClass(id, ImportStructure(id, val, table)); 
+		inline void InstallStructureNestedClasses(const JsonVal& val, SymbolTable& table, Structure* s) {
+			InstallDependencies(Get(val, "contains"), table, [s](const auto& id, auto* nested) {
+				s->InstallNestedClass(id, nested); 
 			});
 		}
 
@@ -244,8 +244,7 @@ namespace incremental {
 
 			DeserializeStructure(id, val, s);
 
-			ImportStructureNestedClasses(val, table, s);
-
+			InstallStructureNestedClasses(val, table, s);
 			InstallStructureBases(val, table, s);
 			InstallStructureFields(val, table, s);
 			InstallStructureFriends(val, table, s);

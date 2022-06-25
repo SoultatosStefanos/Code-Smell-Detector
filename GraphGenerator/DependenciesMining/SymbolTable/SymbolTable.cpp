@@ -829,7 +829,10 @@ void SymbolTable::AddJsonStructure(dependenciesMining::Structure* structure, Jso
 	for (const auto& [id, base] : structure->GetBases())
 		json_structure["bases"].append(id);
 
-	structure->GetContains().AddJsonSymbolTable(json_structure["contains"]);
+	Put(json_structure, "contains");
+	for (const auto& [id, nested] : structure->GetContains())
+		json_structure["contains"].append(id);
+
 
 	Put(json_structure, "friends");
 	for (const auto& [id, buddy] : structure->GetFriends())
