@@ -1,26 +1,14 @@
-// GUI-Clang bridge.
-// Soultatos Stefanos 2022
-
 #pragma once
 
-#include <functional>
-
-#include "clang/Frontend/FrontendActions.h"
-#include "clang/Tooling/CommonOptionsParser.h"
-#include "clang/Tooling/Tooling.h"
-#include "clang/ASTMatchers/ASTMatchers.h"
-#include "clang/ASTMatchers/ASTMatchFinder.h"
-#include "clang/AST/RecursiveASTVisitor.h"
-#include "Gui.h"
+#include <cassert>
 
 namespace gui {
 
+	class Gui;
+
+	// NOTE: Thread safe
 	class GuiController final {
 	public:
-		using FilePred = std::function<bool(const char*)>;
-		using MatchResult = clang::ast_matchers::MatchFinder::MatchResult;
-		using Decl = clang::Decl;
-
 		GuiController(const GuiController&) = delete;
 		GuiController(GuiController&&) = delete;
 
@@ -29,17 +17,26 @@ namespace gui {
 
 		static GuiController& GetSingleton();
 
-		void SetIgnoredPred(const FilePred& f) { m_is_ignored = f; }
-		void SetHeaderPred(const FilePred& f) { m_is_header = f; }
+		unsigned GetTotalUnits(void) const { return m_total_units; }
+		void SetTotalUnits(unsigned units) { m_total_units = units; }
 
-		void UpdateGui(const MatchResult& res, const Decl& decl) const;
+		unsigned GetUnitsDone(void) const { return m_units_done; }
+
+		const Gui& GetGui(void) const;
+		Gui& GetGui(void);
+
+		bool IsGuiProgressDone(void) const { return GetTotalUnits() == GetUnitsDone(); }
+		void AdvanceGuiProgress(unsigned units = 1); 
 
 	private:
 		GuiController() = default;
 		~GuiController() = default;
 
-		FilePred m_is_ignored;
-		FilePred m_is_header;
+		void SetUnitsDone(unsigned units);
+		void UpdateGuiProgress(void);
+
+		unsigned m_total_units { 0 };
+		unsigned m_units_done { 0 };
 	};
 
-} // gui
+}

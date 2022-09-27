@@ -36,6 +36,7 @@ set(SUBDIRECTORIES
 	Gui
 	Incremental
 	Main
+	Messages
 	SourceLoader
 	Utilities
 )

@@ -4,6 +4,8 @@
 
 #include <functional>
 #include <iostream>
+#include <boost/signals2/signal.hpp>
+
 #include "SymbolTable.h"
 #include "Incremental.h"
 #include "../Ignored/Ignored.h"
@@ -82,14 +84,18 @@ namespace dependenciesMining {
 
 	// ----------------------------------------------------------------------------------
 
-	using ClassDeclObserver = std::function<void(const MatchFinder::MatchResult&, const CXXRecordDecl&)>;
-	using FieldDeclObserver = std::function<void(const MatchFinder::MatchResult&, const FieldDecl&)>;
-	using MethodDeclObserver = std::function<void(const MatchFinder::MatchResult&, const CXXMethodDecl&)>;
-	using MethodVarDeclObserver = std::function<void(const MatchFinder::MatchResult&, const VarDecl&)>;
+	bool IsMiningDisrupted(void);
+	void DisruptMining(void);
 
-	void InstallClassDeclObserver(ClassDeclObserver f);
-	void InstallFieldDeclObserver(FieldDeclObserver f);
-	void InstallMethodDeclObserver(MethodDeclObserver f);
-	void InstallMethodVarDeclObserver(MethodVarDeclObserver f);
+	using BeginSourceSignal = boost::signals2::signal< void(CompilerInstance&) >;
+	using EndSourceSignal = boost::signals2::signal< void() >;
+
+	using BeginSourceSlot = BeginSourceSignal::slot_type;
+	using EndSourceSlot = EndSourceSignal::slot_type;
+
+	using Connection = boost::signals2::connection;
+
+	Connection ConnectToBeginSource(const BeginSourceSlot& f);
+	Connection ConnectToEndSource(const EndSourceSlot& f);
 
 } // dependenciesMining

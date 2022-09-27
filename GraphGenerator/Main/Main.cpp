@@ -7,6 +7,7 @@
 #include "GraphToJson.h"
 #include "GraphGeneration.h"
 #include "FileSystem.h"
+#include "Messages.h"
 #include "json/writer.h"
 #include <iostream>
 #include <cstdlib>
@@ -20,6 +21,7 @@ using namespace graph;
 using namespace graphGeneration;
 using namespace graphToJson;
 using namespace gui;
+using namespace messages;
 
 using FilePaths = std::vector<std::string>;
 using FilePathIDs = std::vector<unsigned>;
@@ -43,14 +45,24 @@ namespace {
 	}
 
 	void PrintMiningResult(int res, std::ostream& os = std::cout) {
-		if (res == 0) 
+		switch (res)
+		{
+		case 0:
 			os << "\nCOMPILATION FINISHED\n";
-		else if (res == 1)
+			break;
+
+		case 1:
 			os << "\nCOMPILATION FAILED\n";
-		else if (res == 2) 
+			break;
+
+		case 2:
 			os << "\nCOMPILATION FINISHED (with skipped files)\n";
-		else
+			break;
+
+		default:
 			assert(false && "See: `int clang::tooling::ClangTool::run(clang::tooling::ToolAction *Action)`");
+			break;
+		}
 	}
 
 } // namespace
@@ -154,7 +166,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	std::cout << "\n-------------------------------------------------------------------------------------\n\n";
-	int miningRes;
+	int miningRes { -1 };
 
 #ifdef GUI
 	wxEntryStart(argc, argv);
@@ -165,32 +177,32 @@ int main(int argc, char* argv[]) {
 	const auto max = clangTool->getSourcePaths().size();
 #endif
 
-	wxGetApp().SetMax(max);
-	wxGetApp().SetOnCancel([&clangTool, outputPath]() {
-		ExportDependencies(*clangTool, structuresTable, outputPath);
+	GuiController::GetSingleton().GetGui().ConnectToCancel(&DisruptMining);
+	GuiController::GetSingleton().GetGui().OnInit();
 
-		std::exit(EXIT_SUCCESS);
-	});
-	
- 	wxTheApp->CallOnInit();
+	GuiController::GetSingleton().SetTotalUnits(max);
 
-	GuiController::GetSingleton().SetHeaderPred([](const auto* f) { return IsHeaderFile(f); });
-	GuiController::GetSingleton().SetIgnoredPred([](const auto* f) { return ignored["filePaths"]->isIgnored(f); } );
-
-	InstallClassDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
-	InstallFieldDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
-	InstallMethodDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
-	InstallMethodVarDeclObserver([](const auto& res, const auto& decl) { GuiController::GetSingleton().UpdateGui(res, decl); });
+	ConnectToEndSource([]() {
+		PostMessage([]() { 
+			GuiController::GetSingleton().AdvanceGuiProgress(); 
+			});
+		});
 
 #ifdef INCREMENTAL_GENERATION
 	if (parsedFiles.size() > 1)
-		wxGetApp().SkipFiles(parsedFiles.size() - 1, parsedFiles.back());
+		GuiController::GetSingleton().AdvanceGuiProgress(parsedFiles.size());
 #endif
 
-	miningRes = MineArchitecture(*clangTool); 
+	auto worker = std::thread([&miningRes, &clangTool](){ miningRes = MineArchitecture(*clangTool); });
 
-	wxGetApp().Finish();
+	do
+	{
+		PollMessage();
+		GuiController::GetSingleton().GetGui().Render();
+	} while (!GuiController::GetSingleton().IsGuiProgressDone() and !IsMiningDisrupted());
 
+	worker.join();
+	
 	PrintMiningResult(miningRes);
 
 	ExportDependencies(*clangTool, structuresTable, outputPath);

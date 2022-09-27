@@ -2,40 +2,55 @@
 
 #include <wx/wx.h>
 #include <wx/progdlg.h>
+#include <boost/signals2/signal.hpp>
+#include <memory>
+#include <string>
 
 namespace gui {
 
-class Gui : public wxApp {
-public:
-  using OnCancel = std::function<void()>;
+	class Gui : public wxApp {
+	private:
+		using CancelSignal = boost::signals2::signal< void() >;
 
-public:
-  bool OnInit() override;
-  int OnExit() override;
+	public:
+		using CancelSlot = CancelSignal::slot_type;
+		using Connection = boost::signals2::connection;
 
-  void Update();
-  void Update(const char* file);
-  void Finish();
+	public:
+		Gui() = default;
+		virtual ~Gui() override = default;
 
-  void SetMax(size_t _max) { m_max = _max; }
-  void SetOnCancel(const OnCancel& f) { m_on_cancel = f; }
+		unsigned GetProgress(void) const { return m_progress; } 
+		void SetProgress(unsigned curr) { m_progress = curr; }
 
-  void SkipFiles(size_t num, const std::string& currFile);
+		const std::string& GetCaption(void) const { return m_caption; }
+		void SetCaption(std::string caption) { m_caption = std::move(caption); }
 
-private:
-  void UpdateProgressBar();
-  void Cancel();
+		const std::string& GetTitle(void) const { return m_title; }
+		void SetTitle(std::string title) { m_title = std::move(title); }
 
-  size_t m_max = 0;
-  size_t m_curr = 0;
-  wxProgressDialog* m_dialog = nullptr;
-  wxFrame* m_frame = nullptr;
-  std::string m_max_str = "";
-  std::string m_current_file = "";
-  std::string m_progress_str = "";
+		bool OnInit(void) override;
+		int OnExit(void) override;
 
-  OnCancel m_on_cancel;
-};
+		void Render(void);
+
+		Connection ConnectToCancel(const CancelSlot& f) { return m_cancel_signal.connect(f); }
+
+	protected:
+		wxProgressDialog* GetDialog() const { return m_dialog.get(); }
+		wxFrame* GetFrame() const { return m_frame.get(); }
+
+		void EmitCancel(void) const { m_cancel_signal(); }
+
+	private:
+		unsigned m_progress { 0 };
+		std::string m_caption { "Parsed files: " }; 
+		std::string m_title { "Mining..." }; 
+		std::unique_ptr< wxProgressDialog > m_dialog;
+		std::unique_ptr< wxFrame > m_frame;
+
+		CancelSignal m_cancel_signal;
+	};
 
 }
 

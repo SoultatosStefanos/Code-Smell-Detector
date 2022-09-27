@@ -5,6 +5,7 @@
 #include "clang/Lex/PreprocessorOptions.h"
 #include <vector>
 #include <iostream>
+#include <atomic>
 
 #define CLASS_DECL "ClassDecl"
 #define STRUCT_DECL "StructDecl"
@@ -21,29 +22,6 @@ using namespace filesystem;
 SymbolTable structuresTable;
 Sources parsedFiles;
 IgnoreRegistry ignored;
-
-// ----------------------------------------------------------------------------------------------
-
-namespace {
-
-	using ClassDeclObservers = std::vector<ClassDeclObserver>;
-	using FieldDeclObservers = std::vector<FieldDeclObserver>;
-	using MethodDeclObservers = std::vector<MethodDeclObserver>;
-	using MethodVarDeclObservers = std::vector<MethodVarDeclObserver>;
-
-	ClassDeclObservers classCallbacks;
-	FieldDeclObservers fieldCallbacks;
-	MethodDeclObservers methodCallbacks;
-	MethodVarDeclObservers methodVarCallbacks;
-
-	template <typename Decl, typename Observers>
-	inline void NotifyObservers(const MatchFinder::MatchResult& res, const Decl& decl, const Observers& observers) {
-		for (const auto& f : observers)
-			f(res, decl);
-	}
-
-} // namespace
-
 
 // ----------------------------------------------------------------------------------------------
 
@@ -75,7 +53,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	}
 
 	assert(d);
-	NotifyObservers(result, *d, classCallbacks);
 
 	const auto structID = GetIDfromDecl(d);
 
@@ -268,6 +245,8 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // ----------------------------------------------------------------------------------------------
 // Hanlde all the Fields in classes/structs (non structure fields)
 void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
+	if (IsMiningDisrupted()) return;
+
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
@@ -294,8 +273,6 @@ void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult&
 void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		assert(d);
-
-		NotifyObservers(result, *d, fieldCallbacks);
 
 		const auto fieldID = GetIDfromDecl(d);
 
@@ -361,8 +338,6 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const CXXMethodDecl* d = result.Nodes.getNodeAs<CXXMethodDecl>(METHOD_DECL)) {
 		assert(d);
 		
-		NotifyObservers(result, *d, methodCallbacks);
-
 		const auto methodID = GetIDfromDecl(d);
 
 		const RecordDecl* parent = d->getParent();
@@ -644,8 +619,6 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 	if (const VarDecl* d = result.Nodes.getNodeAs<VarDecl>(METHOD_VAR_OR_ARG)) {
 		assert(d);
 
-		NotifyObservers(result, *d, methodVarCallbacks);
-
 		const auto* parentMethodDecl = d->getParentFunctionOrMethod();
 
 		// Ignore the methods declarations 
@@ -776,14 +749,34 @@ void SetIgnoredRegions(const char* filesPath, const char* namespacesPath) {
 	ignored["namespaces"] = std::make_unique<IgnoredNamespaces>(namespacesPath);
 }
 
+namespace {
+
+	BeginSourceSignal beginSrcSignal;
+	EndSourceSignal endSrcSignal;
+
+	class SourceFileTracker : public SourceFileCallbacks {
+	public:
+		SourceFileTracker() = default;
+		~SourceFileTracker() override = default;
+
+		bool handleBeginSource(CompilerInstance& compiler) override {
+			beginSrcSignal(compiler);
+			return IsMiningDisrupted() ? false : true; // false breaks the AST recursion.
+		}
+
+		void handleEndSource() override { endSrcSignal(); }
+	};
+
+} // namespace
+
 int MineArchitecture(ClangTool& tool) {
 	assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
 	assert(ignored.find("namespaces") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
 
-	static DeclarationMatcher ClassDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
-	static DeclarationMatcher FieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
-	static DeclarationMatcher MethodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
-	static DeclarationMatcher MethodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
+	static DeclarationMatcher classDeclMatcher = anyOf(cxxRecordDecl(isClass()).bind(CLASS_DECL), cxxRecordDecl(isStruct()).bind(STRUCT_DECL));
+	static DeclarationMatcher fieldDeclMatcher = fieldDecl().bind(FIELD_DECL);
+	static DeclarationMatcher methodDeclMatcher = cxxMethodDecl().bind(METHOD_DECL);
+	static DeclarationMatcher methodVarMatcher = varDecl().bind(METHOD_VAR_OR_ARG);
 
 	clang::CompilerInstance comp;
 	comp.getPreprocessorOpts().addMacroDef("_W32BIT_");
@@ -792,14 +785,15 @@ int MineArchitecture(ClangTool& tool) {
 	FeildDeclsCallback fieldCallback;
 	MethodDeclsCallback methodCallback;
 	MethodVarsCallback methodVarCallback;
-	MatchFinder Finder;
+	MatchFinder finder;
+	SourceFileTracker fileTracker;
 
-	Finder.addMatcher(ClassDeclMatcher, &classCallback);
-	Finder.addMatcher(FieldDeclMatcher, &fieldCallback);
-	Finder.addMatcher(MethodDeclMatcher, &methodCallback);
-	Finder.addMatcher(MethodVarMatcher, &methodVarCallback);
+	finder.addMatcher(classDeclMatcher, &classCallback);
+	finder.addMatcher(fieldDeclMatcher, &fieldCallback);
+	finder.addMatcher(methodDeclMatcher, &methodCallback);
+	finder.addMatcher(methodVarMatcher, &methodVarCallback);
 
-	return tool.run(newFrontendActionFactory(&Finder).get());
+  	return tool.run(newFrontendActionFactory(&finder, &fileTracker).get());
 }
 
 void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<std::string>& headers) {
@@ -829,21 +823,21 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 	}
 }
 
-void InstallClassDeclObserver(ClassDeclObserver f) {
-	classCallbacks.push_back(std::move(f));
+// ------------------------------------ //
+
+Connection ConnectToBeginSource(const BeginSourceSlot& f) {
+	return beginSrcSignal.connect(f);
 }
 
-void InstallFieldDeclObserver(FieldDeclObserver f) {
-	fieldCallbacks.push_back(std::move(f));
+Connection ConnectToEndSource(const EndSourceSlot& f) {
+	return endSrcSignal.connect(f);
 }
 
-void InstallMethodDeclObserver(MethodDeclObserver f) {
-	methodCallbacks.push_back(std::move(f));
-}
+static std::atomic_bool disrupted { false };
 
-void InstallMethodVarDeclObserver(MethodVarDeclObserver f) {
-	methodVarCallbacks.push_back(std::move(f));
-}
+bool IsMiningDisrupted(void) { return disrupted; }
+
+void DisruptMining(void) { disrupted = true; }
 
 
 } // dependenciesMining
