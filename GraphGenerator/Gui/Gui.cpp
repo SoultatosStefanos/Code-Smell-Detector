@@ -13,8 +13,10 @@ namespace gui {
 			100, 
 			GetFrame(),
 			wxPD_AUTO_HIDE | wxPD_APP_MODAL | wxPD_CAN_ABORT |
-			wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME
+			wxPD_ELAPSED_TIME | wxPD_ESTIMATED_TIME | wxPD_REMAINING_TIME | 
+			wxPD_SMOOTH
 			);
+		m_dialog->SetWindowStyleFlag(wxRESIZE_BORDER);
 
 		assert(GetFrame());
 		assert(GetDialog());

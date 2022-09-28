@@ -1,12 +1,12 @@
 #pragma once
 
 #include <cassert>
+#include <string_view>
 
 namespace gui {
 
 	class Gui;
 
-	// NOTE: Thread safe
 	class GuiController final {
 	public:
 		GuiController(const GuiController&) = delete;
@@ -26,14 +26,15 @@ namespace gui {
 		Gui& GetGui(void);
 
 		bool IsGuiProgressDone(void) const { return GetTotalUnits() == GetUnitsDone(); }
-		void AdvanceGuiProgress(unsigned units = 1); 
+		void AdvanceGuiProgress(unsigned units = 1);
+		void UpdateGuiCaption(std::string_view currFileName);
+		void AdvanceAndUpdateGui(std::string_view currFileName, unsigned units = 1);
 
 	private:
 		GuiController() = default;
 		~GuiController() = default;
 
 		void SetUnitsDone(unsigned units);
-		void UpdateGuiProgress(void);
 
 		unsigned m_total_units { 0 };
 		unsigned m_units_done { 0 };

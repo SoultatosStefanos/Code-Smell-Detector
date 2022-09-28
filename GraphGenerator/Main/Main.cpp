@@ -182,15 +182,14 @@ int main(int argc, char* argv[]) {
 
 	GuiController::GetSingleton().SetTotalUnits(max);
 
-	ConnectToEndSource([]() {
-		PostMessage([]() { 
-			GuiController::GetSingleton().AdvanceGuiProgress(); 
+	ConnectToBeginSource([](auto currFileName) {
+		PostMessage([currFileName]() { 
+			GuiController::GetSingleton().AdvanceAndUpdateGui(currFileName); 
 			});
 		});
 
 #ifdef INCREMENTAL_GENERATION
-	if (parsedFiles.size() > 1)
-		GuiController::GetSingleton().AdvanceGuiProgress(parsedFiles.size());
+	GuiController::GetSingleton().AdvanceGuiProgress(parsedFiles.size());
 #endif
 
 	auto worker = std::thread([&miningRes, &clangTool](){ miningRes = MineArchitecture(*clangTool); });

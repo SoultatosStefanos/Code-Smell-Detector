@@ -87,7 +87,7 @@ namespace dependenciesMining {
 	bool IsMiningDisrupted(void);
 	void DisruptMining(void);
 
-	using BeginSourceSignal = boost::signals2::signal< void(CompilerInstance&) >;
+	using BeginSourceSignal = boost::signals2::signal< void(std::string_view) >;
 	using EndSourceSignal = boost::signals2::signal< void() >;
 
 	using BeginSourceSlot = BeginSourceSignal::slot_type;

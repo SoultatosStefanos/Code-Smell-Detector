@@ -21,7 +21,18 @@ namespace gui {
 
 	void GuiController::AdvanceGuiProgress(unsigned units) {
 		SetUnitsDone(GetUnitsDone() + units);
-		UpdateGuiProgress();
+		const auto percentageDone = (GetUnitsDone() * 100) / GetTotalUnits();
+		GetGui().SetProgress(percentageDone);
+	}
+
+	void GuiController::UpdateGuiCaption(std::string_view currFileName) {
+		auto&& caption = std::string(currFileName) + '\t' + std::to_string(GetUnitsDone()) + "/" + std::to_string(GetTotalUnits());
+		GetGui().SetCaption(std::move(caption));
+	}
+
+	void GuiController::AdvanceAndUpdateGui(std::string_view currFileName, unsigned units) { 
+		AdvanceGuiProgress(units); 
+		UpdateGuiCaption(currFileName); 
 	}
 
 	void GuiController::SetUnitsDone(unsigned units) {
@@ -29,14 +40,6 @@ namespace gui {
 		assert(units <= GetTotalUnits());
 		m_units_done = units;
 		assert(GetTotalUnits() >= GetUnitsDone());
-	}
-
-	void GuiController::UpdateGuiProgress(void) {
-		const auto percentageDone = (GetUnitsDone() * 100) / GetTotalUnits();
-		auto&& caption = "Parsed files: " + std::to_string(GetUnitsDone()) + "/" + std::to_string(GetTotalUnits());
-		
-		GetGui().SetProgress(percentageDone);
-		GetGui().SetCaption(std::move(caption));
 	}
 
 }

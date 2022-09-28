@@ -23,6 +23,9 @@ SymbolTable structuresTable;
 Sources parsedFiles;
 IgnoreRegistry ignored;
 
+inline bool IsFilePathIgnored(const std::string& path) { return ignored["filePaths"]->isIgnored(path); }
+inline bool IsNamespaceIgnored(const std::string& name) { return ignored["namespaces"]->isIgnored(name); }
+
 // ----------------------------------------------------------------------------------------------
 
 // Handle all the Classes and Structs and the Bases
@@ -81,7 +84,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 	structure.SetSourceInfo(srcLocation.getFilename(), srcLocation.getLine(), srcLocation.getColumn());
-	if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+	if (IsFilePathIgnored(srcLocation.getFilename())) {
 		return;
 	}
 
@@ -91,7 +94,7 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 	// Namespace
 	std::string fullEnclosingNamespace = GetFullNamespaceName(d);
-	if (ignored["namespaces"]->isIgnored(fullEnclosingNamespace)) {
+	if (IsNamespaceIgnored(fullEnclosingNamespace)) {
 		return;
 	}
 	structure.SetNamespace(fullEnclosingNamespace);
@@ -282,11 +285,11 @@ void FeildDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		// Ignored
-		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+		if (IsFilePathIgnored(srcLocation.getFilename())) {
 			return;
 		}
 
-		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
+		if (IsNamespaceIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
 
@@ -348,10 +351,10 @@ void MethodDeclsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 		// Ignored
-		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+		if (IsFilePathIgnored(srcLocation.getFilename())) {
 			return;
 		}
-		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parent))) {
+		if (IsNamespaceIgnored(GetFullNamespaceName(parent))) {
 			return;
 		}
 
@@ -639,10 +642,10 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 		const auto srcLocation = result.SourceManager->getPresumedLoc(d->getLocation());
 
-		if (ignored["filePaths"]->isIgnored(srcLocation.getFilename())) {
+		if (IsFilePathIgnored(srcLocation.getFilename())) {
 			return;
 		}
-		if (ignored["namespaces"]->isIgnored(GetFullNamespaceName(parentClass))) {
+		if (IsNamespaceIgnored(GetFullNamespaceName(parentClass))) {
 			return;
 		}
 
@@ -695,29 +698,14 @@ void MethodVarsCallback::run(const MatchFinder::MatchResult& result) {
 
 // ----------------------------------------------------------------------------------------------
 
-namespace {
-
-	Sources DropIgnoredFiles(const Sources& srcs) {
-		assert(ignored.find("filePaths") != std::end(ignored) && "Make a call to SetIgnoredRegions()");
-
-		Sources res;
-		std::copy_if(std::begin(srcs), std::end(srcs), std::back_inserter(res), [](const auto& file) {
-			return !ignored["filePaths"]->isIgnored(file);
-		});
-
-		return res;
-	}
-
-} // namespace
-
 std::unique_ptr<ClangTool> CreateClangTool(const char* cmpDBPath, std::string& errorMsg) {
 	assert(cmpDBPath);
 	static auto database = CompilationDatabase::autoDetectFromSource(cmpDBPath, errorMsg);
 
 #ifdef INCREMENTAL_GENERATION
-	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(DropParsedFiles(database->getAllFiles(), parsedFiles))) : nullptr;
+	return database ? std::make_unique<ClangTool>(*database, DropParsedFiles(database->getAllFiles(), parsedFiles)) : nullptr;
 #else
-	return database ? std::make_unique<ClangTool>(*database, DropIgnoredFiles(database->getAllFiles())) : nullptr;
+	return database ? std::make_unique<ClangTool>(*database, database->getAllFiles()) : nullptr;
 #endif
 }
 
@@ -736,9 +724,9 @@ std::unique_ptr<ClangTool> CreateClangTool(const std::vector<std::string>& srcs)
 	static auto parser = CommonOptionsParser::create(argc, argv, myToolCategory);
 
 #ifdef INCREMENTAL_GENERATION
-	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(DropParsedFiles(srcs, parsedFiles))) : nullptr;
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropParsedFiles(srcs, parsedFiles)) : nullptr;
 #else
-	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), DropIgnoredFiles(srcs)) : nullptr;
+	return parser ? std::make_unique<ClangTool>(parser->getCompilations(), srcs) : nullptr;
 #endif
 }
 
@@ -752,13 +740,23 @@ namespace {
 	BeginSourceSignal beginSrcSignal;
 	EndSourceSignal endSrcSignal;
 
+	inline std::string_view GetCurrentFileName(const CompilerInstance& compiler) {
+		auto parsed = SmallVector< const FileEntry* >();
+		compiler.getSourceManager().getFileManager().GetUniqueIDMapping(parsed);
+		assert(!parsed.empty());
+		return parsed.back()->getName().data();
+	}
+
 	class SourceFileTracker : public SourceFileCallbacks {
 	public:
 		SourceFileTracker() = default;
 		~SourceFileTracker() override = default;
 
 		bool handleBeginSource(CompilerInstance& compiler) override {
-			beginSrcSignal(compiler);
+			const auto currentFileName = GetCurrentFileName(compiler);
+			if (!IsFilePathIgnored(std::string(currentFileName))) 
+				beginSrcSignal(currentFileName);
+
 			return IsMiningDisrupted() ? false : true; // false breaks the AST recursion.
 		}
 
@@ -809,7 +807,7 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 	for (auto* file : files) {
 		const auto path =  file->getName().str();
 
-		if (ignored["filePaths"]->isIgnored(path))
+		if (IsFilePathIgnored(path))
 			continue;
 
 		if (IsHeaderFile(path)) {
