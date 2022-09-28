@@ -743,7 +743,7 @@ namespace {
 
 	auto skippedFiles = std::unordered_set< std::string_view >();
 
-	inline void SkipFile(std::string_view fileName) { skippedFiles.insert(fileName); }
+	inline void MarkFileAsSkipped(std::string_view fileName) { skippedFiles.insert(fileName); }
 
 	inline bool WasFileSkipped(std::string_view fileName) { return skippedFiles.find(fileName) != std::cend(skippedFiles); }
 
@@ -772,7 +772,7 @@ namespace {
 			const auto currentFileName = GetCurrentFileName(compiler);
 
 			if (!IsFilePathIgnored(std::string(currentFileName))) beginSrcSignal(currentFileName);
-			if (IsMiningDisrupted()) SkipFile(currentFileName);
+			if (IsMiningDisrupted()) MarkFileAsSkipped(currentFileName);
 
 			return IsMiningDisrupted() ? false : true; // false breaks the AST recursion.
 		}
