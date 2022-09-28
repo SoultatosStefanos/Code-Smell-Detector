@@ -4,6 +4,7 @@
 #include "clang/Frontend/CompilerInstance.h"
 #include "clang/Lex/PreprocessorOptions.h"
 #include <vector>
+#include <unordered_set>
 #include <iostream>
 #include <atomic>
 
@@ -735,6 +736,21 @@ void SetIgnoredRegions(const char* filesPath, const char* namespacesPath) {
 	ignored["namespaces"] = std::make_unique<IgnoredNamespaces>(namespacesPath);
 }
 
+// NOTE:
+// We use this anonymous namespace in order to mark source files that were bypassed in the AST due to disruptions from the GUI.
+// These files must not be exported, since their contents have not been loaded into the native symbol table.
+namespace {
+
+	auto skippedFiles = std::unordered_set< std::string_view >();
+
+	inline void SkipFile(std::string_view fileName) { skippedFiles.insert(fileName); }
+
+	inline bool WasFileSkipped(std::string_view fileName) { return skippedFiles.find(fileName) != std::cend(skippedFiles); }
+
+} // namespace
+
+// NOTE:
+// Usage of a clang::tooling::SourceFileCallbacks derivative, in order to signal the parsing of source files.
 namespace {
 
 	BeginSourceSignal beginSrcSignal;
@@ -754,8 +770,9 @@ namespace {
 
 		bool handleBeginSource(CompilerInstance& compiler) override {
 			const auto currentFileName = GetCurrentFileName(compiler);
-			if (!IsFilePathIgnored(std::string(currentFileName))) 
-				beginSrcSignal(currentFileName);
+
+			if (!IsFilePathIgnored(std::string(currentFileName))) beginSrcSignal(currentFileName);
+			if (IsMiningDisrupted()) SkipFile(currentFileName);
 
 			return IsMiningDisrupted() ? false : true; // false breaks the AST recursion.
 		}
@@ -813,7 +830,7 @@ void GetMinedFiles(ClangTool& tool, std::vector<std::string>& srcs, std::vector<
 		if (IsHeaderFile(path)) {
 			headers.push_back(path);
 		}
-		else if (IsSourceFile(path)) {
+		else if (IsSourceFile(path) && !WasFileSkipped(path)) {
 			srcs.push_back(path);
 		}
 	}
