@@ -245,8 +245,6 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 // ----------------------------------------------------------------------------------------------
 // Hanlde all the Fields in classes/structs (non structure fields)
 void FeildDeclsCallback::installFundamentalField(const MatchFinder::MatchResult& result) {
-	if (IsMiningDisrupted()) return;
-
 	if (const FieldDecl* d = result.Nodes.getNodeAs<FieldDecl>(FIELD_DECL)) {
 		const auto fieldID = GetIDfromDecl(d);
 
