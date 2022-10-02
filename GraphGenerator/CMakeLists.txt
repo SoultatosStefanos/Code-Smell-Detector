@@ -25,6 +25,13 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC GUI=1)
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
 
+# Try to guess the clang include paths (linux)
+set(CLANG_INCLUDE_DIR "/usr/lib/llvm-15/lib/clang/15.0.2/include")
+
+message(STATUS "CLANG_INCLUDE_DIR: " ${CLANG_INCLUDE_DIR})
+
+add_definitions(-DCLANG_INCLUDE_DIR="${CLANG_INCLUDE_DIR}")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS} ${wxWidgets_LIBRARIES})
 
 set(SUBDIRECTORIES

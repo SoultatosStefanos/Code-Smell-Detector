@@ -113,21 +113,22 @@ void ClassDeclsCallback::run(const MatchFinder::MatchResult& result) {
 		std::string parentName;
 		ID_T parentID;
 
-		Structure* templateParent;
+		Structure* templateParent{ nullptr };
 		if (structure.IsTemplateInstantiationSpecialization()) {								// template Instantiation Specialization
 			auto* parent = d->getTemplateInstantiationPattern();
 			parentID = GetIDfromDecl(parent);
 			parentName = GetFullStructureName(parent);
 			templateParent = (Structure*)structuresTable.Lookup(parentID);
 		}
-		else {																					// template Full and Parsial Specialization
+		else {																					// template Full and Partial Specialization
 			parentName = d->getQualifiedNameAsString();
+			parentID = GetIDfromDecl(d);
 			templateParent = (Structure*)structuresTable.Lookup(parentName);
-			assert(templateParent);
-			parentID = templateParent->GetID();
 		}
+
 		if (!templateParent)
 			templateParent = (Structure*)structuresTable.Install(parentID, parentName);
+
 		structure.SetTemplateParent(templateParent);
 
 		//Template Arguments		
@@ -805,6 +806,14 @@ int MineArchitecture(ClangTool& tool) {
 	finder.addMatcher(fieldDeclMatcher, &fieldCallback);
 	finder.addMatcher(methodDeclMatcher, &methodCallback);
 	finder.addMatcher(methodVarMatcher, &methodVarCallback);
+
+// NOTE: Need to add clang include directory as argument, else system headers won't be found, and the st will be incomplete on unix systems.
+#ifdef __unix__
+	static const auto clang_dir = "-I" + std::string(CLANG_INCLUDE_DIR);
+
+	auto ardj1 = getInsertArgumentAdjuster(clang_dir.c_str());	
+	tool.appendArgumentsAdjuster(ardj1);
+#endif
 
   	return tool.run(newFrontendActionFactory(&finder, &fileTracker).get());
 }
