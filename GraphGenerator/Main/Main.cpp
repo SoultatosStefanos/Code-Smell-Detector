@@ -171,6 +171,8 @@ int main(int argc, char* argv[]) {
 #ifdef GUI
 	wxEntryStart(argc, argv);
 
+// NOTE: Might need to set max from clang::tooling::CompilationDatabase::getAllCompileCommands().size().
+// FIXME?
 #ifdef INCREMENTAL_GENERATION
 	const auto max = clangTool->getSourcePaths().size() + (parsedFiles.empty() ? 0 : parsedFiles.size() - 1);
 #else
