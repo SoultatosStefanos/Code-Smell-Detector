@@ -19,18 +19,21 @@ add_library(${PROJECT_NAME})
 
 add_definitions("-fno-rtti -D_GNU_SOURCE -D_DEBUG -D__STDC_CONSTANT_MACROS -D__STDC_FORMAT_MACROS -D__STDC_LIMIT_MACROS")
 
-target_compile_definitions(${PROJECT_NAME} PUBLIC INCREMENTAL_GENERATION=1)
-target_compile_definitions(${PROJECT_NAME} PUBLIC GUI=1)
-
 set(CLANG_LIBS libclang-cpp.so)
 set(JSONCPP_LIBS libjsoncpp.so)
 
 # Try to guess the clang include paths (linux)
-set(CLANG_INCLUDE_DIR "/usr/lib/llvm-15/lib/clang/15.0.2/include")
+set(CLANG_INCLUDE_DIR "/usr/lib/llvm-15/lib/clang/15.0.2/include" CACHE STRING "The directory path to the .h files for clang.")
+set(INCREMENTAL_GENERATION TRUE CACHE BOOL "Wether to mine incrementally after cancel and re-run.")
+set(GUI TRUE CACHE BOOL "Wether to render the gui progress bar.")
 
-message(STATUS "CLANG_INCLUDE_DIR: " ${CLANG_INCLUDE_DIR})
+message("CLANG_INCLUDE_DIR: " ${CLANG_INCLUDE_DIR})
+message("INCREMENTAL_GENERATION: " ${INCREMENTAL_GENERATION})
+message("GUI: " ${GUI})
 
 add_definitions(-DCLANG_INCLUDE_DIR="${CLANG_INCLUDE_DIR}")
+target_compile_definitions(${PROJECT_NAME} PUBLIC INCREMENTAL_GENERATION=${INCREMENTAL_GENERATION})
+target_compile_definitions(${PROJECT_NAME} PUBLIC GUI=${GUI})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${CLANG_LIBS} ${JSONCPP_LIBS} ${wxWidgets_LIBRARIES})
 
